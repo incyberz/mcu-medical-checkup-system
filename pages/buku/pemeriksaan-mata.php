@@ -20,17 +20,17 @@ $visus_mata_kanan =  input('visus_mata_kanan', '', 'Visus Mata Kanan', 1, 'numbe
 $mata_kanan =  radio_tf('Reflek Cahaya', 'feklek_cahaya_kanan', '', '', '', 'Positif', 'Negatif');
 $mata_kanan .=  radio_tf('Konjungtiva', 'konjungtiva_kanan', '', '', '', 'Anemis', 'An Anemis');
 
-$bm_kanan = radio('bola_mata_kanan', 'bmk1', 1, 'Normal');
-$bm_kanan .= radio('bola_mata_kanan', 'bmk2', 2, 'Strabismus');
-$bm_kanan .= radio('bola_mata_kanan', 'bmk3', 3, 'Lainnya');
+$bm_kanan = radio('bola_mata_kanan', 'bm_kanan1', 1, 'Normal');
+$bm_kanan .= radio('bola_mata_kanan', 'bm_kanan2', 2, 'Strabismus');
+$bm_kanan .= radio('bola_mata_kanan', 'bm_kanan3', 3, 'Lainnya');
 
 $visus_mata_kiri =  input('visus_mata_kiri', '', 'Visus Mata Kiri', 1, 'number', 1, 20);
 $mata_kiri =  radio_tf('Reflek Cahaya', 'feklek_cahaya_kiri', '', '', '', 'Positif', 'Negatif');
 $mata_kiri .=  radio_tf('Konjungtiva', 'konjungtiva_kiri', '', '', '', 'Anemis', 'An Anemis');
 
-$bm_kiri = radio('bola_mata_kiri', 'bmk1', 1, 'Normal');
-$bm_kiri .= radio('bola_mata_kiri', 'bmk2', 2, 'Strabismus');
-$bm_kiri .= radio('bola_mata_kiri', 'bmk3', 3, 'Lainnya');
+$bm_kiri = radio('bola_mata_kiri', 'bm_kiri1', 1, 'Normal');
+$bm_kiri .= radio('bola_mata_kiri', 'bm_kiri2', 2, 'Strabismus');
+$bm_kiri .= radio('bola_mata_kiri', 'bm_kiri3', 3, 'Lainnya');
 
 $pupil_kanan = '';
 for ($i = 1; $i <= 8; $i++) {

@@ -5,13 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MEDICAL RECORD MMC - CLINIC | KLIKNIK MUTIARA 1</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <!-- <link rel="stylesheet" href="css/insho-styles.css" /> -->
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/radio-toolbar.css" />
-  <?php include '../insho_styles.php'; ?>
+  <link rel="stylesheet" href="../../css/bootstrap.min.css" />
+  <!-- <link rel="stylesheet" href="../../css/insho-styles.css" /> -->
+  <link rel="stylesheet" href="../../css/buku.css" />
+  <link rel="stylesheet" href="../../css/radio-toolbar.css" />
 
-  <script src="js/jquery.min.js"></script>
+  <script src="../../js/jquery.min.js"></script>
   <style>
     h2 {
       text-align: center;
@@ -24,11 +23,12 @@
   </style>
 </head>
 <?php
-include 'include/mcu_functions.php';
-include 'include/insho_functions.php';
-include 'include/date_managements.php';
-include 'include/img_icon.php';
-include 'user_var.php';
+include 'book_var.php';
+include '../../../insho_styles.php';
+include '../../include/mcu_functions.php';
+include '../../include/insho_functions.php';
+include '../../include/date_managements.php';
+include '../../include/img_icon.php';
 ?>
 
 <body>
@@ -44,60 +44,60 @@ include 'user_var.php';
       # NAMA PERUSAHAAN DAN BIODATA KARYAWAN
       # =======================================================
       echo '</section><section>';
-      include 'pages/nomor-mcu.php';
+      include 'nomor-mcu.php';
       echo '</section><section>';
-      include 'pages/perusahaan.php';
+      include 'perusahaan.php';
       echo '</section><section>';
-      include 'pages/biodata.php';
+      include 'biodata.php';
 
       # ===================================================
       # RIWAYAT PENYAKIT
       # ===================================================
       echo '</section><section>';
-      include 'pages/riwayat-penyakit.php';
+      include 'riwayat-penyakit.php';
       echo '</section><section>';
-      include 'pages/riwayat-pengobatan.php';
+      include 'riwayat-pengobatan.php';
       echo '</section><section>';
-      include 'pages/riwayat-penyakit-keluarga.php';
+      include 'riwayat-penyakit-keluarga.php';
       echo '</section><section>';
-      include 'pages/pola-hidup.php';
+      include 'pola-hidup.php';
       echo '</section><section>';
-      include 'pages/gejala-penyakit.php';
+      include 'gejala-penyakit.php';
 
       # ===================================================
       # KELUHAN SEKARANG
       # ===================================================
       echo '</section><section>';
-      include 'pages/keluhan-sekarang.php';
+      include 'keluhan-sekarang.php';
 
       # ===================================================
       # PEMERIKSAAN FISIK AWAL
       # ===================================================
       echo '</section><section>';
-      include 'pages/pemeriksaan-fisik-awal.php';
+      include 'pemeriksaan-fisik-awal.php';
 
       # ===================================================
       # PEMERIKSAAN MATA
       # ===================================================
       echo '</section><section>';
-      include 'pages/pemeriksaan-mata.php';
+      include 'pemeriksaan-mata.php';
 
       # ===================================================
       # PEMERIKSAAN GIGI
       # ===================================================
       echo '</section><section>';
-      include 'pages/pemeriksaan-gigi.php';
+      include 'pemeriksaan-gigi.php';
 
       # ===================================================
       # PEMERIKSAAN FISIK
       # ===================================================
       echo '</section><section>';
-      include 'pages/pemeriksaan-fisik.php';
+      include 'pemeriksaan-fisik.php';
 
       ?>
     </section>
   </div>
 </body>
-<script src="js/main.js"></script>
+<script src="../../js/buku.js"></script>
 
 </html>
