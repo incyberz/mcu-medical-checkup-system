@@ -5,12 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MEDICAL RECORD MMC - CLINIC | KLIKNIK MUTIARA 1</title>
-  <link rel="stylesheet" href="../../css/bootstrap.min.css" />
-  <!-- <link rel="stylesheet" href="../../css/insho-styles.css" /> -->
-  <link rel="stylesheet" href="../../css/buku.css" />
-  <link rel="stylesheet" href="../../css/radio-toolbar.css" />
+  <link rel="stylesheet" href="../../assets/css/bootstrap.min.css" />
+  <!-- <link rel="stylesheet" href="../../assets/css/insho-styles.css" /> -->
+  <link rel="stylesheet" href="../../assets/css/buku.css" />
+  <link rel="stylesheet" href="../../assets/css/radio-toolbar.css" />
 
-  <script src="../../js/jquery.min.js"></script>
+  <script src="../../assets/js/jquery.min.js"></script>
   <style>
     h2 {
       text-align: center;
@@ -32,9 +32,9 @@ include '../../include/img_icon.php';
 ?>
 
 <body>
-  <div style="position:fixed; top:500px; right:10px">
+  <!-- <div style="position:fixed; top:500px; right:10px">
     <button class="btn btn-success f30" onclick="location.reload()" style="padding: 5px 15px">REFRESH</button>
-  </div>
+  </div> -->
   <div class="container">
     <section>
       <?php
@@ -98,6 +98,6 @@ include '../../include/img_icon.php';
     </section>
   </div>
 </body>
-<script src="../../js/buku.js"></script>
+<script src="../../assets/js/buku.js"></script>
 
 </html>

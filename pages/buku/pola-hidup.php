@@ -2,8 +2,8 @@
 echo "<h2>POLA HIDUP</h2>";
 function ilustrasi($nama, $w = 180, $h = 'auto')
 {
-  $me = "../../img/ilustrasi/$nama.jpeg";
-  $na = "../../img/img_na.jpg";
+  $me = "../../assets/img/ilustrasi/$nama.jpeg";
+  $na = "../../assets/img/img_na.jpg";
   $width =  $w . 'px';
   $height = $h == 'auto' ? '' : $h . 'px';
   if (file_exists($me)) {
