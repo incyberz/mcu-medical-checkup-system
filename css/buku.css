@@ -1,9 +1,0 @@
-section{
-  padding: 60px 15px;
-  margin: 0 -15px;
-}
-section:nth-child(odd){background: #eee;}
-h1{color: blueviolet;}
-h2{color: darkgreen;}
-
-/* .section_name */
