@@ -7,6 +7,7 @@ $arr = [
   'login' => 'pages/login/login',
 ];
 
+if ($parameter) echo '<section><div class=container>';
 if (array_key_exists($parameter, $arr)) {
   // tujuan in array
   $tujuan = $arr[$parameter] . '.php';
@@ -23,3 +24,4 @@ if (array_key_exists($parameter, $arr)) {
     include 'pages/na.php';
   }
 }
+if ($parameter) echo '</div></section>';

@@ -7,7 +7,7 @@
         <div class="count-box">
           <i class="fas fa-user-md"></i>
           <span data-purecounter-start="0" data-purecounter-end="17" data-purecounter-duration="1" class="purecounter"></span>
-          <p>Docter Professional</p>
+          <p>Dokter dan Tim</p>
         </div>
       </div>
 
@@ -15,7 +15,7 @@
         <div class="count-box">
           <i class="far fa-hospital"></i>
           <span data-purecounter-start="0" data-purecounter-end="34" data-purecounter-duration="1" class="purecounter"></span>
-          <p>Layanan Pemeriksaan</p>
+          <p>Paket Layanan Pemeriksaan</p>
         </div>
       </div>
 

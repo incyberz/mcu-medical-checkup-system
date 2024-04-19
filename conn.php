@@ -9,19 +9,19 @@ if ($online_version) {
   $db_server = "localhost";
   $db_user = "pesc7881_insho";
   $db_pass = "hq'qC3D}+Hzj@TT";
-  $db_name = "pesc7881_wms";
+  $db_name = "pesc7881_mcu";
 
   $db_user = "iotikain_insho";
   $db_pass = "hq'qC3D}+Hzj@TT";
-  $db_name = "iotikain_wms";
+  $db_name = "iotikain_mcu";
 } else {
   $db_server = "localhost";
   $db_user = "root";
   $db_pass = '';
-  $db_name = "db_wms";
+  $db_name = "db_mcu";
   // if (1) {
   //   $dm_db = 1;
-  //   $db_name = "db_online_wms";
+  //   $db_name = "db_online_mcu";
   // }
 }
 

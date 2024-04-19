@@ -1,5 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
 <?php
 session_start();
+date_default_timezone_set("Asia/Jakarta");
 # ================================================
 # PHP INDEX
 # ================================================
@@ -10,7 +13,6 @@ $null = '<span class="kecil miring red consolas">null</span>';
 $null_gray = '<span class="f12 miring abu consolas">null</span>';
 $hideit = 'hideit';
 $today = date('Y-m-d');
-
 
 // set auto login
 // $_SESSION['mcu_username'] = 'wh';
@@ -39,6 +41,11 @@ if (isset($_SESSION['mcu_username'])) {
   $username = $_SESSION['mcu_username'];
 }
 
+
+# ================================================
+# DATA PAGES AT
+# ================================================
+include 'data_pages.php';
 
 
 # ================================================
@@ -80,15 +87,15 @@ if ($parameter == 'logout') {
   include 'pages/login/logout.php';
   exit;
 }
+
+$back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> Back</a>";
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Mutiara MCU Information System</title>
+  <title>Mutiara Medical Center</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -113,32 +120,148 @@ if ($parameter == 'logout') {
   <link href="assets/css/style.css" rel="stylesheet">
 
   <!-- =======================================================
-  * Template Name: medilab
+  * Template Name: Medilab
   * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
   * Updated: Mar 17 2024 with Bootstrap v5.3.3
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+  <?php include "../insho_styles.php"; ?>
+  <style>
+    <?php if ($dm) {
+      echo '.debug{display:inline; background:yellow; color: blue}';
+    } else {
+      echo '.debug{display:none;}';
+    }
+    ?>@media (max-width: 500px) {
+      .desktop-only {
+        display: none;
+      }
+    }
+
+    section {
+      padding-top: 140px;
+      padding-bottom: 15px;
+      /* min-height: 100vh; bahaya untuk section count */
+    }
+
+    #footer .footer-top {
+      padding: 0;
+    }
+  </style>
 </head>
+
+<style>
+  .produk .icon-box {
+    text-align: center;
+    border: 1px solid #d5e1ed;
+    padding: 80px 20px;
+    transition: all ease-in-out 0.3s;
+  }
+
+  .produk .icon-box .icon {
+    margin: 0 auto;
+    width: 64px;
+    height: 64px;
+    background: #1977cc;
+    border-radius: 5px;
+    transition: all 0.3s ease-out 0s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    transform-style: preserve-3d;
+    position: relative;
+    z-index: 2;
+  }
+
+  .produk .icon-box .icon i {
+    color: #fff;
+    font-size: 28px;
+    transition: ease-in-out 0.3s;
+  }
+
+  .produk .icon-box .icon::before {
+    position: absolute;
+    content: "";
+    left: -8px;
+    top: -8px;
+    height: 100%;
+    width: 100%;
+    background: rgba(25, 119, 204, 0.2);
+    border-radius: 5px;
+    transition: all 0.3s ease-out 0s;
+    transform: translateZ(-1px);
+    z-index: -1;
+  }
+
+  .produk .icon-box h4 {
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 24px;
+  }
+
+  .produk .icon-box h4 a {
+    color: #2c4964;
+  }
+
+  .produk .icon-box p {
+    line-height: 24px;
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+
+  .produk .icon-box:hover {
+    background: #1977cc;
+    border-color: #1977cc;
+  }
+
+  .produk .icon-box:hover .icon {
+    background: #fff;
+  }
+
+  .produk .icon-box:hover .icon i {
+    color: #1977cc;
+  }
+
+  .produk .icon-box:hover .icon::before {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .produk .icon-box:hover h4 a,
+  .produk .icon-box:hover p {
+    color: #fff;
+  }
+
+  /* my styles */
+  .img-mcu {
+    width: 280px;
+    height: 200px;
+    object-fit: cover;
+    margin: 0 0 15px 0;
+    transition: .2s;
+    border-radius: 10px;
+  }
+
+  .img-mcu:hover {
+    transform: scale(1.1);
+  }
+
+  .shout {
+    color: #33a;
+    font-weight: bold;
+    font-size: 24px;
+    font-family: consolas;
+  }
+
+  .produk .icon-box:hover .shout {
+    color: #ff0;
+  }
+</style>
 
 <body>
 
-  <!-- ======= Top Bar ======= -->
-  <div id="topbar" class="d-flex align-items-center fixed-top">
-    <div class="container d-flex justify-content-between">
-      <div class="contact-info d-flex align-items-center">
-        <i class="bi bi-envelope"></i> <a href="mailto:mmcpjk3@gmail.com">mmcpjk3@gmail.com</a>
-        <i class="bi bi-phone"></i> 021-8909 5776
-      </div>
-      <div class="d-none d-lg-flex social-links align-items-center">
-        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
-      </div>
-    </div>
-  </div>
-
+  <?php include 'pages/topbar.php'; ?>
   <?php include 'pages/header.php'; ?>
   <?php if (!$parameter) include 'pages/hero.php'; ?>
 
@@ -160,6 +283,7 @@ if ($parameter == 'logout') {
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
@@ -168,6 +292,4 @@ if ($parameter == 'logout') {
 
 </html>
 
-<!-- Tambun Business Park Blok C12 Tambun Selatan
-Kab Bekasi 17510 Jawa Barat Indonesia 
-Telp 021-8909 5776 email: mmcpjk3@gmail.com  -->
+<?php include 'include/js_btn_aksi.php'; ?>
