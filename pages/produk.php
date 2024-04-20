@@ -13,7 +13,7 @@
       $arr = [
         [
           'Program MCU',
-          'Harga mulai dari Rp70.000 dengan Paket Lengkap untuk prasyarat ketenagakerjaan. Biaya bersifat negotiable!',
+          'Biaya mulai dari Rp70.000 dengan Paket Lengkap untuk prasyarat ketenagakerjaan. Biaya bersifat negotiable!',
           'mcu-corporate.jpg',
           '?program-mcu',
           ''

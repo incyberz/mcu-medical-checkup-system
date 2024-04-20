@@ -7,6 +7,7 @@ date_default_timezone_set("Asia/Jakarta");
 # PHP INDEX
 # ================================================
 $dm = 0;
+$id_klinik = 1; //klinik MMC
 $debug = '';
 $unset = '<span class="kecil miring red consolas">unset</span>';
 $null = '<span class="kecil miring red consolas">null</span>';
@@ -30,7 +31,7 @@ $today = date('Y-m-d');
 $id_user = '';
 $is_login = 0;
 $id_role = 0; // pengunjung
-$sebagai = 'Pengunjung';
+$role = 'Pengunjung';
 $username = '';
 $nama_user = '';
 $email = '';
@@ -64,11 +65,7 @@ include 'data_user.php';
 # INCLUDES
 # ================================================
 include 'include/insho_functions.php';
-include 'include/wms_functions.php';
-include 'include/data_perusahaan.php';
 include 'include/crud_icons.php';
-include 'include/arr_master.php';
-include 'include/arr_sheet.php';
 
 
 # ================================================
@@ -118,6 +115,7 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
 
   <!-- =======================================================
   * Template Name: Medilab
@@ -283,7 +281,6 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/vendor/jquery/jquery.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
@@ -293,3 +290,8 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
 </html>
 
 <?php include 'include/js_btn_aksi.php'; ?>
+<script>
+  function onDev() {
+    alert('Fitur ini masih dalam tahap pengembangan. Terimakasih sudah mencoba!');
+  }
+</script>

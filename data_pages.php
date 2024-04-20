@@ -41,7 +41,7 @@ $button_href = "#produk";
 
 //why us
 $mengapa_kami = "Mengapa Pilih $nama_sistem?";
-$mengapa_kami_desc = "Target utama kami adalah <i>Corporate</i>, <i>basic-price</i> fully negotiable</i>. Kami memberikan harga yang sangat terjangkau dan kompetitif dengan kualitas layanan yang profesional. Peralatan lengkap, onsite ke perusahaan, dokter yang berpengalaman, dan sistem informasi medis online realtime menjadikan kami sebagai pilihan terbaik untuk kebutuhan Pelayanan Kesehatan Anda.";
+$mengapa_kami_desc = "Target utama kami adalah <i>Corporate</i>, <i>basic-price</i> fully negotiable</i>. Kami memberikan biaya yang sangat terjangkau dan kompetitif dengan kualitas layanan yang profesional. Peralatan lengkap, onsite ke perusahaan, dokter yang berpengalaman, dan sistem informasi medis online realtime menjadikan kami sebagai pilihan terbaik untuk kebutuhan Pelayanan Kesehatan Anda.";
 $keunggulan = [
   'High Security Data Rekam Medis' =>
   [
@@ -57,7 +57,7 @@ $keunggulan = [
   ],
   'Biaya Sangat Terjangkau' =>
   [
-    'desc' => 'Basic Price dari kami adalah the best price bagi Corporate/Lembaga Anda. Untuk harga bersifat negotiable sesuai Jumlah Peserta MCU dan lokasi perusahaan Anda! Silahkan Anda hubungi Marketing kami dan buktikan!',
+    'desc' => 'Basic Price dari kami adalah the best price bagi Corporate/Lembaga Anda. Untuk biaya bersifat negotiable sesuai Jumlah Peserta MCU dan lokasi perusahaan Anda! Silahkan Anda hubungi Marketing kami dan buktikan!',
     'icon' => 'dollar-circle',
     'image' => 'high-security'
   ],

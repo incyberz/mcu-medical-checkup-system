@@ -11,9 +11,9 @@
     $mcu_programs = [
       [
         'title' => 'MCU Corporate',
-        'desc' => 'Harga mulai dari <span class="f22">Rp70.000</span> dengan Paket Lengkap untuk prasyarat ketenagakerjaan. Biaya bersifat negotiable! Cocok bagi Anda sebagai HRD atau Pimpinan Perusahaan.',
+        'desc' => 'Biaya mulai dari <span class="f22">Rp70.000</span> dengan Paket Lengkap untuk prasyarat ketenagakerjaan. Biaya bersifat negotiable! Cocok bagi Anda sebagai HRD atau Pimpinan Perusahaan.',
         'image' => 'mcu-corporate.jpg',
-        'src' => '?mcu-corporate',
+        'src' => '?mcu-detail&id_jenis=1',
         'caption' => 'Pilih Paket Corporate',
         'shout' => ''
       ],
@@ -21,7 +21,7 @@
         'title' => 'MCU Mandiri',
         'desc' => 'Semisal Cek Gula Darah, Cek Darah Lengkap, Cek Urine dan lain sebagainya. Cocok bagi Anda yang ingin mengetahui gejala penyakit secara akurat atau ingin mengecek kondisi kesehatan tubuh secara rutin.',
         'image' => 'mcu-mandiri.avif',
-        'src' => '?mcu-mandiri',
+        'src' => '?mcu-detail&id_jenis=2',
         'caption' => 'Pilih Paket Mandiri',
         'shout' => ''
       ],
