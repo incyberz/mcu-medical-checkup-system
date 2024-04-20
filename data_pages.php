@@ -23,7 +23,7 @@ if ($jam >= 9) {
 
 
 $text_wa = "Selamat $waktu Customer Service $nama_sistem!%0a%0aSetelah melihat website $nama_sistem, saya ingin bertanya perihal:%0a%0a";
-$link_wa = "<a href='https://api.whatsapp.com/send?phone=$no_wa&text=$text_wa' target=_blank>$no_wa</a>";
+$link_wa = "<a href='https://api.whatsapp.com/send?phone=$no_wa&text=$text_wa' target=_blank id=no_wa_marketing>$no_wa</a>";
 
 $social_links = [
   'twitter' => '#',

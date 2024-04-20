@@ -67,15 +67,30 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
 
         <div class="php-email-form">
           <div class="form-group mt-3">
-            <input type="text" name="nama_anda" class="form-control input-kontak" id="nama_anda" placeholder="Nama Anda..." required>
+            <input type="text" minlength="3" maxlength="30" name="nama_anda" class="form-control input-kontak" id="nama_anda" placeholder="Nama Anda..." required>
+            <div class="f12 abu mt1 mb2 hideit" id=nama_anda_info>3 s.d 30 huruf</div>
           </div>
           <div class="form-group mt-3">
-            <input type="text" class="form-control input-kontak" name="subject" id="subject" placeholder="Subject pesan..." required>
+            <input type="text" minlength="5" maxlength="50" class="form-control input-kontak" name="subject_pesan" id="subject_pesan" placeholder="Subject pesan..." required>
+            <div class="f12 abu mt1 mb2 hideit" id=subject_pesan_info>Subject pesan antara 5 s.d 50 karakter</div>
           </div>
           <div class="form-group mt-3">
-            <textarea class="form-control input-kontak mb2" name="message" rows="5" placeholder="Pesan atau pertanyaan yang ingin Anda sampaikan..." required></textarea>
+            <textarea minlength="50" maxlength="500" class="form-control input-kontak mb2" name="isi_pesan" id="isi_pesan" rows="5" placeholder="Pesan atau pertanyaan yang ingin Anda sampaikan..." required></textarea>
+            <div class="f12 abu mt1 mb2 hideit" id=isi_pesan_info>Isi pesan antara 50 s.d 500 karakter</div>
           </div>
-          <div class="text-center"><button type="submit"><i class="bi bi-whatsapp"></i> Kirim ke Tim Marketing</button></div>
+          <div class="text-center">
+            <button type="submit" id=btn_kirim_pesan2><i class="bi bi-whatsapp"></i> Kirim ke Tim Marketing kami</button>
+            <button type="submit" id=btn_kirim_pesan class="hideit"><i class="bi bi-whatsapp"></i> Kirim ke Tim Marketing kami</button>
+            <div class="f12 abu mt1 mb2" id=btn_kirim_info>Silahkan isi dahulu semua field!</div>
+          </div>
+        </div>
+
+        <div class="bordered p2 hideit" id=blok_processing>
+          <div class="consolas abu">Processing message...</div>
+          <hr>
+          <div class="darkblue">Pesan Anda akan kami teruskan via Whatsapp ke Tim Marketing. Jika pesan berhasil terkirim maka Anda akan menerima pesan balasan dalam waktu dekat.</div>
+          <hr>
+          <div class="hijau">Terimakasih telah menghubungi kami !</div>
         </div>
 
       </div>
@@ -87,9 +102,85 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
 </section>
 
 <script>
+  function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
   $(function() {
     $('.input-kontak').keyup(function() {
+      let nama_anda = $('#nama_anda').val();
+      let subject_pesan = $('#subject_pesan').val();
+      let isi_pesan = $('#isi_pesan').val();
 
-    })
+      if (nama_anda) {
+        if (nama_anda.length >= 3 && nama_anda.length <= 30) {
+          $('#nama_anda_info').fadeOut();
+        } else {
+          $('#nama_anda_info').show();
+          return;
+        }
+        $('#nama_anda').val(toTitleCase(nama_anda.replace(/[^a-zA-Z ]/g, '').replace('  ', ' ')));
+      }
+
+      if (subject_pesan) {
+        if (subject_pesan.length >= 5 && subject_pesan.length <= 50) {
+          $('#subject_pesan_info').fadeOut();
+        } else {
+          $('#subject_pesan_info').show();
+          return;
+        }
+        $('#subject_pesan').val(toTitleCase(subject_pesan.replace(/[^a-zA-Z0-9 ]/g, '').replace('  ', ' ')));
+      }
+
+      if (isi_pesan) {
+        if (isi_pesan.length >= 50 && isi_pesan.length <= 500) {
+          $('#isi_pesan_info').fadeOut();
+        } else {
+          $('#isi_pesan_info').text(`Anda baru mengetik ${isi_pesan.length} karakter, minimal 50 karakter`);
+          $('#isi_pesan_info').show();
+          return;
+        }
+        // $('#isi_pesan').val(isi_pesan.replace('  ', ' ').replace('<', '< '));
+      }
+
+      if (nama_anda && subject_pesan && isi_pesan) {
+
+        $('#btn_kirim_pesan2').hide()
+        $('#btn_kirim_pesan').fadeIn()
+        $('#btn_kirim_info').fadeOut()
+        console.log('OK');
+      } else {
+        $('#btn_kirim_info').text('Silahkan isi dahulu semua field !')
+        $('#btn_kirim_info').fadeIn()
+        $('#btn_kirim_pesan').hide();
+        $('#btn_kirim_pesan2').fadeIn();
+      }
+
+    });
+    $('.input-kontak').keyup();
+
+    $('#btn_kirim_pesan').click(function() {
+      $('.php-email-form').slideUp();
+      $('#blok_processing').slideDown();
+
+      let no_wa = $('#no_wa_marketing').text();
+      if (!no_wa) {
+        alert('nomor wa marketing undefined');
+        return;
+      }
+
+      let tgl = new Date();
+
+      let text_wa = `MESSAGE FROM CONTACT PAGE%0a%0aFrom: ${$('#nama_anda').val()}%0aSubject: ${$('#subject_pesan').val()}%0aPesan: ${$('#isi_pesan').val()}%0a%0a[MMC Information System, ${tgl}]`;
+
+      setTimeout(() => {
+        location.replace(`https://api.whatsapp.com/send?phone=${no_wa}&text=${text_wa}`)
+      }, 5000);
+    });
   })
 </script>
