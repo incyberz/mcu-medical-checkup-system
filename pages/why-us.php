@@ -13,6 +13,9 @@ foreach ($keunggulan as $key => $item) {
   ";
 }
 
+
+$edit_section = $role == 'admin' ? edit_section('why-us', 'Why-us (Keunggulan)') : '';
+
 echo "
 <section id='why-us' class='why-us'>
   <div class='container'>
@@ -33,6 +36,7 @@ echo "
         </div>
       </div>
     </div>
+    $edit_section
   </div>
 </section>
 ";

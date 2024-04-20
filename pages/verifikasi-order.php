@@ -4,7 +4,8 @@
   }
 </style>
 <?php
-// admin_only();
+admin_only('Maaf, hanya login admin yang dapat melakukan Verifikasi Order<hr>Mohon bersabar untuk menunggu balasan dari Tim Marketing kami.<hr>Page ini otomatis redirect ke homepage...', 5000);
+
 
 
 $pesan_insert = '';
@@ -67,10 +68,10 @@ if (isset($_POST['btn_order_paket'])) {
   // exit;
 }
 
-$judul = 'Order Paket';
+$judul = 'Verifikasi Order';
 set_title($judul);
 $divs = '';
-$id_paket = $_GET['id_paket'] ?? die(erid('id_paket'));
+$order_no = $_GET['order_no'] ?? die(erid('order_no'));
 
 // get paket properti
 $s = "SELECT 

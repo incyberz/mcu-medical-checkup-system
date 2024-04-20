@@ -9,6 +9,8 @@
 
     <div class="row">
       <?php
+      $edit_section = $role == 'admin' ? edit_section('produk', 'produk (program kami)') : '';
+
       // data from database
       $arr = [
         [
@@ -54,6 +56,7 @@
 
       ?>
     </div>
+    <?= $edit_section ?>
 
   </div>
 </section>

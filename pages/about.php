@@ -38,6 +38,7 @@ foreach ($arr as $item) {
   ";
 }
 
+$edit_section = $role == 'admin' ? edit_section('about', 'about (tentang kami)') : '';
 
 echo "
   <section id='about' class='about'>
@@ -50,6 +51,7 @@ echo "
           <h3>$tentang[title]</h3>
           <p>$tentang[desc]</p>
           $boxs
+          $edit_section
         </div>
       </div>
     </div>

@@ -50,7 +50,22 @@ if (!$parameter) {
             <li><a href="#">Drop Down 4</a></li>
           </ul>
         </li> -->
-        <li><a class="nav-link " href="?login">Login</a></li>
+        <?php
+        if ($username) {
+          // login
+          echo "
+            <li class='dropdown'><a href='#'><span class='tebal darkblue'>$username</span> <i class='bi bi-chevron-down'></i></a>
+              <ul>
+                <li><a href='#' onclick='onDev()'>Foto Profile</a></li>
+                <li><a href='#' onclick='onDev()'>Biodata</a></li>
+                <li><a href='?logout' onclick='return confirm(\"Logout?\")'>Logout</a></li>
+              </ul>
+            </li>
+          ";
+        } else {
+          echo "<li><a class='nav-link ' href='?login'>Login</a></li>";
+        }
+        ?>
       </ul>
       <i class="bi bi-list mobile-nav-toggle"></i>
     </nav><!-- .navbar -->

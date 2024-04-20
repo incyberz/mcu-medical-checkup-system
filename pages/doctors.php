@@ -48,6 +48,8 @@
     <div class="row">
 
       <?php
+      $edit_section = $role == 'admin' ? edit_section('doctors', 'dokter dan tim') : '';
+
       $arr = [
         [
           'image' => 'ahmad.png',
@@ -128,6 +130,7 @@
 
 
     </div>
+    <?= $edit_section ?>
 
   </div>
 </section><!-- End Doctors Section -->

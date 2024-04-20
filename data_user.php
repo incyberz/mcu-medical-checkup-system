@@ -19,8 +19,8 @@ if ($username == '') {
   WHERE a.username='$username'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   if (mysqli_num_rows($q) == 0) {
-    unset($_SESSION['wms_username']);
-    unset($_SESSION['wms_role']);
+    unset($_SESSION['mmc_username']);
+    unset($_SESSION['mmc_role']);
 
     die("Data username: $username tidak ada.");
   }
@@ -29,15 +29,12 @@ if ($username == '') {
 
   $id_user = $d['id'];
   $is_login = 1;
-  $id_role = $d['id_role'];
   $role = $d['role'];
   $nama_user = $d['nama_user'];
-  $jabatan = $d['jabatan'];
 
-  $_SESSION['wms_role'] = $role;
+  $_SESSION['mmc_role'] = $role;
 
   $nama_user = ucwords(strtolower($nama_user));
-  $jabatan = ucwords(strtolower($jabatan));
 
   $src_profile = "assets/img/user/$id_user.jpg";
   if (!file_exists($src_profile)) $src_profile = $profile_na;

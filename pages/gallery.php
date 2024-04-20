@@ -1,3 +1,7 @@
+<?php
+$edit_section = $role == 'admin' ? edit_section('gallery', 'gallery') : '';
+
+?>
 <section id="gallery" class="gallery">
   <div class="container">
 
@@ -75,6 +79,6 @@
       </div>
 
     </div>
-
+    <?= $edit_section ?>
   </div>
-</section><!-- End Gallery Section -->
+</section>

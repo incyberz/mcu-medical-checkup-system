@@ -54,7 +54,7 @@
 
     <div class="me-md-auto text-center text-md-start">
       <div class="copyright">
-        &copy; Copyright <strong><span>Mutiara MCU</span></strong>. All Rights Reserved
+        &copy; Copyright <strong><span>MMC Information System</span></strong>. All Rights Reserved
       </div>
       <style>
         .credits,

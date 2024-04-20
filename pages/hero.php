@@ -9,6 +9,15 @@
     text-shadow: 2px 1px 3px white;
   }
 </style>
+<?php
+if ($username) {
+  $welcome_msg = "Welcome $nama_user!";
+  $welcome_msg2 = "Anda sedang login sebagai <b class='darkblue miring'>$role</b> dan dapat mengakses fitur tambahan sesuai dengan hak akses Anda";
+  if ($role == 'admin') {
+    $welcome_msg2 .= edit_section('hero', 'Hero (Landing Page)', $img_edit);
+  }
+}
+?>
 <section id="hero" class="d-flex align-items-center">
   <div class="container">
     <h1 class="upper"><?= $welcome_msg ?></h1>

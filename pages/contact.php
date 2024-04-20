@@ -9,6 +9,12 @@
     opacity: 100%;
   }
 </style>
+
+<?php
+$edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
+
+
+?>
 <section id="contact" class="contact">
   <div class="container">
 
@@ -38,7 +44,7 @@
           <div class="address">
             <i class="bi bi-geo-alt"></i>
             <h4>Lokasi:</h4>
-            <p>Tambun Business Park Blok C12, Jl. Raya Pantura, Tambun Selatan</p>
+            <p>Tambun Business Park Blok C12, Jl. Raya Pantura, Tambun, Bekasi, Jawa Barat, Indonesia</p>
           </div>
 
           <div class="email">
@@ -59,32 +65,31 @@
 
       <div class="col-lg-8 mt-5 mt-lg-0">
 
-        <form action="forms/contact.php" method="post" role="form" class="php-email-form">
-          <div class="row">
-            <div class="col-md-6 form-group">
-              <input type="text" name="name" class="form-control" id="name" placeholder="Nama Anda" required>
-            </div>
-            <div class="col-md-6 form-group mt-3 mt-md-0">
-              <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
-            </div>
+        <div class="php-email-form">
+          <div class="form-group mt-3">
+            <input type="text" name="nama_anda" class="form-control input-kontak" id="nama_anda" placeholder="Nama Anda..." required>
           </div>
           <div class="form-group mt-3">
-            <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
+            <input type="text" class="form-control input-kontak" name="subject" id="subject" placeholder="Subject pesan..." required>
           </div>
           <div class="form-group mt-3">
-            <textarea class="form-control" name="message" rows="5" placeholder="Pesan" required></textarea>
+            <textarea class="form-control input-kontak mb2" name="message" rows="5" placeholder="Pesan atau pertanyaan yang ingin Anda sampaikan..." required></textarea>
           </div>
-          <div class="my-3">
-            <div class="loading">Loading</div>
-            <div class="error-message"></div>
-            <div class="sent-message">Your message has been sent. Thank you!</div>
-          </div>
-          <div class="text-center"><button type="submit">Kirim Pesan</button></div>
-        </form>
+          <div class="text-center"><button type="submit"><i class="bi bi-whatsapp"></i> Kirim ke Tim Marketing</button></div>
+        </div>
 
       </div>
 
     </div>
+    <?= $edit_section ?>
 
   </div>
-</section><!-- End Contact Section -->
+</section>
+
+<script>
+  $(function() {
+    $('.input-kontak').keyup(function() {
+
+    })
+  })
+</script>

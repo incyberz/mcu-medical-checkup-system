@@ -1,5 +1,5 @@
 <?php
-if(isset($_GET['logout'])){
+if (isset($_GET['logout'])) {
   // delete cookie
 
   // echo '<pre>';
@@ -8,8 +8,8 @@ if(isset($_GET['logout'])){
 
   echo 'logging out...';
 
-  unset($_SESSION['wms_username']);
-  unset($_SESSION['wms_role']);
+  unset($_SESSION['mmc_username']);
+  unset($_SESSION['mmc_role']);
 
 
   echo '<script>location.replace("?")</script>';

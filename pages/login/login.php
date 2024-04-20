@@ -14,14 +14,14 @@ if (isset($_POST['btn_login_wms'])) {
     // $sql_password = $username==$password ? 'password is null' : "password='$password'";
     // $sql_password = "password=md5('$password')";
     $s = "SELECT 1 from tb_user WHERE username='$username' and $sql_password";
-    echo $s;
+    // echo $s;
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     if (mysqli_num_rows($q) == 1) {
       $d = mysqli_fetch_assoc($q);
-      $_SESSION['mcu_username'] = $username;
+      $_SESSION['mmc_username'] = $username;
 
 
-      echo 'Processing login...<script>location.replace("?")</script>';
+      echo '<div style="padding: 100px 30px">Processing login...</div><script>location.replace("?")</script>';
       exit;
     } else {
       $pesan_login = div_alert('danger', 'Maaf, username dan password tidak tepat. Silahkan coba kembali!');
@@ -36,7 +36,7 @@ if (isset($_POST['btn_login_wms'])) {
 <style>
   .full {
     display: flex;
-    height: 100vh;
+    min-height: 60vh;
   }
 
   .form-login {
@@ -46,9 +46,9 @@ if (isset($_POST['btn_login_wms'])) {
 </style>
 <div class="full" data-aos='fade-up'>
   <div class="wadah gradasi-biru form-login p-4">
-    <h3>Login</h3>
-    <?php include 'login_process.php'; ?>
+    <h3>MMC Login</h3>
     <?= $pesan_login ?>
+    <div class="mt2">Anda dapat login sebagai pasien, dokter, petugas medis, atau sebagai administrator.</div>
     <hr>
     <form method="post">
       <div class="form-group">
@@ -66,8 +66,8 @@ if (isset($_POST['btn_login_wms'])) {
       </div>
     </form>
 
-    <div class="tengah mt3" data-aos="fade-up" data-aos-delay="300">Belum punya akun? Silahkan <a href="#" onclick='alert("Fitur Register belum tersedia. Silahkan hubungi developer.")'><b>Register</b></a></div>
-    <div class="tengah mt3" data-aos="fade-up" data-aos-delay="300">Lupa password? <a href="#" onclick='alert("Fitur Reset Password belum tersedia. Silahkan hubungi developer.")'><b>Reset Password</b></a></div>
+    <!-- <div class="tengah mt3" data-aos="fade-up" data-aos-delay="300">Belum punya akun? Silahkan <a href="#" onclick='alert("Fitur Register belum tersedia. Silahkan hubungi developer.")'><b>Register</b></a></div> -->
+    <!-- <div class="tengah mt3" data-aos="fade-up" data-aos-delay="300">Lupa password? <a href="#" onclick='alert("Fitur Reset Password belum tersedia. Silahkan hubungi developer.")'><b>Reset Password</b></a></div> -->
 
   </div>
 </div>

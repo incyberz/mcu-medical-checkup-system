@@ -2,6 +2,8 @@
 <html lang="en">
 <?php
 session_start();
+// session_destroy();
+// exit;
 date_default_timezone_set("Asia/Jakarta");
 # ================================================
 # PHP INDEX
@@ -16,10 +18,10 @@ $hideit = 'hideit';
 $today = date('Y-m-d');
 
 // set auto login
-// $_SESSION['mcu_username'] = 'wh';
+// $_SESSION['mmc_username'] = 'wh';
 
 // set logout
-// unset($_SESSION['mcu_username']);
+// unset($_SESSION['mmc_username']);
 
 
 // include 'pages/login.php';
@@ -37,9 +39,9 @@ $nama_user = '';
 $email = '';
 $no_wa = '';
 
-if (isset($_SESSION['mcu_username'])) {
+if (isset($_SESSION['mmc_username'])) {
   $is_login = 1;
-  $username = $_SESSION['mcu_username'];
+  $username = $_SESSION['mmc_username'];
 }
 
 
@@ -66,6 +68,8 @@ include 'data_user.php';
 # ================================================
 include 'include/insho_functions.php';
 include 'include/crud_icons.php';
+include 'include/date_managements.php';
+include 'include/session_managements.php';
 
 
 # ================================================
@@ -86,6 +90,13 @@ if ($parameter == 'logout') {
 }
 
 $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> Back</a>";
+
+function edit_section($page, $caption = '', $icon = '')
+{
+  return "<hr><a class='btn-edit-page' href='?manage-page&p=$page'>$icon Manage Section $caption</a>";
+}
+
+
 ?>
 
 <head>
@@ -139,7 +150,7 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
 
     section {
       padding-top: 140px;
-      padding-bottom: 15px;
+      <?php if ($parameter) echo "padding-bottom: 15px;"; ?>
       /* min-height: 100vh; bahaya untuk section count */
     }
 
@@ -148,6 +159,8 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
     }
   </style>
 </head>
+
+
 
 <style>
   .produk .icon-box {
@@ -254,6 +267,37 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
 
   .produk .icon-box:hover .shout {
     color: #ff0;
+  }
+</style>
+
+
+<style>
+  .btn-edit-page {
+    font-family: "Raleway", sans-serif;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 12px 35px;
+    margin-top: 10px;
+    border-radius: 50px;
+    transition: 0.5s;
+    color: #fff;
+    background: #844;
+    text-shadow: none;
+    text-align: center;
+  }
+
+  .btn-edit-page:hover {
+    background: #3291e6;
+    color: #ff0;
+  }
+
+  @media (max-width:400px) {
+    .btn-edit-page {
+      width: 100%;
+    }
   }
 </style>
 
