@@ -14,6 +14,10 @@ if ($online_version) {
   $db_user = "iotikain_insho";
   $db_pass = "hq'qC3D}+Hzj@TT";
   $db_name = "iotikain_mcu";
+
+  $db_user = "mmcclini_admin";
+  $db_pass = "MMC-Clinic2024";
+  $db_name = "mmcclini_mmc";
 } else {
   $db_server = "localhost";
   $db_user = "root";

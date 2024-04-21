@@ -6,7 +6,7 @@ $header_logo = 'header-logo.png';
 $no_wa = '6281381112693'; // meyda
 $no_wa = '6287888129250'; // pa ahmad
 
-$email = 'mmcpjk3@gmail.com';
+$email = 'info@mmc-clinic.com';
 $phone = '021-8909 5776';
 
 $jam = date('H');

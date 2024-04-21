@@ -50,7 +50,7 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
           <div class="email">
             <i class="bi bi-envelope"></i>
             <h4>Email:</h4>
-            <p>mmcpjk3@gmail.com</p>
+            <p>info@mmc-clinic.com</p>
           </div>
 
           <div class="phone">

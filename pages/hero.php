@@ -13,8 +13,14 @@
 if ($username) {
   $welcome_msg = "Welcome $nama_user!";
   $welcome_msg2 = "Anda sedang login sebagai <b class='darkblue miring'>$role</b> dan dapat mengakses fitur tambahan sesuai dengan hak akses Anda";
+  $edit_section = '';
   if ($role == 'admin') {
-    $welcome_msg2 .= edit_section('hero', 'Hero (Landing Page)', $img_edit);
+    $edit_section .= edit_section('hero', 'Hero (Landing Page)', $img_edit);
+    $edit_section .= "
+      <div id=edit_hero class='wadah mt2 gradasi-kuning'>
+        Edit Hero Zzz
+      </div>
+    ";
   }
 }
 ?>
@@ -23,5 +29,6 @@ if ($username) {
     <h1 class="upper"><?= $welcome_msg ?></h1>
     <h2 style='max-width: 400px'><?= $welcome_msg2 ?></h2>
     <a href="<?= $button_href ?>" class="btn-get-started scrollto"><?= $button_msg ?></a>
+    <?= $edit_section ?>
   </div>
 </section>

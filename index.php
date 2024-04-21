@@ -93,7 +93,9 @@ $back = "<a href='#' onclick='history.back()'><i class='bi bi-arrow-left'></i> B
 
 function edit_section($page, $caption = '', $icon = '')
 {
-  return "<hr><a class='btn-edit-page' href='?manage-page&p=$page'>$icon Manage Section $caption</a>";
+  $id = 'edit_' . $page . '__toggle';
+  // return "<hr><a class='btn-edit-page' href='?manage-page&p=$page'>$icon Manage Section $caption</a>";
+  return "<hr><span class='btn-edit-page btn_aksi' id=$id>$icon Manage Section $caption</span>";
 }
 
 
@@ -272,6 +274,10 @@ function edit_section($page, $caption = '', $icon = '')
 
 
 <style>
+  .btn_aksi {
+    cursor: pointer;
+  }
+
   .btn-edit-page {
     font-family: "Raleway", sans-serif;
     text-transform: uppercase;
