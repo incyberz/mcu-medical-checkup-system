@@ -1,4 +1,13 @@
+<style>
+  #tb_edit_visi td {
+    background: none;
+  }
+</style>
 <?php
+// for edit
+$tentang_title = '';
+$tentang_desc = '';
+
 $href = $tentang['video']['src'];
 
 $arr = ['visi', 'misi', 'sejarah', 'goals'];
@@ -38,7 +47,79 @@ foreach ($arr as $item) {
   ";
 }
 
+
 $edit_section = $role == 'admin' ? edit_section('about', 'about (tentang kami)') : '';
+if ($username and $role == 'admin') {
+  $edit_section = "
+    <div class=container>
+    $edit_section
+    <div id=edit_about class='wadah mt2 gradasi-kuning'>
+      <form method=post class=wadah>
+        <div class=sub_form>Form Edit Text</div>
+        <input class='form-control mb1' name=tentang_title value='$tentang_title' placeholder='tentang_title...'>
+        <textarea class='form-control mb1' name=tentang_desc placeholder='tentang_desc...' rows=5>$tentang_desc</textarea>
+        <div class='wadah gradasi-hijau'>
+          <table class='table' id=tb_edit_visi>
+            <tr>
+              <td valign=top align=right class='pr2 pt1 abu '>Visi</td>
+              <td>
+                <textarea class='form-control' name=visi placeholder='visi...'></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td valign=top align=right class='pr2 pt1 abu '>Misi</td>
+              <td>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+                <textarea class='form-control mb1' name=misi[] placeholder='misi...'></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td valign=top align=right class='pr2 pt1 abu '>Sejarah</td>
+              <td>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+                <textarea class='form-control mb1' name=sejarah[] placeholder='Paragraf sejarah...'></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td valign=top align=right class='pr2 pt1 abu '>Goals</td>
+              <td>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+                <textarea class='form-control mb1' name=goals[] placeholder='goals...'></textarea>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <button class='btn btn-success btn-sm on-dev' name=btn_save_settings value=about>Save Settings</button>
+      </form>
+    </div>
+    </div>
+  ";
+}
+
 
 echo "
   <section id='about' class='about'>
@@ -51,9 +132,9 @@ echo "
           <h3>$tentang[title]</h3>
           <p>$tentang[desc]</p>
           $boxs
-          $edit_section
         </div>
       </div>
+      $edit_section
     </div>
   </section>
 ";

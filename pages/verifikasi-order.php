@@ -99,7 +99,7 @@ a.info_biaya,
 a.biaya,
 a.customizable,
 (
-  SELECT COUNT(1) FROM tb_detail_paket 
+  SELECT COUNT(1) FROM tb_paket_detail 
   WHERE id_paket=a.id) count_pemeriksaan
 
 FROM tb_paket a 
@@ -200,7 +200,7 @@ while ($paket = mysqli_fetch_assoc($q)) {
     $s2 = "SELECT 
     b.nama as nama_pemeriksaan
 
-    FROM tb_detail_paket a 
+    FROM tb_paket_detail a 
     JOIN tb_pemeriksaan b ON a.id_pemeriksaan =b.id 
     WHERE a.id_paket=$paket[id_paket] ORDER BY no";
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));

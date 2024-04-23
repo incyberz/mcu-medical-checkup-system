@@ -1,6 +1,15 @@
 <style>
   .item-corporate {
-    background: #ddffffaa;
+    /* background: #ddffff; */
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: solid 2px blue;
+  }
+
+  #produk h3 {
+    font-size: 20px;
   }
 </style>
 <?php
@@ -16,12 +25,14 @@ a.info_biaya,
 a.biaya,
 a.customizable,
 (
-  SELECT COUNT(1) FROM tb_detail_paket 
+  SELECT COUNT(1) FROM tb_paket_detail 
   WHERE id_paket=a.id) count_pemeriksaan
 
 FROM tb_paket a 
 JOIN tb_jenis_paket b ON a.id_jenis = b.id
-WHERE a.id_jenis=$id_jenis ORDER BY no";
+WHERE a.id_jenis=$id_jenis 
+AND status=1 -- status paket yang aktif
+ORDER BY no";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $count_valid_paket = 0;
 while ($paket = mysqli_fetch_assoc($q)) {
@@ -39,7 +50,10 @@ while ($paket = mysqli_fetch_assoc($q)) {
     a.deskripsi 
 
     FROM tb_pemeriksaan a 
-    WHERE a.id_klinik=$id_klinik ";
+    WHERE a.id_klinik=$id_klinik 
+    AND status=1 
+    AND for_opsional=1 
+    ";
     $lihat_detail = 'Lihat Pilihan Pemeriksaan';
 
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
@@ -77,9 +91,10 @@ while ($paket = mysqli_fetch_assoc($q)) {
     $s2 = "SELECT 
     b.nama as nama_pemeriksaan
 
-    FROM tb_detail_paket a 
+    FROM tb_paket_detail a 
     JOIN tb_pemeriksaan b ON a.id_pemeriksaan =b.id 
-    WHERE a.id_paket=$paket[id_paket] ORDER BY no";
+    WHERE a.id_paket=$paket[id_paket] 
+    ORDER BY no";
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     $details = '';
     while ($detail = mysqli_fetch_assoc($q2)) {
@@ -99,13 +114,19 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
   $divs .= "
   <div class='col-xl-4 col-md-6'>
-    <div class='wadah p2 item-corporate'>
-      <h3 >$paket[nama_paket]</h3>
-      <div class='f12 abu mt1 mb2'>$paket[deskripsi]</div>
-      <div class='f18 consolas darkblue mt1 mb1'>$shout</div>
-      <span class='btn_aksi pointer f12' id=$id_toggle> $img_detail $lihat_detail</span>
-      <div id=detail$id_paket class='hideit wadah gradasi-kuning mt1 '>$details</div>
-      $btn_pilih
+    <div class='wadah p2 item-corporate gradasi-toska'>
+      <div>
+        <h3 >$paket[nama_paket]</h3>
+        <div class='f14  mt1 mb2'>$paket[deskripsi]</div>
+      </div>
+      <div class='f18 consolass darkblue mt1 mb1'>$shout</div>
+      <div>
+        <span class='btn_aksi pointer f12' id=$id_toggle> $img_detail $lihat_detail</span>
+        <div id=detail$id_paket class='hideit wadah gradasi-kuning mt1 '>$details</div>
+      </div>
+      <div>
+        $btn_pilih
+      </div>
     </div>
   </div>
   ";

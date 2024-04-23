@@ -34,10 +34,11 @@ $social_links = [
 
 
 //hero 
-$welcome_msg = "Welcome to $nama_sistem";
+$header_welcome = "Welcome to $nama_sistem";
 $welcome_msg2 = "Kami adalah Penyedia Jasa Layanan Kesehatan Professional dan Komprehensif bidang Medical Checkup, In-House Clinic, dan Klinik Pratama";
-$button_msg = "Program Kami";
+$button_caption = "Program Kami";
 $button_href = "#produk";
+$bg_hero = 'hero-bg3.jpg';
 
 //why us
 $mengapa_kami = "Mengapa Pilih $nama_sistem?";
@@ -47,37 +48,31 @@ $keunggulan = [
   [
     'desc' => 'Data Rekam Medis Pasien kami jamin kerahasiaannya. Kami menggunakan teknologi enkripsi untuk setiap data sensitive, memisahkan data antar corporate (separated-database), dan data hanya dapat diakses oleh pihak yang berwenang.',
     'icon' => 'check-shield',
-    'image' => 'high-security'
   ],
   'Realtime Reporting MCU' =>
   [
     'desc' => 'Anda sebagai Corporate maupun karyawan (individual) dapat memantau proses MCU dimulai proses pendaftaran, pemeriksaan, hingga hasil MCU dengan login masing-masing via smartphone',
     'icon' => 'mobile',
-    'image' => 'high-security'
   ],
   'Biaya Sangat Terjangkau' =>
   [
     'desc' => 'Basic Price dari kami adalah the best price bagi Corporate/Lembaga Anda. Untuk biaya bersifat negotiable sesuai Jumlah Peserta MCU dan lokasi perusahaan Anda! Silahkan Anda hubungi Marketing kami dan buktikan!',
     'icon' => 'dollar-circle',
-    'image' => 'high-security'
   ],
   'Onsite ke Perusahaan' =>
   [
     'desc' => 'Tidak perlu ada waktu yang terbuang! Dengan minimal 100 karyawan kami dapat melayani Medical Checkup di Perusahaan Anda (onsite)!',
     'icon' => 'car',
-    'image' => 'high-security'
   ],
   'Program Pelayanan Medis' =>
   [
     'desc' => 'Pengalaman kami lebih dari 20 tahun di bidang Pelayanan Medis. Kami juga memiliki beberapa Klinik Pratama, In-House Clinic, serta Fasilitas Medical Checkup dan Laboratorium Medis',
     'icon' => 'medal',
-    'image' => 'high-security'
   ],
   'Peralatan Medis Lengkap' =>
   [
     'desc' => 'Peralatan penunjang medis kami yang canggih dan terakreditasi Paripurna membuat waktu pemeriksaan bagi Anda (karyawan Anda) lebih cepat, efisien, dan akurat.',
     'icon' => 'cog',
-    'image' => 'high-security'
   ],
 ];
 

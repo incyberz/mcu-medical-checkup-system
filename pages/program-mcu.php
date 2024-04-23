@@ -13,7 +13,7 @@
         'title' => 'MCU Corporate',
         'desc' => 'Biaya mulai dari <span class="f22">Rp70.000</span> dengan Paket Lengkap untuk prasyarat ketenagakerjaan. Biaya bersifat negotiable! Cocok bagi Anda sebagai HRD atau Pimpinan Perusahaan.',
         'image' => 'mcu-corporate.jpg',
-        'src' => '?mcu-detail&id_jenis=1',
+        'src' => '?program-detail&id_jenis=1',
         'caption' => 'Pilih Paket Corporate',
         'shout' => ''
       ],
@@ -21,7 +21,7 @@
         'title' => 'MCU Mandiri',
         'desc' => 'Semisal Cek Gula Darah, Cek Darah Lengkap, Cek Urine dan lain sebagainya. Cocok bagi Anda yang ingin mengetahui gejala penyakit secara akurat atau ingin mengecek kondisi kesehatan tubuh secara rutin.',
         'image' => 'mcu-mandiri.avif',
-        'src' => '?mcu-detail&id_jenis=2',
+        'src' => '?program-detail&id_jenis=2',
         'caption' => 'Pilih Paket Mandiri',
         'shout' => ''
       ],

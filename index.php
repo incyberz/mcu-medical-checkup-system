@@ -16,6 +16,7 @@ $null = '<span class="kecil miring red consolas">null</span>';
 $null_gray = '<span class="f12 miring abu consolas">null</span>';
 $hideit = 'hideit';
 $today = date('Y-m-d');
+$edit_section = '';
 
 // set auto login
 // $_SESSION['mmc_username'] = 'wh';
@@ -311,6 +312,7 @@ function edit_section($page, $caption = '', $icon = '')
 
   <?php include 'pages/topbar.php'; ?>
   <?php include 'pages/header.php'; ?>
+  <?php include 'pages/save_settings_process.php'; ?>
   <?php if (!$parameter) include 'pages/hero.php'; ?>
 
   <main id="main">
@@ -344,4 +346,9 @@ function edit_section($page, $caption = '', $icon = '')
   function onDev() {
     alert('Fitur ini masih dalam tahap pengembangan. Terimakasih sudah mencoba!');
   }
+  $(function() {
+    $('.on-dev').click(function() {
+      onDev()
+    })
+  })
 </script>
