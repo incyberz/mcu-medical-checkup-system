@@ -13,9 +13,28 @@
   }
 </style>
 <?php
+
 $divs = '';
 $id_program = $_GET['id_program'] ?? die(erid('id_program')); //corporate at MMC
-$Corporate = $id_program == 1 ? 'Corporate' : 'Mandiri';
+
+$s = "SELECT * FROM tb_program WHERE id='$id_program'";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+if (!mysqli_num_rows($q)) {
+  echo div_alert('danger', "Maaf, data jenis program tidak ditemukan.");
+} else {
+  $d = mysqli_fetch_assoc($q);
+  $nama_program = $d['nama'];
+  $deskripsi_program = $d['deskripsi'];
+}
+
+set_title("$nama_program - $nama_sistem");
+echo "
+  <div class='section-title'>
+    <h2>$nama_program</h2>
+    <p>$back | $deskripsi_program</p>
+  </div>
+";
+
 
 $s = "SELECT 
 a.id as id_paket,
@@ -145,11 +164,6 @@ $alert = '';
 if (!$count_valid_paket) $alert = div_alert('danger', "Maaf, belum ada Paket yang cocok untuk Program ini. Anda boleh menghubungi kami untuk informasi lebih lanjut dengan cara klik Nomor Whatsapp di paling atas.");
 
 echo "
-<div class='section-title'>
-  <h2>MCU $Corporate</h2>
-  <p>$back | Silahkan Pilih Paket untuk Medical Chekup $Corporate!</p>
-</div>
-
 <section id='produk' class='produk p0'>
   <div class='row'>
     $divs

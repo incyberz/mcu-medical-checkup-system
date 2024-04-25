@@ -9,7 +9,6 @@ date_default_timezone_set("Asia/Jakarta");
 # PHP INDEX
 # ================================================
 $dm = 0;
-$id_klinik = 1; //klinik MMC
 $debug = '';
 $unset = '<span class="kecil miring red consolas">unset</span>';
 $null = '<span class="kecil miring red consolas">null</span>';
@@ -17,6 +16,8 @@ $null_gray = '<span class="f12 miring abu consolas">null</span>';
 $hideit = 'hideit';
 $today = date('Y-m-d');
 $edit_section = '';
+
+$id_klinik = 1; //klinik MMC
 
 // set auto login
 // $_SESSION['mmc_username'] = 'wh';

@@ -5,6 +5,8 @@ $links = '';
 foreach ($social_links as $key => $link) {
   $links .= "<a href='$link' class='$key'><i class='bi bi-$key'></i></a>";
 }
+$links = ''; //zzz link belum siap
+
 
 echo "
   <div id='topbar' class='d-flex align-items-center fixed-top'>
