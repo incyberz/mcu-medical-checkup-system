@@ -78,6 +78,29 @@ $edit_section = $role == 'admin' ? edit_section('gallery', 'gallery') : '';
         </div>
       </div>
 
+      <div class="col-lg-3 col-md-4">
+        <div class="gallery-item">
+          <a href="assets/img/gallery/gallery-9.jpg" class="galelry-lightbox">
+            <img src="assets/img/gallery/gallery-9.jpg" alt="" class="img-fluid">
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-4">
+        <div class="gallery-item">
+          <a href="assets/img/gallery/gallery-10.jpg" class="galelry-lightbox">
+            <img src="assets/img/gallery/gallery-10.jpg" alt="" class="img-fluid">
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-4">
+        <div class="gallery-item">
+          <a href="assets/img/gallery/gallery-11.jpg" class="galelry-lightbox">
+            <img src="assets/img/gallery/gallery-11.jpg" alt="" class="img-fluid">
+          </a>
+        </div>
+      </div>
+
     </div>
     <?= $edit_section ?>
   </div>

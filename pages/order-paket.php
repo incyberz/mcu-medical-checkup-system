@@ -74,7 +74,7 @@ $id_paket = $_GET['id_paket'] ?? die(erid('id_paket'));
 
 // get paket properti
 $s = "SELECT 
-a.id_jenis,
+a.id_program,
 a.no as no_paket,
 a.nama as nama_paket,
 a.deskripsi,
@@ -86,9 +86,9 @@ $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) die('Data Paket tidak ditemukan.');
 $paket = mysqli_fetch_assoc($q);
 
-$id_jenis = $paket['id_jenis'];
+$id_program = $paket['id_program'];
 
-$Corporate = $id_jenis == 1 ? 'Corporate' : 'Mandiri';
+$Corporate = $id_program == 1 ? 'Corporate' : 'Mandiri';
 
 $s = "SELECT 
 a.id as id_paket,
@@ -102,7 +102,7 @@ a.customizable,
   WHERE id_paket=a.id) count_pemeriksaan
 
 FROM tb_paket a 
-JOIN tb_jenis_paket b ON a.id_jenis = b.id
+JOIN tb_program b ON a.id_program = b.id
 WHERE a.id=$id_paket ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $count_valid_paket = 0;
@@ -157,7 +157,7 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
     // non custom
     $lihat_detail = 'Lihat Detail Pemeriksaan';
-    $order_no = date('y') . "0$id_klinik-0$id_jenis-" . strtotime('now');
+    $order_no = date('y') . "0$id_klinik-0$id_program-" . strtotime('now');
     $form_order = "
       <form method=post class='mt4 wadah gradasi-hijau'>
         <div class='flexy flex-between'>
@@ -215,7 +215,7 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
   $id_toggle = 'detail' . $id_paket . '__toggle';
   $biaya_show = $paket['biaya'] ? number_format($paket['biaya'], 0) : '';
-  $shout = $id_jenis == 1 ?  $paket['info_biaya'] : 'Rp' . $biaya_show;
+  $shout = $id_program == 1 ?  $paket['info_biaya'] : 'Rp' . $biaya_show;
   $shout = $shout == 'Rp' ? 'Custom Biaya' : $shout;
 
   if ($pesan_insert) {
@@ -244,10 +244,23 @@ while ($paket = mysqli_fetch_assoc($q)) {
       </div>
     ";
   } else {
+
+    $src_hi = "assets/img/paket/$id_paket-hi.jpg";
+    $src = "assets/img/paket/$id_paket.jpg";
+    if (file_exists($src_hi)) {
+      $paket =  "<a href='$src_hi' target=_blank><img src='$src_hi' class='img-fluid br5'></a>";
+    } elseif (file_exists($src)) {
+      $paket =  "<a href='$src' target=_blank><img src='$src' class='img-fluid br5'></a>";
+    } else {
+      $paket = "        
+      <h3 >$paket[nama_paket]</h3>
+      <div class='f14  mt1 mb2'>$paket[deskripsi]</div>
+    ";
+    }
+
     $divs = "
       <div class='wadah p2 item-corporate' style='max-width:600px; margin:auto'>
-        <h3 >$paket[nama_paket]</h3>
-        <div class='f12 abu mt1 mb2'>$paket[deskripsi]</div>
+        $paket
         <div class='f18 consolas darkblue mt1 mb1'>$shout</div>
         <span class='btn_aksi pointer f12' id=$id_toggle> $img_detail $lihat_detail</span>
         <div id=detail$id_paket class='hideit wadah gradasi-kuning mt1 '>$details</div>

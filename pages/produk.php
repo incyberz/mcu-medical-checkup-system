@@ -17,21 +17,21 @@
           'Program MCU',
           'Biaya mulai dari Rp70.000 dengan Paket Lengkap untuk prasyarat ketenagakerjaan. Biaya bersifat negotiable!',
           'mcu-corporate.jpg',
-          '?program-mcu',
+          '?program&jenis=mcu',
           ''
         ],
         [
           'Program In-House Clinic',
           'Program In-House Clinic untuk Corporate (perusahaan) dan Sekolah/Pesantren',
           'inhouse-clinic.avif',
-          '?inhouse-clinic',
+          '?program&jenis=inhouse-clinic',
           ''
         ],
         [
           'Klinik Pratama',
           'Kami melayani pengobatan umum...',
           'klinik-pratama.avif',
-          '?klinik-pratama',
+          '?program&jenis=klinik-pratama',
           ''
         ],
       ];

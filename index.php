@@ -138,7 +138,10 @@ function edit_section($page, $caption = '', $icon = '')
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
-  <?php include "../insho_styles.php"; ?>
+  <?php
+  $insho_styles = file_exists('insho_styles.php') ? 'insho_styles.php' : '../insho_styles.php';
+  include $insho_styles;
+  ?>
   <style>
     <?php if ($dm) {
       echo '.debug{display:inline; background:yellow; color: blue}';

@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: solid 2px blue;
+    /* border: solid 2px blue; */
   }
 
   #produk h3 {
@@ -14,8 +14,8 @@
 </style>
 <?php
 $divs = '';
-$id_jenis = $_GET['id_jenis'] ?? die(erid('id_jenis')); //corporate at MMC
-$Corporate = $id_jenis == 1 ? 'Corporate' : 'Mandiri';
+$id_program = $_GET['id_program'] ?? die(erid('id_program')); //corporate at MMC
+$Corporate = $id_program == 1 ? 'Corporate' : 'Mandiri';
 
 $s = "SELECT 
 a.id as id_paket,
@@ -29,9 +29,10 @@ a.customizable,
   WHERE id_paket=a.id) count_pemeriksaan
 
 FROM tb_paket a 
-JOIN tb_jenis_paket b ON a.id_jenis = b.id
-WHERE a.id_jenis=$id_jenis 
-AND status=1 -- status paket yang aktif
+JOIN tb_program b ON a.id_program = b.id
+WHERE a.id_program=$id_program 
+AND status=1 -- status paket yang aktif 
+AND customizable is null 
 ORDER BY no";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $count_valid_paket = 0;
@@ -108,16 +109,24 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
   $id_toggle = 'detail' . $id_paket . '__toggle';
   $biaya_show = $paket['biaya'] ? number_format($paket['biaya'], 0) : '';
-  $shout = $id_jenis == 1 ?  $paket['info_biaya'] : 'Rp' . $biaya_show;
+  $shout = $id_program == 1 ?  $paket['info_biaya'] : 'Rp' . $biaya_show;
   $shout = $shout == 'Rp' ? 'Custom Biaya' : $shout;
 
+  $src = "assets/img/paket/$id_paket.jpg";
+  if (file_exists($src)) {
+    $paket =  "<img src='$src' class='w-100 br5'>";
+  } else {
+    $paket = "        
+      <h3 >$paket[nama_paket]</h3>
+      <div class='f14  mt1 mb2'>$paket[deskripsi]</div>
+    ";
+  }
 
   $divs .= "
   <div class='col-xl-4 col-md-6'>
     <div class='wadah p2 item-corporate gradasi-toska'>
       <div>
-        <h3 >$paket[nama_paket]</h3>
-        <div class='f14  mt1 mb2'>$paket[deskripsi]</div>
+        $paket
       </div>
       <div class='f18 consolass darkblue mt1 mb1'>$shout</div>
       <div>
