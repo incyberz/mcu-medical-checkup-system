@@ -18,6 +18,12 @@ $today = date('Y-m-d');
 $edit_section = '';
 
 $id_klinik = 1; //klinik MMC
+$lokasi_pages = 'pages';
+$lokasi_pdf = 'assets/pdf';
+$lokasi_img = 'assets/img';
+
+$whatsapp_klinik_show = '0852-1257-2979';
+$whatsapp_klinik = '6285212572979';
 
 // set auto login
 // $_SESSION['mmc_username'] = 'wh';
@@ -39,18 +45,13 @@ $role = 'Pengunjung';
 $username = '';
 $nama_user = '';
 $email = '';
-$no_wa = '';
+$whatsapp = '';
 
 if (isset($_SESSION['mmc_username'])) {
   $is_login = 1;
   $username = $_SESSION['mmc_username'];
 }
 
-
-# ================================================
-# DATA PAGES AT
-# ================================================
-include 'data_pages.php';
 
 
 # ================================================
@@ -59,9 +60,14 @@ include 'data_pages.php';
 include 'conn.php';
 
 # ================================================
+# DATA PAGES AT
+# ================================================
+include 'klinik_data.php';
+
+# ================================================
 # USER DATA IF LOGIN
 # ================================================
-include 'data_user.php';
+include 'user_data.php';
 
 
 

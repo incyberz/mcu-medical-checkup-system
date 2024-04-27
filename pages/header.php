@@ -1,14 +1,4 @@
 <?php
-$logo = $singkatan_sistem;
-if ($header_logo) {
-  $src = "assets/img/$header_logo";
-  if (file_exists($src)) {
-    $logo = "<a href='index.php' class='logo me-auto'><img src='$src' alt='$singkatan_sistem' class='img-fluid'></a>";
-  } else {
-    // warning logo missing
-  }
-}
-
 // hide other info menu when parameter terisi
 $li_anchor = '';
 if (!$parameter) {
@@ -25,7 +15,7 @@ if (!$parameter) {
 <header id="header" class="fixed-top">
   <div class="container d-flex align-items-center">
 
-    <h1 class="logo me-auto"><a href="index.html"><?= $logo ?></a></h1>
+    <h1 class="logo me-auto"><a href="index.html"><?= $img_header_logo ?></a></h1>
     <!-- Uncomment below if you prefer to use an image logo -->
     <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
 

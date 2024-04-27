@@ -1,13 +1,39 @@
 <?php
-// header & topbar
-$nama_sistem = 'Mutiara Medical Center';
-$singkatan_sistem = 'MMC';
-$header_logo = 'header-logo.png';
-$no_wa = '6281381112693'; // meyda
-$no_wa = '6287888129250'; // pa ahmad
+$s = "SELECT a.* 
+FROM tb_klinik_data a 
+WHERE id_klinik=$id_klinik
+";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+if (mysqli_num_rows($q) == 0) {
+  echo div_alert('danger', "Belum ada data klinik.");
+} else {
+  $klinik = [];
+  while ($d = mysqli_fetch_assoc($q)) {
+    $klinik[$d['field']] = $d['value'];
+  }
+}
 
-$email = 'info@mmc-clinic.com';
-$phone = '021-8909 5776';
+// header & topbar
+$nama_sistem = $klinik['nama_sistem'];
+$singkatan_sistem = $klinik['singkatan_sistem'];
+$whatsapp = $klinik['whatsapp'];
+$email = $klinik['email'];
+$telepon = $klinik['telepon'];
+$alamat = $klinik['alamat'];
+$header_logo = $klinik['header-logo'];
+
+// header logo
+$img_header_logo = $singkatan_sistem;
+if ($header_logo) {
+  $src = "assets/img/$header_logo";
+  if (file_exists($src)) {
+    $img_header_logo = "<a href='index.php' class='logo me-auto'><img src='$src' alt='$singkatan_sistem' class='img-fluid'></a>";
+  } else {
+    // warning logo missing
+  }
+}
+
+
 
 $jam = date('H');
 
@@ -23,7 +49,7 @@ if ($jam >= 9) {
 
 
 $text_wa = "Selamat $waktu Customer Service $nama_sistem!%0a%0aSetelah melihat website $nama_sistem, saya ingin bertanya perihal:%0a%0a";
-$link_wa = "<a href='https://api.whatsapp.com/send?phone=$no_wa&text=$text_wa' target=_blank id=no_wa_marketing>$no_wa</a>";
+$link_wa = "<a href='https://api.whatsapp.com/send?phone=$whatsapp&text=$text_wa' target=_blank id=no_wa_marketing>$whatsapp</a>";
 
 $social_links = [
   'twitter' => '#',
@@ -34,10 +60,10 @@ $social_links = [
 
 
 //hero 
-$header_welcome = "Welcome to $nama_sistem";
-$welcome_msg2 = "Kami adalah Penyedia Jasa Layanan Kesehatan Professional dan Komprehensif bidang Medical Checkup, In-House Clinic, dan Klinik Pratama";
-$button_caption = "Program Kami";
-$button_href = "#produk";
+$hero_header = "Welcome to $nama_sistem";
+$hero_desc = "Kami adalah Penyedia Jasa Layanan Kesehatan Professional dan Komprehensif bidang Medical Checkup, In-House Clinic, dan Klinik Pratama";
+$hero_button = "Program Kami";
+$hero_href = "#produk";
 $bg_hero = 'hero-bg3.jpg';
 
 //why us

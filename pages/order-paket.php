@@ -14,7 +14,7 @@ if (isset($_POST['btn_verifikasi'])) {
   $pesan_by_system = str_replace('<br>', '%0a', $_POST['pesan_by_system']);
   $pesan_tambahan = $_POST['pesan_tambahan'] ? "%0a%0a%0a_Pesan tambahan:_%0a $_POST[pesan_tambahan]" : '';
   $text_wa = "$pesan_by_system $pesan_tambahan";
-  $href = "https://api.whatsapp.com/send?phone=$no_wa&text=$text_wa";
+  $href = "https://api.whatsapp.com/send?phone=$whatsapp&text=$text_wa";
 
   $href = str_replace(array("\r", "\n"), '', $href);
   $href = str_replace("\n", '%0a', $href);

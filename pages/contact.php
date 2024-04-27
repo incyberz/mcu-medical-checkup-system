@@ -44,19 +44,19 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
           <div class="address">
             <i class="bi bi-geo-alt"></i>
             <h4>Lokasi:</h4>
-            <p>Tambun Business Park Blok C12, Jl. Raya Pantura, Tambun, Bekasi, Jawa Barat, Indonesia</p>
+            <p><?= $alamat ?></p>
           </div>
 
           <div class="email">
             <i class="bi bi-envelope"></i>
             <h4>Email:</h4>
-            <p>info@mmc-clinic.com</p>
+            <p><?= $email ?></p>
           </div>
 
           <div class="phone">
             <i class="bi bi-phone"></i>
             <h4>Telepon:</h4>
-            <p>021-8909 5776</p>
+            <p><?= $phone ?></p>
           </div>
 
         </div>
