@@ -56,7 +56,7 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
           <div class="phone">
             <i class="bi bi-phone"></i>
             <h4>Telepon:</h4>
-            <p><?= $phone ?></p>
+            <p><?= $telepon ?></p>
           </div>
 
         </div>

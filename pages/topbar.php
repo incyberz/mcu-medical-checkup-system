@@ -13,7 +13,7 @@ echo "
     <div class='container d-flex justify-content-between'>
       <div class='contact-info d-flex align-items-center'>
         <a href='mailto:$email'><i class='bi bi-envelope'></i> <span class='desktop-only'>$email</span></a>
-        <i class='bi bi-phone desktop-only'></i> <span class='desktop-only'>$phone</span>
+        <i class='bi bi-phone desktop-only'></i> <span class='desktop-only'>$telepon</span>
         <i class='bi bi-whatsapp'></i> $link_wa
       </div>
       <div class='d-none d-lg-flex social-links align-items-center'>

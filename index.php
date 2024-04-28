@@ -316,6 +316,10 @@ function edit_section($page, $caption = '', $icon = '')
       width: 100%;
     }
   }
+
+  .log {
+    background: yellow;
+  }
 </style>
 
 <body>

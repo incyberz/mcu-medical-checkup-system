@@ -14,7 +14,8 @@ function echolog($pesan, $break = true)
 {
   $br = ($break and $pesan != 'sukses') ? '<br>' : '';
   $dots = ($break and $pesan != 'sukses') ? '... ' : '';
-  echo "$br<span class='log'>syslog: $pesan$dots</span>";
+  $dots = '... ';
+  echo "<span class='log'>$pesan$dots</span>$br";
 }
 
 function baca_csv($file, $separator = ',')

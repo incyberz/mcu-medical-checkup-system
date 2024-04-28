@@ -22,12 +22,19 @@ if ($username) {
       <div id=edit_global class='hideita wadah mt2 gradasi-kuning'>
         <form method=post class=wadah>
           <div class='consolas abu f14 mb2'>Form Edit Global Variable</div>
-          <input class='form-control mb1' name=nama_sistem value='$nama_sistem' placeholder='Nama Sistem...'>
-          <input class='form-control mb1' name=singkatan_sistem value='$singkatan_sistem' placeholder='Singkatan Sistem...'>
-          <input class='form-control mb1' name=whatsapp value='$whatsapp' placeholder='Kontak Whatsapp...'>
-          <input class='form-control mb1' name=telepon value='$phone' placeholder='Kontak Telepon...'>
-          <input type=email class='form-control mb1' name=email value='$email' placeholder='Kontak Email...'>
-          <textarea class='form-control mb1' name=alamat value='$alamat' placeholder='Alamat lengkap...' rows=4>$alamat</textarea>
+          <input required class='form-control mb1' name=nama_sistem value='$nama_sistem' placeholder='Nama Sistem...'>
+          <input required class='form-control mb1' name=singkatan_sistem value='$singkatan_sistem' placeholder='Singkatan Sistem...'>
+          <input required class='form-control mb1' name=whatsapp value='$whatsapp' placeholder='Kontak Whatsapp...'>
+          <input required class='form-control mb1' name=telepon value='$telepon' placeholder='Kontak Telepon...'>
+          <input required type=email class='form-control mb1' name=email value='$email' placeholder='Kontak Email...'>
+          <textarea required class='form-control mb1' name=alamat value='$alamat' placeholder='Alamat lengkap...' rows=4>$alamat</textarea>
+          <div class='wadah mt2'>
+            <div class='f14 abu mb1'>Sosial Media</div>
+            <input class='form-control mb1' name=twitter value='$twitter' placeholder='Media Tweeter...'>
+            <input class='form-control mb1' name=facebook value='$facebook' placeholder='Media Facebook...'>
+            <input class='form-control mb1' name=instagram value='$instagram' placeholder='Media Instagram...'>
+            <input class='form-control mb1' name=linkedin value='$linkedin' placeholder='Media LinkedIn...'>
+          </div>
           <div class=pt1>
             <button class='btn btn-success btn-sm proper' name=btn_save_settings value='global'>Save global Settings</button>
           </div>
@@ -38,14 +45,13 @@ if ($username) {
             <div class=flexy>
               <div class='pt2 pl2'>Ganti logo dengan:</div>
               <div>
-                <input type=file class='form-control' name=header_logo value='$header_logo' accept='.jpg'>
+                <input required type=file class='form-control' name=header_logo value='$header_logo' accept='.png'>
               </div>
               <div class=pt1>
                 <button class='btn btn-success btn-sm ' name=btn_save_settings value='global'>Replace</button>
               </div>
             </div>
             <div class='miring abu f12 mt2 pl2'>Wajib PNG transparan dengan height 50px, klik-kanan pada logo diatas, lalu Save As, lalu edit gambar tersebut</div>
-            <div class='miring abu f12 mt2 pl2'>Agar perubahan langsung terlihat, nama file disarankan tidak boleh sama dengan <span class='darkblue tebal'>\"$header_logo\"</span></div>
           </div>
         </form>
       </div>
@@ -79,10 +85,10 @@ if ($username) {
             <div class='flexy mt2'>
               <div class='pt2 pl2'>Ganti bg-hero dengan:</div>
               <div>
-                <input required type=file class='form-control' name=bg_hero value='$bg_hero' accept='.png'>
+                <input required type=file class='form-control' name=bg_hero value='$bg_hero' accept='.jpg'>
               </div>
               <div class=pt1>
-                <button class='btn btn-success btn-sm on-dev' name=btn_save_settings value='hero'>Replace</button>
+                <button class='btn btn-success btn-sm' name=btn_save_settings value='hero'>Replace</button>
               </div>
             </div>
           </div>
