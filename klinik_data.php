@@ -139,8 +139,8 @@ foreach ($arr_keunggulan as $key => $value) {
 
 // tentang kami
 $tentang = [
-  'title' => $klinik['tentang_title'],
-  'desc' => $klinik['tentang_desc'],
+  'title' => $klinik['tentang_title'] ?? 'Tentang Kami',
+  'desc' => $klinik['tentang_desc'] ?? '',
   'video' => $klinik['tentang_video'] ?? '',
   'video_bg' => $klinik['tentang_video_bg'] ?? '',
 
@@ -160,7 +160,7 @@ $tentang = [
   'goals_icon' => $klinik['goals_icon'] ?? 'medal',
   'goals_href' => $klinik['goals_href'] ?? '',
 
-  'visi' => $klinik['visi'] ?? '',
+  'visi' => $klinik['visi'] ?? 'zzz',
   'misi' => [
     'Memberikan layanan kesehatan yang professional, terjangkau, dan berkualitas tinggi',
     'Mengembangkan teknologi informasi untuk meningkatkan efisiensi dan kualitas layanan',

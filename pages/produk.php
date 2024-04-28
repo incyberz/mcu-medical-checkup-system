@@ -10,6 +10,11 @@
     <div class="row">
       <?php
       $edit_section = $role == 'admin' ? edit_section('produk', 'produk (program kami)') : '';
+      $edit_section .= "    
+        <div id=edit_produk class='hideit wadah mt2 gradasi-kuning'>
+          Untuk manage Program dan Paket-paketnya silahkan menuju laman <a href='?manage-produk'>Manage Program</a>.
+        </div>
+      ";
 
       $s = "SELECT * FROM tb_jenis_program ORDER BY no";
       $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
