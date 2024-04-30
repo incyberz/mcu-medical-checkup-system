@@ -21,6 +21,7 @@ $id_klinik = 1; //klinik MMC
 $lokasi_pages = 'pages';
 $lokasi_pdf = 'assets/pdf';
 $lokasi_img = 'assets/img';
+$lokasi_paket = 'assets/img/paket';
 
 $whatsapp_klinik_show = '0852-1257-2979';
 $whatsapp_klinik = '6285212572979';
@@ -319,6 +320,11 @@ function edit_section($page, $caption = '', $icon = '')
 
   .log {
     background: yellow;
+  }
+
+  .btn-transparan {
+    border: none;
+    background: none;
   }
 </style>
 

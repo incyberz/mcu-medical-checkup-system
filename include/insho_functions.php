@@ -1,9 +1,27 @@
 <?php
+// v.1.3.4 seth2 dan key2kolom
 // v.1.3.3 tr_col colspan=100%
 // v.1.3.2 baca_csv update
 // v.1.3.1 echolog update
 // v.1.3.0 revision with echolog
 // v.1.2.0 revision with function baca_csv
+
+function set_h2($judul, $sub_judul = '')
+{
+  echo "
+    <div class='section-title'>
+      <h2>$judul</h2>
+      <p>$sub_judul</p>
+    </div>
+  ";
+}
+
+function key2kolom($key)
+{
+  return ucwords(str_replace('_', ' ', $key));
+}
+
+
 function tr_col($pesan, $td_class = '', $tr_class = '', $jumlah_col = 100)
 {
   $colspan = $jumlah_col < 10 ? $jumlah_col : "$jumlah_col%";

@@ -11,7 +11,7 @@
 </style>
 <?php
 // bg hero
-echo "<style>#hero{background: url('assets/img/$bg_hero') top center;}</style>";
+echo "<style>#hero{background: url('assets/img/$bg_hero') top center no-repeat;}</style>";
 $welcome_login = '';
 if ($username) {
   $welcome_login .= "Welcome <b class=darkblue>$nama_user</b>! Anda sedang login sebagai <b class='darkblue miring'>$role</b> dan dapat mengakses fitur tambahan sesuai dengan hak akses Anda";
@@ -95,9 +95,27 @@ if ($username) {
         </form>
       </div>
     ";
-    $edit_section = "<div class='wadah bg-white mt4'><p>$welcome_login</p>$edit_section</div>";
+    $fitur_login = "<div class='wadah bg-white mt4'><p>$welcome_login</p>$edit_section</div>";
+    // end fitur admin
+
+  } elseif ($role == 'marketing') {
+    $fitur_login = "
+      <div class='wadah gradasi-kuning mt4'>
+        <p>$welcome_login</p>
+        <a class='btn btn-primary' href='?manage-paket'>Manage Paket</a>
+        <a class='btn btn-primary' href='?manage-order'>Manage Order</a>
+      </div>
+    ";
   }
 }
+
+$section_login = !$username ? '' : "
+  <section>
+    <div class='container'>
+      $fitur_login
+    </div>
+  </section>
+";
 
 echo "
 <section id='hero' class='d-flex align-items-center'>
@@ -107,10 +125,6 @@ echo "
     <a href='$hero_href' class='btn-get-started scrollto'>$hero_button</a>
   </div>
 </section>
-<section>
-  <div class='container'>
-    $edit_section
-  </div>
-</section>
+$section_login
 ";
 ?>

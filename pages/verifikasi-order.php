@@ -4,291 +4,287 @@
   }
 </style>
 <?php
-admin_only('Maaf, hanya login admin yang dapat melakukan Verifikasi Order<hr>Mohon bersabar untuk menunggu balasan dari Tim Marketing kami.<hr>Page ini otomatis redirect ke homepage...', 5000);
+$order_no = $_GET['order_no'] ?? die(erid('order_no'));
+$judul = 'Verifikasi Order';
+set_title($judul);
+set_h2($judul, "Untuk Order No : $order_no");
+only(['admin', 'marketing']);
 
 
 
-$pesan_insert = '';
-if (isset($_POST['btn_verifikasi'])) {
 
 
-  $pesan_by_system = str_replace('<br>', '%0a', $_POST['pesan_by_system']);
-  $pesan_tambahan = $_POST['pesan_tambahan'] ? "%0a%0a%0a_Pesan tambahan:_%0a $_POST[pesan_tambahan]" : '';
-  $text_wa = "$pesan_by_system $pesan_tambahan";
-  $href = "https://api.whatsapp.com/send?phone=$whatsapp&text=$text_wa";
 
-  $href = str_replace(array("\r", "\n"), '', $href);
-  $href = str_replace("\n", '%0a', $href);
 
-  echo div_alert('success', "Pastikan Anda membuka Whatsapp-Web atau sudah terinstall Aplikasi Whatsapp. Pesan Order akan diteruskan melalui whatsapp ke Marketing PT.MMC.");
-  jsurl($href, 2000);
+
+
+
+
+
+
+
+
+
+# ===========================================================
+# PROCESSORS
+# ===========================================================
+if (isset($_POST['btn_batalkan'])) {
+  $order_no = $_POST['btn_batalkan'];
+  $s = "UPDATE tb_order SET 
+  status = -1, 
+  tanggal_verifikasi = CURRENT_TIMESTAMP,
+  diverifikasi_oleh = $id_user,
+  alasan_batal = '$_POST[alasan_batal]'
+
+  WHERE order_no='$order_no'";
+  echo $s;
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echo div_alert('success', "Order No. $order_no telah dibatalkan.");
+  // jsurl('', 3000);
+
+} elseif (isset($_POST['btn_proses'])) {
+
+  $order_no = $_POST['btn_proses'];
+  // echo '<pre>';
+  // var_dump($_POST);
+  // echo '</pre>';
+
+  $s = "INSERT INTO tb_pendaftar (
+    nama,
+    perusahaan,
+    jabatan,
+    no_wa,
+    username 
+  ) VALUES (
+    '$_POST[nama_pendaftar]',
+    '$_POST[perusahaan_pendaftar]',
+    '$_POST[jabatan_pendaftar]',
+    '$_POST[no_wa_pendaftar]',
+    '$_POST[username_pendaftar]'
+  )";
+  // echo "$s <hr>";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echo div_alert('success', "Pendaftar baru berhasil ditambahkan.");
+
+
+  $s = "UPDATE tb_order SET 
+  status = 1, 
+  tanggal_verifikasi = CURRENT_TIMESTAMP,
+  diverifikasi_oleh = $id_user,
+  no_wa = '$_POST[no_wa_pendaftar]' 
+
+  WHERE order_no='$order_no'";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echo div_alert('success', "Data Order No. $order_no telah diupdate.");
+
+  // jsurl('', 3000);
+  // processing whatsapp message
+  $pesan = "Selamat $waktu Saudara/i $_POST[nama_pendaftar] dari $_POST[perusahaan_pendaftar] ";
+  echo $pesan;
   exit;
 }
 
-if (isset($_POST['btn_order_paket'])) {
-  $order_no = $_POST['order_no'] ?? die(erid('order_no'));
-  $pendaftar = $_POST['pendaftar'] ?? die(erid('pendaftar'));
-  $jabatan = $_POST['jabatan'] ?? die(erid('jabatan'));
-  $perusahaan = $_POST['perusahaan'] ?? die(erid('perusahaan'));
-  $jumlah_peserta = $_POST['jumlah_peserta'] ?? die(erid('jumlah_peserta'));
-  $id_paket = $_POST['btn_order_paket'] ?? die(erid('btn_order_paket'));
-
-  $s = "SELECT 1 FROM tb_order WHERE order_no='$order_no'";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  if (mysqli_num_rows($q)) {
-    // sudah ada data
-    $pesan_insert = div_alert('success', 'Order Anda sudah tersimpan di database.');
-  } else {
-    $ip_address = $_SERVER['REMOTE_ADDR'];
-    $s = "INSERT INTO tb_order (
-      order_no,
-      pendaftar,
-      jabatan,
-      perusahaan,
-      jumlah_peserta,
-      id_paket,
-      ip_address
-    ) VALUES (
-      '$order_no',
-      '$pendaftar',
-      '$jabatan',
-      '$perusahaan',
-      '$jumlah_peserta',
-      '$id_paket',
-      '$ip_address'
-    )";
-
-    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-    $pesan_insert = div_alert('success', 'Order Anda berhasil tersimpan.');
-  }
 
 
 
 
-  // exit;
-}
 
-$judul = 'Verifikasi Order';
-set_title($judul);
-$divs = '';
-$order_no = $_GET['order_no'] ?? die(erid('order_no'));
 
-// get paket properti
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ===========================================================
+# NORMAL FLOW
+# ===========================================================
 $s = "SELECT 
-a.id_program,
-a.no as no_paket,
-a.nama as nama_paket,
-a.deskripsi,
-a.biaya,
-a.info_biaya 
+a.tanggal_order as tanggal_order,
+a.pendaftar,
+a.jabatan,
+a.perusahaan,
+a.jumlah_peserta,
+a.status,
+a.alasan_batal,
+a.tanggal_verifikasi,
+b.nama as nama_paket,
+c.nama as program,
 
-FROM tb_paket a WHERE id=$id_paket";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-if (!mysqli_num_rows($q)) die('Data Paket tidak ditemukan.');
-$paket = mysqli_fetch_assoc($q);
-
-$id_program = $paket['id_program'];
-
-$Corporate = $id_program == 1 ? 'Corporate' : 'Mandiri';
-
-$s = "SELECT 
-a.id as id_paket,
-a.nama as nama_paket,
-a.deskripsi,
-a.info_biaya,
-a.biaya,
-a.customizable,
 (
-  SELECT COUNT(1) FROM tb_paket_detail 
-  WHERE id_paket=a.id) count_pemeriksaan
-
-FROM tb_paket a 
-JOIN tb_program b ON a.id_program = b.id
-WHERE a.id=$id_paket ";
+  SELECT nama FROM tb_user WHERE id=a.diverifikasi_oleh) diverifikasi_oleh,
+(
+  SELECT nama FROM tb_status_order WHERE status=a.status) status_order
+FROM tb_order a 
+JOIN tb_paket b ON a.id_paket=b.id 
+JOIN tb_program c ON b.id_program=c.id 
+WHERE a.order_no='$order_no'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$count_valid_paket = 0;
-while ($paket = mysqli_fetch_assoc($q)) {
-  if ($paket['count_pemeriksaan'] == 0) continue;
-  $count_valid_paket++;
-  $id_paket = $paket['id_paket'];
-  $nama_paket = $paket['nama_paket'];
-  $customizable = $paket['customizable'];
-
-  $where_id = $customizable ? "b.id_klinik=$id_klinik" : " a.id_paket=$paket[id_paket]";
-
-  if ($customizable) {
-    $s2 = "SELECT 
-    a.id as id_pemeriksaan,
-    a.nama as nama_pemeriksaan,
-    a.deskripsi 
-
-    FROM tb_pemeriksaan a 
-    WHERE a.id_klinik=$id_klinik ";
-    $lihat_detail = 'Lihat Pilihan Pemeriksaan';
-
-    $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
-    $pilihan = '';
-    while ($detail = mysqli_fetch_assoc($q2)) {
-      $id_pemeriksaan = $detail['id_pemeriksaan'];
-      $deskripsi = $detail['deskripsi'];
-      $pilihan .= "
-        <tr>
-          <td>
-            <input type=checkbox name=pemeriksaan__$id_pemeriksaan id=pemeriksaan__$id_pemeriksaan>
-          </td>
-          <td>
-            <label for=pemeriksaan__$id_pemeriksaan class=pointer>
-              $detail[nama_pemeriksaan] 
-              <div class='f12 abu miring'>$deskripsi</div>
-            </label>
-          </td>
-        </tr>
-      ";
+if (!mysqli_num_rows($q)) {
+  die('Data order tidak ditemukan.');
+} else {
+  $d = mysqli_fetch_assoc($q);
+  $status = $d['status'];
+  $nama_pendaftar = $d['pendaftar'];
+  $perusahaan_pendaftar = $d['perusahaan'];
+  $jabatan_pendaftar = $d['jabatan'];
+  $tr = '';
+  foreach ($d as $key => $value) {
+    if (
+      $key == 'status'
+      || $key == 'alasan_batal'
+      || $key == 'diverifikasi_oleh'
+      || $key == 'tanggal_verifikasi'
+    ) continue;
+    if ($key == 'tanggal_order') {
+      $value = date('d-M-y, H:i', strtotime($value)) . " ~ <span class='f12 miring abu'>" . eta(strtotime($value) - strtotime('now')) . '</span>';
+    } elseif ($key == 'status_order') {
+      if ($status == -1) {
+        $tgl = date('d-M-y', strtotime($d['tanggal_verifikasi']));
+        $value = "
+          <div class='tebal miring red'>$value</div>
+          <div class='f12 miring abu'>Dibatalkan oleh: $d[diverifikasi_oleh] at $tgl</div>
+          <div class='f12 miring abu'>Alasan: $d[alasan_batal]</div>
+        ";
+      } elseif ($status > 0) {
+        $tgl = date('d-M-y', strtotime($d['tanggal_verifikasi']));
+        $value = "
+          <div class='tebal miring green'>$value</div>
+          <div class='f12 miring abu'>Diterima dan diproses oleh: $d[diverifikasi_oleh] at $tgl</div>
+        ";
+      } else {
+        $value = '<span class="tebal miring red">Belum diverifikasi</span>';
+      }
     }
-    $details = "
-      <form method=post>
-        <table class='table table-bordered kiri'>
-          $pilihan
-        </table>
-        <button class='btn btn-primary w-100' onclick='onDev()'>Submit Custom Pemeriksaan</button>
-      </form>
-    ";
-    $form_order = '';
-  } else {
-
-    // non custom
-    $lihat_detail = 'Lihat Detail Pemeriksaan';
-    $order_no = date('y') . "0$id_klinik-0$id_program-" . strtotime('now');
-    $form_order = "
-      <form method=post class='mt4 wadah gradasi-hijau'>
-        <div class='flexy flex-between'>
-          <div class='sub_form'>Form Order Paket MCU</div>
-          <div class='consolas darkblue flexy'>
-            <div>Order No:</div> 
-            <div>
-              <input type=hidden name=order_no value=$order_no >
-              <input name=order_no2 value=$order_no class='form-control form-control-sm' disabled>
-            </div> 
-            
-          </div>
-
-        </div>
-
-        <div class='darkabu mb1'>Nama Anda</div>
-        <input required minlength=3 maxlength=30 class='form-control' name=pendaftar id=pendaftar>
-        <div class='mb4 mt1 f12 abu miring'>Mohon Anda masukan nama lengkap Anda sesuai KTP agar proses verifikasi berjalan lancar</div>
-
-        <select class='form-control mb2' name=jabatan id=jabatan>
-          <option value='0'>--Pilih Posisi--</option>
-          <option value='Pimpinan Perusahaan'>Saya Pimpinan Perusahaan</option>
-          <option value='Divisi HRD'>Saya Divisi HRD</option>
-          <option value='Divisi Marketing'>Saya Divisi Marketing</option>
-          <option value='Divisi Lainnya'>Saya Divisi Lainnya</option>
-        </select>
-
-        <input required minlength=3 maxlength=50 class='form-control mb4' name=perusahaan id=perusahaan placeholder='Nama Perusahaan...'>
-
-        <div class='darkabu mb1'>Perkiraan Jumlah Peserta MCU</div>
-        <input required type=number min=10 max=100000 class='form-control mb1' name=jumlah_peserta id=jumlah_peserta>
-        <div class='mb2 f12 abu miring'>Silahkan masukan estimasi jumlah peserta MCU yang akan Anda daftarkan! Jumlah peserta sangat mempengaruhi terhadap negosiasi biaya paket.</div>
-
-        <div class=mt2><button disabled class='btn btn-primary w-100' name=btn_order_paket id=btn_order_paket value=$id_paket>Order Paket</button></div>
-
-      </form>
-    ";
-
-    $s2 = "SELECT 
-    b.nama as nama_pemeriksaan
-
-    FROM tb_paket_detail a 
-    JOIN tb_pemeriksaan b ON a.id_pemeriksaan =b.id 
-    WHERE a.id_paket=$paket[id_paket] ORDER BY no";
-    $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
-    $details = '';
-    while ($detail = mysqli_fetch_assoc($q2)) {
-      $details .= "<li>$detail[nama_pemeriksaan]</li>";
-    }
-    if ($details) $details = "<ol class='f14 darkabu m0 pl3'>$details</ol>";
-  }
-
-
-
-
-  $id_toggle = 'detail' . $id_paket . '__toggle';
-  $biaya_show = $paket['biaya'] ? number_format($paket['biaya'], 0) : '';
-  $shout = $id_program == 1 ?  $paket['info_biaya'] : 'Rp' . $biaya_show;
-  $shout = $shout == 'Rp' ? 'Custom Biaya' : $shout;
-
-  if ($pesan_insert) {
-    $tgl = date('M d, Y, H:i:s');
-
-    $arr = explode('?', $_SERVER['HTTP_REFERER']);
-    $link = "$arr[0]?verifikasi-order&order_no=$order_no";
-    $link = urlencode($link);
-
-    $pesan_by_system = "*ORDER-NO : $order_no* <br>============================<br>Kepada Yth. Tim Marketing Mutiara Medical Center,<br><br>Saya *$pendaftar* selaku *$jabatan di $perusahaan* mengajukan Order Paket MCU *$Corporate $nama_paket* dengan estimasi jumlah peserta sebanyak *$jumlah_peserta karyawan*.<br><br>Mohon segera di-follow-up untuk Surat Penawaran-nya. Terimakasih. [Mutiara MCU System, $tgl]<br><br>$link";
-    $divs = "
-      $pesan_insert
-      <div class='wadah p2 item-corporate' style='max-width:600px; margin:auto'>
-        <form method=post class=''>
-          <div class='f14 darkabu mb1 consolas'>Pesan By System</div>
-          <div class='bordered f12 abu p1 mb4'>$pesan_by_system</div>
-          <input type=hidden name=pesan_by_system value='$pesan_by_system' />
-
-          <div class='f14 darkabu mb1'>Pesan tambahan dari Anda (opsional)</div>
-          <textarea class='form-control mb2' rows=5 name=pesan_tambahan id=pesan_tambahan></textarea>
-
-          <button class='btn btn-primary w-100' name=btn_verifikasi>Lanjutkan Verifikasi by Whatsapp</button>
-          <div class='f12 mt1 darkabu'>Pesan Order Anda akan kami teruskan ke Bagian Marketing PT. MMC via Whatsapp agar segera di follow-up dan segera membuat Surat Penawaran untuk Anda.</div>
-
-        </form>
-      </div>
-    ";
-  } else {
-    $divs = "
-      <div class='wadah p2 item-corporate' style='max-width:600px; margin:auto'>
-        <h3 >$paket[nama_paket]</h3>
-        <div class='f12 abu mt1 mb2'>$paket[deskripsi]</div>
-        <div class='f18 consolas darkblue mt1 mb1'>$shout</div>
-        <span class='btn_aksi pointer f12' id=$id_toggle> $img_detail $lihat_detail</span>
-        <div id=detail$id_paket class='hideit wadah gradasi-kuning mt1 '>$details</div>
-        $form_order
-      </div>
+    $kolom = key2kolom($key);
+    $tr .= "
+      <tr>
+        <td>$kolom</td>
+        <td>:</td>
+        <td>$value</td>
+      </tr>
     ";
   }
+  echo "<table class='table'>$tr</table>";
 }
 
-$alert = '';
-if (!$count_valid_paket) $alert = div_alert('danger', "Maaf, belum ada Paket yang cocok untuk Program ini. Anda boleh menghubungi kami untuk informasi lebih lanjut dengan cara klik Nomor Whatsapp di paling atas.");
+$proses_or_batal = '';
+$form_batalkan_order = '';
+$form_proses_order = '';
+if ($status) {
+  // if ($status == -1) {
+  //   // $proses_or_batal = "DIBATALKAN";
+  // } elseif ($status == 1) {
+  //   $proses_or_batal = "BARU DIPROSES";
+  // } else {
+  //   $proses_or_batal = "PROSES LANJUT";
+  // }
+} else {
+  // status is null BELUM DIPROSES
+  $proses_or_batal = "
+  <div class='mb2'>
+    <span class='btn btn-primary btn_aksi btn_handle_order' id=form_proses_order__toggle>Proses Order</span>
+    <span class='btn btn-danger btn_aksi btn_handle_order' id=form_batalkan_order__toggle>Batalkan Order</span>
+  </div>
+  ";
 
-echo "
-<div class='section-title'>
-  <h2>$judul</h2>
-  <p>$back | Silahkan Anda melanjutkan proses order MCU $Corporate!</p>
-</div>
+  $form_batalkan_order = "
+  <form class='hideit wadah' method='post' id=form_batalkan_order>
+    <div class='flexy'>
+      <div>
+        <input required type='text' class='form-control' name=alasan_batal placeholder='Alasan batal...'>
+      </div>
+      <div>
+        <button class='btn btn-danger' name=btn_batalkan value='$order_no'>Batalkan</button>
+      </div>
+    </div>
+  </form>
+  ";
 
-<section id='produk' class='produk p0'>
-  $divs
-  $alert
-</section>
-";
+  $username_pendaftar = strtolower(str_replace(' ', '', $d['pendaftar']));
+  $s = "SELECT 1 FROM tb_pendaftar WHERE username like '$username_pendaftar%'";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $count = mysqli_num_rows($q);
+  if ($count) {
+    $count++;
+    $username_pendaftar .= $count;
+  }
 
+  $form_proses_order = "
+    <form class='hideita wadah gradasi-hijau' method='post' id=form_proses_order>
+      <input type=hidden name=nama_pendaftar value='$nama_pendaftar'> 
+      <input type=hidden name=perusahaan_pendaftar value='$perusahaan_pendaftar'> 
+      <input type=hidden name=jabatan_pendaftar value='$jabatan_pendaftar'> 
+      <input required class='form-control mb1' name=no_wa_pendaftar id=no_wa_pendaftar placeholder='Whatsapp Pendaftar...'>
+      <div class='f12 abu miring mb3 ml1'>Lihat pada pesan whatsapp yang diterima</div>
 
+      <input required class='form-control mb1' name=username_pendaftar id=username_pendaftar value='$username_pendaftar' placeholder='Username untuk Pendaftar...'>
+      <div class='f14 abu miring mb3 ml1'>Username pendaftar dibutuhkan agar pendaftar dapat melanjutkan proses MoU Medical Checkup. Password default sama dengan username</div>
+
+      <textarea class='form-control mb3' name=pesan_tambahan placeholder='Pesan tambahan jika ada...'></textarea>
+
+      <button class='btn btn-primary' name=btn_proses value='$order_no'>Proses dan Kirim ke Whatsapp Pendaftar</button>
+    </form>
+  ";
+}
+
+echo "$proses_or_batal";
+echo $form_batalkan_order;
+echo $form_proses_order;
 ?>
+
+
+
+
+
 <script>
   $(function() {
-    $('#jabatan').change(function() {
-      let val = $(this).val();
-      console.log(val);
-      if (val == '0') {
-        $(this).addClass('gradasi-merah');
-        $('#btn_order_paket').prop('disabled', 1);
-
+    $('.btn_handle_order').click(function() {
+      let id = $(this).prop('id');
+      if (id == 'form_proses_order__toggle') {
+        $('#form_batalkan_order').slideUp();
       } else {
-        $('#btn_order_paket').prop('disabled', 0);
-        $(this).removeClass('gradasi-merah');
-
+        $('#form_proses_order').slideUp();
       }
     })
+  })
+</script>
+
+
+<script>
+  $(function() {
+    $('#no_wa_pendaftar').keyup(function() {
+      let val = $(this).val();
+
+      if (val.length > 2) {
+        if (val.substring(0, 1) == '0') {
+          $(this).val('62' + val.substring(1, 100));
+        }
+      }
+
+      $(this).val(
+        $(this).val().replace(/[^0-9]/g, '')
+      )
+    });
+
+    $('#username_pendaftar').keyup(function() {
+      $(this).val(
+        $(this).val()
+        .trim()
+        .toLowerCase()
+        .replace(/[!@#$%^&*()+\-=\[\]{}.,;:'`"\\|<>\/?~ ]/gim, '')
+      );
+
+    });
   })
 </script>

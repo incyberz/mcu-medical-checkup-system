@@ -16,14 +16,10 @@ $img_warning = '<img class="zoom pointer" src="assets/img/icons/warning.png" alt
 $img_next = '<img class="zoom pointer" src="assets/img/icons/next.png" alt="next" height=20px>';
 $img_prev = '<img class="zoom pointer" src="assets/img/icons/prev.png" alt="prev" height=20px>';
 $img_locked = '<img class="zoom pointer" src="assets/img/icons/locked.png" alt="locked" height=20px>';
-$img_sum = '<img class="zoom pointer" src="assets/img/icons/sum.png" alt="sum" height=20px>';
-$img_sum_disabled = '<img class="zoom pointer" src="assets/img/icons/sum_disabled.png" alt="sum_disabled" height=20px>';
+$img_image = '<img class="zoom pointer" src="assets/img/icons/image.png" alt="image" height=20px>';
+$img_wa = '<img class="zoom pointer" src="assets/img/icons/wa.png" alt="wa" height=20px>';
 
 
 
 $bintang = '<span class="tebal red pointer" onclick="alert(\'Field ini wajib diisi.\')">*</span>';
 $unique = '<span class="tebal blue pointer" onclick="alert(\'Field ini isinya harus unique.\')">*</span>';
-
-
-$fs_icon = ' <b class="f14 ml1 mr1 biru p1 pr2 br5" style="display:inline-block;background:green;color:white">FS</b>';
-$img_fs = $fs_icon;

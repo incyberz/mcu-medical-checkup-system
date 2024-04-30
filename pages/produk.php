@@ -12,7 +12,7 @@
       $edit_section = $role == 'admin' ? edit_section('produk', 'produk (program kami)') : '';
       $edit_section .= "    
         <div id=edit_produk class='hideit wadah mt2 gradasi-kuning'>
-          Untuk manage Program dan Paket-paketnya silahkan menuju laman <a href='?manage-produk'>Manage Program</a>.
+          Untuk manage Program dan Paket-paketnya silahkan menuju laman <a href='?manage-paket'>Manage Paket</a>.
         </div>
       ";
 

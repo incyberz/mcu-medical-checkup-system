@@ -20,7 +20,7 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
 
     <div class="section-title">
       <h2>Kontak</h2>
-      <p>Untuk perihal fee marketing, basic price, jenis pemeriksaan, atau tentang proses MCU yang kurang jelas, dapat Anda tanyakan kepada Tim Marketing kami. Untuk alamat kantor kami adalah sebagai berikut:</p>
+      <p>Untuk perihal negosiasi harga, jenis pemeriksaan, atau tentang proses MCU yang kurang jelas, dapat Anda tanyakan kepada Tim Marketing kami via form berikut. Untuk alamat kantor kami adalah sebagai berikut:</p>
     </div>
   </div>
 

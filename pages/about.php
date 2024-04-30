@@ -29,6 +29,8 @@ $goals_href = $klinik['goals_href'] ?? '';
 
 $href = $tentang_video;
 
+// echo "<h1>$tentang_video</h1>";
+
 $arr = ['visi', 'misi', 'sejarah', 'goals'];
 $boxs = '';
 foreach ($arr as $item) {
@@ -225,11 +227,16 @@ if ($username and $role == 'admin') {
 
 
 echo "
+  <style>
+    .about .video-box {
+      background: url('assets/img/$tentang_video_bg') center center no-repeat;
+    }
+  </style>
   <section id='about' class='about'>
     <div class='container-fluid'>
       <div class='row'>
         <div class='col-xl-5 col-lg-6 video-box d-flex justify-content-center align-items-stretch position-relative'>
-          <a href='$href' class='glightbox play-btn mb-4'></a>
+          <a href='$tentang_video' class='glightbox play-btn mb-4'></a>
         </div>
         <div class='col-xl-7 col-lg-6 icon-boxes d-flex flex-column align-items-stretch justify-content-center py-5 px-lg-5'>
           <h3>$tentang_title</h3>
