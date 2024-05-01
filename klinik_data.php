@@ -89,38 +89,6 @@ for ($i = 0; $i < 10; $i++) {
   }
 }
 
-// $arr_keunggulan = [
-//   'High Security Data Rekam Medis' =>
-//   [
-//     'desc' => 'Data Rekam Medis Pasien kami jamin kerahasiaannya. Kami menggunakan teknologi enkripsi untuk setiap data sensitive, memisahkan data antar corporate (separated-database), dan data hanya dapat diakses oleh pihak yang berwenang.',
-//     'icon' => 'check-shield',
-//   ],
-//   'Realtime Reporting MCU' =>
-//   [
-//     'desc' => 'Anda sebagai Corporate maupun karyawan (individual) dapat memantau proses MCU dimulai proses pendaftaran, pemeriksaan, hingga hasil MCU dengan login masing-masing via smartphone',
-//     'icon' => 'mobile',
-//   ],
-//   'Biaya Sangat Terjangkau' =>
-//   [
-//     'desc' => 'Basic Price dari kami adalah the best price bagi Corporate/Lembaga Anda. Untuk biaya bersifat negotiable sesuai Jumlah Peserta MCU dan lokasi perusahaan Anda! Silahkan Anda hubungi Marketing kami dan buktikan!',
-//     'icon' => 'dollar-circle',
-//   ],
-//   'Onsite ke Perusahaan' =>
-//   [
-//     'desc' => 'Tidak perlu ada waktu yang terbuang! Dengan minimal 100 karyawan kami dapat melayani Medical Checkup di Perusahaan Anda (onsite)!',
-//     'icon' => 'car',
-//   ],
-//   'Program Pelayanan Medis' =>
-//   [
-//     'desc' => 'Pengalaman kami lebih dari 20 tahun di bidang Pelayanan Medis. Kami juga memiliki beberapa Klinik Pratama, In-House Clinic, serta Fasilitas Medical Checkup dan Laboratorium Medis',
-//     'icon' => 'medal',
-//   ],
-//   'Peralatan Medis Lengkap' =>
-//   [
-//     'desc' => 'Peralatan penunjang medis kami yang canggih dan terakreditasi Paripurna membuat waktu pemeriksaan bagi Anda (karyawan Anda) lebih cepat, efisien, dan akurat.',
-//     'icon' => 'cog',
-//   ],
-// ];
 
 for ($i = 0; $i < 10; $i++) {
   $kelebihan[$i] = '';
@@ -137,54 +105,6 @@ foreach ($arr_keunggulan as $key => $value) {
 }
 
 
-// tentang kami
-$tentang = [
-  'title' => $klinik['tentang_title'] ?? 'Tentang Kami',
-  'desc' => $klinik['tentang_desc'] ?? '',
-  'video' => $klinik['tentang_video'] ?? '',
-  'video_bg' => $klinik['tentang_video_bg'] ?? '',
-
-  'visi_title' => $klinik['visi_title'] ?? 'Visi',
-  'visi_icon' => $klinik['visi_icon'] ?? 'star',
-  'visi_href' => $klinik['visi_href'] ?? '',
-
-  'misi_title' => $klinik['misi_title'] ?? 'Misi',
-  'misi_icon' => $klinik['misi_icon'] ?? 'calendar-star',
-  'misi_href' => $klinik['misi_href'] ?? '',
-
-  'sejarah_title' => $klinik['sejarah_title'] ?? 'Sejarah',
-  'sejarah_icon' => $klinik['sejarah_icon'] ?? 'history',
-  'sejarah_href' => $klinik['sejarah_href'] ?? '',
-
-  'goals_title' => $klinik['goals_title'] ?? 'Goals',
-  'goals_icon' => $klinik['goals_icon'] ?? 'medal',
-  'goals_href' => $klinik['goals_href'] ?? '',
-
-  'visi' => $klinik['visi'] ?? 'zzz',
-  'misi' => [
-    'Memberikan layanan kesehatan yang professional, terjangkau, dan berkualitas tinggi',
-    'Mengembangkan teknologi informasi untuk meningkatkan efisiensi dan kualitas layanan',
-    'Menjadi mitra terpercaya bagi perusahaan dalam penyediaan layanan Medical Checkup',
-    'Terus berinovasi untuk memberikan solusi kesehatan yang terbaik bagi masyarakat',
-
-  ],
-  'sejarah' => [
-    '20 tahun berdiri sejak 2002 dan telah melayani berbagai perusahaan di Indonesia',
-    'Didirikan oleh dr. Mutiara, seorang dokter dengan pengalaman lebih dari 30 tahun di bidang kesehatan',
-    'Memiliki cabang klinik dan laboratorium di berbagai wilayah di Indonesia',
-    'Telah melayani lebih dari 1 juta pasien seluruh Indonesia'
-
-
-  ],
-  'goals' => [
-    'Menjadi pusat layanan Medical Checkup terbaik di Indonesia',
-    'Membantu perusahaan menjaga kesehatan karyawannya melalui layanan Medical Checkup yang efektif dan efisien',
-    'Meningkatkan kesadaran masyarakat akan pentingnya pemeriksaan kesehatan secara rutin',
-    'Berkontribusi dalam meningkatkan kualitas hidup masyarakat Indonesia',
-
-
-  ]
-];
 
 
 //produk
@@ -192,3 +112,8 @@ $produk = [
   'title' => 'Program Kami',
   'desc' => 'Buktikan dan dapatkan harga terbaik paling terjangkau untuk semua program kami!',
 ];
+
+
+// Team
+$team_header = $klinik['team_header'] ?? 'Dokter dan Team';
+$team_desc = $klinik['team_desc'] ?? 'Perkenalkan kami adalah Para Dokter Professional dan juga Tim Medis berpengalaman.';
