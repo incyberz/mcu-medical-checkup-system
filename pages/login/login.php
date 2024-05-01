@@ -1,6 +1,6 @@
 <?php
 $pesan_login = '';
-$username = '';
+$username = $_GET['username'] ?? '';
 $password = '';
 
 if (isset($_POST['btn_login_wms'])) {
@@ -16,15 +16,28 @@ if (isset($_POST['btn_login_wms'])) {
     $s = "SELECT 1 from tb_user WHERE username='$username' and $sql_password";
     // echo $s;
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    $username_exist = 0;
     if (mysqli_num_rows($q) == 1) {
-      $d = mysqli_fetch_assoc($q);
+      $username_exist = 1;
+    } else {
+
+      // try in tb_pendaftar
+      $s = "SELECT 1 from tb_pendaftar WHERE username='$username' and $sql_password";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (mysqli_num_rows($q) == 1) {
+        $username_exist = 1;
+      } else {
+        $pesan_login = div_alert('danger', 'Maaf, username dan password tidak tepat. Silahkan coba kembali!');
+      }
+    }
+
+    if ($username_exist) {
+      // $d = mysqli_fetch_assoc($q);
       $_SESSION['mmc_username'] = $username;
 
 
       echo '<div style="padding: 100px 30px">Processing login...</div><script>location.replace("?")</script>';
       exit;
-    } else {
-      $pesan_login = div_alert('danger', 'Maaf, username dan password tidak tepat. Silahkan coba kembali!');
     }
   }
 }
@@ -48,7 +61,7 @@ if (isset($_POST['btn_login_wms'])) {
   <div class="wadah gradasi-biru form-login p-4">
     <h3>MMC Login</h3>
     <?= $pesan_login ?>
-    <div class="mt2">Anda dapat login sebagai pasien, dokter, petugas medis, atau sebagai administrator.</div>
+    <div class="mt2">Anda dapat login sebagai pasien, pendaftar, dokter, petugas medis, atau sebagai administrator.</div>
     <hr>
     <form method="post">
       <div class="form-group">

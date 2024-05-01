@@ -15,6 +15,8 @@ $null = '<span class="kecil miring red consolas">null</span>';
 $null_gray = '<span class="f12 miring abu consolas">null</span>';
 $hideit = 'hideit';
 $today = date('Y-m-d');
+$tanggal_show = date('d-F-Y');
+$tgl_show = date('d-M-y');
 $edit_section = '';
 
 $id_klinik = 1; //klinik MMC

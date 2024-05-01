@@ -2,6 +2,10 @@
 $page_tujuan = "pages/$parameter.php";
 if (!isset($parameter)) die('Routing memerlukan parameter.');
 
+// route home untuk pendaftar
+if (!$parameter and $role == 'pendaftar' and $parameter != 'pendaftar_home') jsurl('?pendaftar_home');
+
+
 $arr = [
   '' => 'pages/home',
   'login' => 'pages/login/login',
