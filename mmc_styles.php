@@ -22,6 +22,102 @@
 </style>
 
 
+<style>
+  /*--------------------------------------------------------------
+# Tim
+--------------------------------------------------------------*/
+  .tim {
+    background: #fff;
+  }
+
+  .tim .member {
+    position: relative;
+    box-shadow: 0px 2px 15px rgba(44, 73, 100, 0.08);
+    padding: 30px;
+    border-radius: 10px;
+  }
+
+  .tim .member .pic {
+    overflow: hidden;
+    width: 180px;
+    border-radius: 50%;
+  }
+
+  .tim .member .pic img {
+    transition: ease-in-out 0.3s;
+  }
+
+  .tim .member:hover img {
+    transform: scale(1.1);
+  }
+
+  .tim .member .member-info {
+    padding-left: 30px;
+  }
+
+  .tim .member h4 {
+    font-weight: 700;
+    margin-bottom: 5px;
+    font-size: 20px;
+    color: #2c4964;
+  }
+
+  .tim .member span {
+    display: block;
+    font-size: 15px;
+    padding-bottom: 10px;
+    position: relative;
+    font-weight: 500;
+  }
+
+  .tim .member span::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 50px;
+    height: 1px;
+    background: #b2c8dd;
+    bottom: 0;
+    left: 0;
+  }
+
+  .tim .member p {
+    margin: 10px 0 0 0;
+    font-size: 14px;
+  }
+
+  .tim .member .social {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .tim .member .social a {
+    transition: ease-in-out 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    width: 32px;
+    height: 32px;
+    background: #a0bcd5;
+  }
+
+  .tim .member .social a i {
+    color: #fff;
+    font-size: 16px;
+    margin: 0 2px;
+  }
+
+  .tim .member .social a:hover {
+    background: #1977cc;
+  }
+
+  .tim .member .social a+a {
+    margin-left: 8px;
+  }
+</style>
 
 <style>
   .produk .icon-box {
@@ -216,7 +312,7 @@
 
 
   /* SOCIAL SPAN OR LINK */
-  .doctors .member .social div {
+  .tim .member .social div {
     transition: ease-in-out 0.3s;
     display: flex;
     align-items: center;
@@ -229,13 +325,13 @@
     cursor: no-drop;
   }
 
-  .doctors .member .social div i {
+  .tim .member .social div i {
     color: #fff;
     font-size: 16px;
     margin: 0 2px;
   }
 
-  .doctors .member .social div:hover {
+  .tim .member .social div:hover {
     background: #cc7719;
   }
 </style>

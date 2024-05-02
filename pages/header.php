@@ -6,7 +6,7 @@ if (!$parameter) {
         <li><a class='nav-link scrollto' href='#why-us'>Keunggulan</a></li>
         <li><a class='nav-link scrollto' href='#about'>Tentang</a></li>
         <li><a class='nav-link scrollto' href='#produk'>Paket MCU</a></li>
-        <li><a class='nav-link scrollto' href='#doctors'>Dokter dan Tim</a></li>
+        <li><a class='nav-link scrollto' href='#tim'>Dokter dan Tim</a></li>
         <li><a class='nav-link scrollto' href='#contact'>Kontak</a></li>
   ";
 }

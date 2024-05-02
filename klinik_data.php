@@ -117,3 +117,5 @@ $produk = [
 // Team
 $team_header = $klinik['team_header'] ?? 'Dokter dan Team';
 $team_desc = $klinik['team_desc'] ?? 'Perkenalkan kami adalah Para Dokter Professional dan juga Tim Medis berpengalaman.';
+$gallery_header = $klinik['gallery_header'] ?? 'Gallery';
+$gallery_desc = $klinik['gallery_desc'] ?? 'Berikut adalah kegiatan kami saat proses Medical Checkup';

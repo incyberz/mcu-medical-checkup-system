@@ -12,10 +12,13 @@
       old_val = $(this).text();
       let new_val = prompt("Value baru:", old_val);
 
-      if (old_val == new_val) {
+      if (new_val === null) {
+        console.log('canceled', new_val);
+        return;
+      } else if (old_val == new_val) {
         console.log('old_val==new_val :: aborted');
         return;
-      } else if (new_val == '') {
+      } else if (new_val === '') {
         let y = confirm('Yakin ingin mengosongkan nilai?');
         if (!y) {
           console.log('aborted :: tidak jadi mengosongkan nilai');

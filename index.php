@@ -15,6 +15,7 @@ $null = '<span class="kecil miring red consolas">null</span>';
 $null_gray = '<span class="f12 miring abu consolas">null</span>';
 $hideit = 'hideit';
 $today = date('Y-m-d');
+$detik = date('ymdHis');
 $tanggal_show = date('d-F-Y');
 $tgl_show = date('d-M-y');
 $edit_section = '';
@@ -24,7 +25,8 @@ $lokasi_pages = 'pages';
 $lokasi_pdf = 'assets/pdf';
 $lokasi_img = 'assets/img';
 $lokasi_paket = 'assets/img/paket';
-$lokasi_team = 'assets/img/dokter-dan-tim';
+$lokasi_tim = 'assets/img/dokter-dan-tim';
+$lokasi_gallery = 'assets/img/gallery';
 
 $whatsapp_klinik_show = '0852-1257-2979';
 $whatsapp_klinik = '6285212572979';
