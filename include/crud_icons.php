@@ -17,7 +17,9 @@ $img_next = '<img class="zoom pointer" src="assets/img/icons/next.png" alt="next
 $img_prev = '<img class="zoom pointer" src="assets/img/icons/prev.png" alt="prev" height=20px>';
 $img_locked = '<img class="zoom pointer" src="assets/img/icons/locked.png" alt="locked" height=20px>';
 $img_image = '<img class="zoom pointer" src="assets/img/icons/image.png" alt="image" height=20px>';
-$img_wa = '<img class="zoom pointer" src="assets/img/icons/wa.png" alt="wa" height=20px>';
+$img_wa = '<img class="zoom pointer" src="assets/img/icons/wa.png" alt="wa" height=25px>';
+$img_home = '<img class="zoom pointer" src="assets/img/icons/home.png" alt="home" height=25px>';
+$img_excel = '<img class="zoom pointer" src="assets/img/icons/excel.png" alt="excel" height=25px>';
 
 
 

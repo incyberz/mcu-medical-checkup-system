@@ -27,6 +27,8 @@ $lokasi_img = 'assets/img';
 $lokasi_paket = 'assets/img/paket';
 $lokasi_tim = 'assets/img/dokter-dan-tim';
 $lokasi_gallery = 'assets/img/gallery';
+$lokasi_excel = 'assets/xls';
+$lokasi_xls = 'assets/xls';
 
 $whatsapp_klinik_show = '0852-1257-2979';
 $whatsapp_klinik = '6285212572979';
@@ -142,6 +144,7 @@ function edit_section($page, $caption = '', $icon = '')
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/radio-toolbar.css" rel="stylesheet">
   <script src="assets/vendor/jquery/jquery.min.js"></script>
 
   <!-- =======================================================

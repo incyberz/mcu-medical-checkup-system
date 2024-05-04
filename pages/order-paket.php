@@ -60,13 +60,26 @@ if (isset($_POST['btn_order_paket'])) {
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     $pesan_insert = div_alert('success', 'Order Anda berhasil tersimpan.');
   }
-
-
-
-
-  // exit;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# NORMAL FLOW 
+# ============================================================
 $judul = 'Order Paket';
 set_title($judul);
 $divs = '';

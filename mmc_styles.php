@@ -335,3 +335,10 @@
     background: #cc7719;
   }
 </style>
+
+
+<style>
+  td {
+    background: none !important;
+  }
+</style>

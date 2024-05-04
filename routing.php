@@ -5,6 +5,9 @@ if (!isset($parameter)) die('Routing memerlukan parameter.');
 // route home untuk pendaftar
 if (!$parameter and $role == 'pendaftar' and $parameter != 'pendaftar_home') jsurl('?pendaftar_home');
 
+// route home untuk pasien
+if (!$parameter and $role == 'pasien' and $parameter != 'pasien_home') jsurl('?pasien_home');
+
 
 $arr = [
   '' => 'pages/home',

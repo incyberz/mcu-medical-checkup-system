@@ -28,7 +28,9 @@ function link_medsos($medsos)
 
 
 
-
+# ============================================================
+# PROCESSORS
+# ============================================================
 if (isset($_POST['btn_upload_image_tim'])) {
   $id_tim = $_POST['btn_upload_image_tim'];
 
@@ -184,6 +186,50 @@ if (isset($_POST['btn_upload_image_tim'])) {
 
 
 $divs = '';
+$s = "SELECT 
+  a.*,
+  a.id as id_tim
+
+  FROM tb_tim a ORDER BY a.nomor";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$jumlah_anggota = mysqli_num_rows($q);
+$tr = '';
+$tr_upload = '';
+$th = '';
+$i = 0;
+while ($d = mysqli_fetch_assoc($q)) {
+  $i++;
+
+  $nama = $d['nama'];
+  $link_twitter = strlen($d['twitter']) <= 1 ? no_medsos('twitter', $nama) : link_medsos('twitter');
+  $link_facebook = strlen($d['facebook']) <= 1 ? no_medsos('facebook', $nama) : link_medsos('facebook');
+  $link_instagram = strlen($d['instagram']) <= 1 ? no_medsos('instagram', $nama) : link_medsos('instagram');
+  $link_linkedin = strlen($d['linkedin']) <= 1 ? no_medsos('linkedin', $nama) : link_medsos('linkedin');
+
+  $src = "$lokasi_tim/$d[image]";
+  $thumb = str_replace('.', '-thumb.', $src);
+  $thumb = file_exists($thumb) ? $thumb : $src;
+
+  $divs .= "
+      <div class='col-lg-6'>
+        <div class='member d-flex align-items-start'>
+          <div class='piczzz'><img src='$thumb' class='img-tim' alt='$d[image]'></div>
+          <div class='member-info'>
+            <h4>$d[nama]</h4>
+            <span>$d[jabatan]</span>
+            <p>$d[shout]</p>
+            <div class='social'>
+              $link_twitter
+              $link_facebook
+              $link_instagram
+              $link_linkedin
+            </div>
+          </div>
+        </div>
+      </div>
+    ";
+}
+
 if ($role == 'admin') {
 
   require_once 'include/editable_js_for_td.php';
@@ -212,24 +258,6 @@ if ($role == 'admin') {
     $thumb = str_replace('.', '-thumb.', $src);
     $thumb = file_exists($thumb) ? $thumb : $src;
 
-    $divs .= "
-      <div class='col-lg-6'>
-        <div class='member d-flex align-items-start'>
-          <div class='piczzz'><img src='$thumb' class='img-tim' alt='$d[image]'></div>
-          <div class='member-info'>
-            <h4>$d[nama]</h4>
-            <span>$d[jabatan]</span>
-            <p>$d[shout]</p>
-            <div class='social'>
-              $link_twitter
-              $link_facebook
-              $link_instagram
-              $link_linkedin
-            </div>
-          </div>
-        </div>
-      </div>
-    ";
 
 
     $td = '';
