@@ -9,6 +9,7 @@ $s = "SELECT
 a.order_no,
 a.tanggal_order,
 a.status,
+a.foto_profil,
 b.nama as nama_paket,
 c.nama as program,
 d.nama as status_order 
@@ -27,6 +28,7 @@ if (!mysqli_num_rows($q)) {
     $tanggal_order = $d['tanggal_order'];
     $tgl = date('d-F-Y', strtotime($tanggal_order));
     $status = $d['status'];
+    // $foto_profil = $d['foto_profil'];
     $status_show = $d['status_order'];
 
     $divs .= "

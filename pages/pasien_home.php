@@ -15,6 +15,12 @@
   .radio-toolbar label {
     padding: 7px 10px;
   }
+
+  .nomor {
+    font-family: consolas;
+    letter-spacing: 1.5px;
+    font-size: 20px;
+  }
 </style>
 <?php
 $judul = 'Pasien Home';
@@ -22,17 +28,69 @@ $sub_judul = "Selamat datang $nama_user di MMC Information System";
 set_title($judul);
 set_h2($judul, $sub_judul);
 only(['pasien', 'pendaftar']);
-require_once 'include/mcu_functions.php';
+// require_once 'include/mcu_functions.php';
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# NORMAL FLOW
+# ============================================================
 $s = "SELECT 
 a.*, 
 a.id as id_pasien,
+a.status, -- status pasien
 b.pendaftar,
 b.tanggal_order,
 c.id as id_paket,
 c.nama as paket,
 d.nama as program,
+d.id as id_program,
 (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
 FROM tb_pasien a 
 JOIN tb_order b ON a.order_no=b.order_no 
@@ -47,11 +105,23 @@ if (!mysqli_num_rows($q)) {
 } else {
   $d = mysqli_fetch_assoc($q);
   $id_pasien = $d['id_pasien'];
+  $id_program = $d['id_program'];
+  $nama = $d['nama'];
+  $gender = $d['gender'];
+  $foto_profil = $d['foto_profil'];
+  $usia = $d['usia'];
+  $no_ktp = $d['no_ktp'];
+  $nikepeg = $d['nikepeg'];
+  $nikepeg_or_strip = $nikepeg ?? '-';
+  $status = $d['status'];
   if (!$d['status_pasien']) {
     $s = "UPDATE tb_pasien SET status=1 WHERE id=$id_pasien";
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     echo div_alert('success', 'Updating MCU Status berhasil.');
     jsurl();
+  }
+  if (!$d['foto_profil']) {
+    $d['status_pasien'] = '<span class="red f14">Belum Upload Foto Profil</span>';
   }
   $id_paket = $d['id_paket'];
   foreach ($d as $key => $value) {
@@ -85,109 +155,73 @@ if (mysqli_num_rows($q2)) {
 $detail_pemeriksaan = "<ol>$li</ol>";
 
 $tanggal_order_show = date('d-m-Y', strtotime($d['tanggal_order']));
-// $jadwal =  date('d-m-Y', strtotime('+13 day', strtotime($d['tanggal_order'])));
-$jadwal = '10-05-2024'; // zzz
-$jadwal_pukul = '13:20 WIB'; // zzz
-$lokasi = 'Onsite di Perusahaan'; // zzz
-
+$last_update_show = $d['last_update'] . ' | ' . eta(strtotime($d['last_update']) - strtotime('now'));
 $id_pasien_show = substr("000$id_pasien", -4);
-$radio_gender = radio_tf('', 'gender', '', '', '', 'Laki-laki', 'Perempuan');
 
-$tb = "
+
+
+
+# ============================================================
+# BLOK INFO PAKET
+# ============================================================
+$blok_info_paket = "
+  <div class='card mb4 gradasi-hijau'>
+    <div class='card-body'>
+      <h3>Paket Medical Checkup Anda</h3>
+      <table class=table>
+        <tr><td class=kolom>Paket</td><td>$d[paket]</td></tr>
+        <tr><td class=kolom>Program</td><td>$d[program]</td></tr>
+        <tr><td class=kolom>Didaftarkan oleh</td><td>$d[pendaftar]</td></tr>
+        <tr><td class=kolom>Tanggal</td><td>$tanggal_order_show</td></tr>
+        <tr><td class=kolom>MCU Status</td><td>$d[status_pasien]</td></tr>
+        <tr>
+          <td colspan=100%>
+            <div class=''><span class='btn_aksi darkblue' id=detail_pemeriksaan__toggle>Lihat detail pemeriksaan $img_detail</span></div>
+            <div id=detail_pemeriksaan class='mt2 hideit'>$detail_pemeriksaan</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+";
+
+
+# ============================================================
+# BLOK FOTO PROFIL
+# ============================================================
+include 'pasien_home-foto-profil.php';
+
+# ============================================================
+# BLOK BIODATA | JADWAL
+# ============================================================
+$blok_biodata = '';
+$blok_jadwal = '';
+if ($foto_profil) {
+  include 'pasien_home-biodata.php';
+  include 'pasien_home-jadwal.php';
+}
+
+
+
+
+
+
+
+
+$BLOK = "
   <div id=info_pasien>
-    <div class='card mb4 gradasi-hijau'>
-      <div class='card-body'>
-        <h3>Paket Medical Checkup Anda</h3>
-        <table class=table>
-          <tr><td class=kolom>Paket</td><td>$d[paket]</td></tr>
-          <tr><td class=kolom>Program</td><td>$d[program]</td></tr>
-          <tr><td class=kolom>Didaftarkan oleh</td><td>$d[pendaftar]</td></tr>
-          <tr><td class=kolom>Tanggal</td><td>$tanggal_order_show</td></tr>
-          <tr><td class=kolom>MCU Status</td><td>$d[status_pasien]</td></tr>
-          <tr>
-            <td colspan=100%>
-              <div class=''><span class='btn_aksi darkblue' id=detail_pemeriksaan__toggle>Lihat detail pemeriksaan $img_detail</span></div>
-              <div id=detail_pemeriksaan class='mt2 hideit'>$detail_pemeriksaan</div>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
 
-    <div class='card mb4 gradasi-hijau'>
-      <div class='card-body'>
-        <h3>Biodata Anda</h3>
-        <form method=post>
-          <table class=table>
-            <tr><td colspan=100%><input class='form-control tengah' value='$d[nama]' /></td></tr>
-            <tr>
-              <td colspan=100%>
-                <div class='radio-toolbar abu'>
-                  <div class='row'>
-                    <div class='col-6'>
-                      <input type='radio' name='gender' id='gender__l' class='opsi_radio' required value='l'>
-                      <label class='proper f14' for='gender__l'>Laki-laki</label>
-                    </div>
-                    <div class='col-6'>
-                      <input type='radio' name='gender' id='gender__p' class='opsi_radio' required value='p'>
-                      <label class='proper f14 p0' for='gender__p'>Perempuan</label>
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
 
-            <tr>
-              <td colspan=100%>
-                <input type=hidden name=usia value='' id=usia required>
-                <div class='f12 abu tengah'> Usia <span id=usia_text>??</span> tahun</div>
-                <table width=100%>
-                  <tr>
-                    <td width=30px>
-                      <span class='btn btn-success btn-sm usia_adjust'>-</span>
-                    </td>
-                    <td>
-                      <input type=range class='form-range' id=range_usia min=20 max=60 value=25>
-                    </td>
-                    <td width=30px>
-                      <span class='btn btn-success btn-sm usia_adjust'>+</span>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <tr><td colspan=100%><input required class='form-control tengah' minlength=16 maxlength=16 value='$d[no_ktp]' placeholder='Nomor KTP' /></td></tr>
-            <tr><td colspan=100%><input class='form-control tengah' minlength=5 maxlength=16 value='$d[nikepeg]' placeholder='Nomor Induk Karyawan' /></td></tr>
-          </table>
-          <button class='btn btn-primary w-100'>Update Biodata</button>
-        </form>
-      </div>
-    </div>
-
-    <div class='card mb4 gradasi-hijau'>
-      <div class='card-body'>
-        <h3>Jadwal Medical Checkup Anda</h3>
-        <table class=table>
-          <tr><td class='kolom tengah' colspan=100%>Nomor MCU / Antrian</td></tr>
-          <tr>
-            <td class=' tengah' colspan=100%>
-              <span class='green f50'>$id_pasien_show</span>
-            </td>
-          </tr>
-          <tr><td class=kolom>Jadwal</td><td>$jadwal</td></tr>
-          <tr><td class=kolom>Pukul</td><td>$jadwal_pukul</td></tr>
-          <tr><td class=kolom>Lokasi</td><td>$lokasi</td></tr>
-        </table>
-      </div>
-    </div>
-
+    $blok_info_paket
+    $blok_foto_profil
+    $blok_biodata
+    $blok_jadwal
     
 
   </div>
 
 ";
-echo "$tb";
+echo "$BLOK";
 ?>
 
 <script>
@@ -212,6 +246,36 @@ echo "$tb";
       $('#usia').val(usia);
       $('#range_usia').val(usia);
       $('#usia_text').text(usia);
+    });
+
+    $('.input_bio').change(function() {
+      let input_bio = document.getElementsByClassName('input_bio');
+      console.log(input_bio);
+    });
+
+
+    $('#nikepeg').keyup(function() {
+      // $(this).val(
+      //   $(this).val()
+      //   .replace(/[^0-9]/g, '')
+      // );
+      $('#digit_nikepeg').text($(this).val().length);
+
     })
+    $('#nama_pasien').keyup(function() {
+      $(this).val(
+        $(this).val()
+        .replace(/['"]/g, '`')
+        .replace(/[!@#$%^&*()+\-_=\[\]{}.,;:\\|<>\/?~0-9]/gim, '')
+        .replace(/  /g, ' ')
+        .toUpperCase()
+        // .replace(
+        //   /\w\S*/g,
+        //   function(txt) {
+        //     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        //   }
+        // )
+      );
+    });
   })
 </script>

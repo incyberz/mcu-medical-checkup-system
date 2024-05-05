@@ -26,6 +26,7 @@ if ($username == '') {
     $id_user = $d['id'];
     $is_login = 1;
     $nama_user = $d['nama_user'];
+    $gender = $d['gender'] ?? '';
 
     if (!$role) {
       $_SESSION['mmc_role'] = $role;
