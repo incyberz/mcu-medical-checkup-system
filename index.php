@@ -27,6 +27,7 @@ $lokasi_img = 'assets/img';
 $lokasi_paket = 'assets/img/paket';
 $lokasi_tim = 'assets/img/dokter-dan-tim';
 $lokasi_gallery = 'assets/img/gallery';
+$lokasi_partner = 'assets/img/partner';
 $lokasi_pasien = 'assets/img/pasien';
 $lokasi_ilustrasi = 'assets/img/ilustrasi';
 $lokasi_excel = 'assets/xls';

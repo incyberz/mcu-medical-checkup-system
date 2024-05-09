@@ -234,6 +234,7 @@ a {text-decoration:none}
   gap: 15px;
 }
 .flex-between{display:flex;justify-content: space-between;}
+.flex-center{display:flex;justify-content: center;}
 .grid2{display:grid;grid-template-columns: auto auto;}
 .grid3{display:grid;grid-template-columns: auto auto auto;}
 .grid4{display:grid;grid-template-columns: auto auto auto auto;}

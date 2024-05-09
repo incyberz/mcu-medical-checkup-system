@@ -1,8 +1,8 @@
 <style>
   .radio-toolbar-penyakit input[type="radio"]:checked+label {
-    background-color: rgb(249, 255, 136);
-    border-color: rgb(204, 159, 68);
-    color: rgb(139, 0, 44);
+    color: white;
+    background-color: #55f;
+    border-color: #44c;
   }
 
   .radio-toolbar-penyakit label {
@@ -32,9 +32,21 @@
   .riwayat-keluarga {
     color: #55a;
   }
+
+  .blok-pertanyaan {
+    border-bottom: solid 3px #ccc;
+  }
+
+  /* tmp */
+  .flex-center {
+    justify-content: center;
+  }
 </style>
 <?php
+only(['pasien']);
 $judul = 'Kuesioner Online';
+$care = "<img src='assets/img/icons/care.png' height=35px />";
+$parent = "<img src='assets/img/icons/parent.png' height=35px />";
 
 $id_program = $_GET['id_program'] ?? die('id_program belum didefinisikan.');
 
@@ -42,7 +54,6 @@ $Saudara = $gender == 'l' ? 'Saudara' : 'Saudari';
 $sub_judul = "<span class=blue>Yth. $Saudara $nama_user! <br><br>Agar proses pemeriksaan Medical Checkup Anda lebih cepat, sangat disarankan Anda menjawab kuesioner berikut dengan sejujur-jujurnya agar kami dapat menyimpulkan dan merekomendasikan tentang kesehatan Anda secara tepat.</span>";
 $start = $_GET['start'] ?? '';
 if ($start) $sub_judul = "Login as: <span class=darkblue>$nama_user</span>";
-only(['pasien']);
 
 if (!$start) {
   set_title($judul);
@@ -72,29 +83,62 @@ if (!$start) {
     $i = 0;
     while ($d = mysqli_fetch_assoc($q)) {
       $i++;
+      $penyakit = $d['penyakit'];
 
-      $s2 = "SELECT *,id as id_pertanyaan FROM tb_pertanyaan WHERE id_program=$id_program AND penyakit='$d[penyakit]'";
+      $s2 = "SELECT *,id as id_pertanyaan FROM tb_pertanyaan WHERE id_program=$id_program AND penyakit='$penyakit'";
       $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
       $isi = '';
       while ($d2 = mysqli_fetch_assoc($q2)) {
         $id_pertanyaan = $d2['id_pertanyaan'];
-        $isi .= "
-          <div class='$d2[section] mb1'>$d2[pertanyaan]</div>
-
-          <div class='radio-toolbar radio-toolbar-penyakit abu mb4 '>
-            <div class='row'>
-              <div class='col-6'>
-                <input type='radio' name='pertanyaan-$id_pertanyaan' id='radio1-$id_pertanyaan' class='opsi_radio' required value='0'  >
-                <label class='proper label-tidak' for='radio1-$id_pertanyaan'>Tidak</label>
-              </div>
-              <div class='col-6'>
-                <input type='radio' name='pertanyaan-$id_pertanyaan' id='radio2-$id_pertanyaan' class='opsi_radio' required value='1' >
-                <label class='proper label-ya' for='radio2-$id_pertanyaan'>Ya</label>
+        $section = $d2['section'];
+        $section__penyakit = $section . "__$penyakit";
+        $opsi = '';
+        if ($section == 'riwayat-penyakit' || $section == 'riwayat-pengobatan') {
+          $icon = $section == 'riwayat-pengobatan' ? $care : '';
+          $opsi = "
+            <div class='radio-toolbar radio-toolbar-penyakit abu mb4 '>
+              <div class='row'>
+                <div class='col-6'>
+                  <input type='radio' name='pertanyaan-$id_pertanyaan' id='radio1-$section__penyakit' class='opsi_radio radio__$section' required value='0'  >
+                  <label class='proper label-tidak' for='radio1-$section__penyakit'>Tidak</label>
+                </div>
+                <div class='col-6'>
+                  <input type='radio' name='pertanyaan-$id_pertanyaan' id='radio2-$section__penyakit' class='opsi_radio radio__$section' required value='1' >
+                  <label class='proper label-ya' for='radio2-$section__penyakit'>Ya</label>
+                </div>
               </div>
             </div>
+          ";
+        } elseif ($section == 'riwayat-keluarga') {
+          $icon = $parent;
+          $opsi = "
+            <div class='flexy mb2 left flex-center'>
+              <div class=''>
+                <div class='form-check form-switch'>
+                  <input class='form-check-input' type='checkbox' id='ayah-$penyakit' name='ayah-$penyakit' value='ayah-$penyakit' value=1>
+                  <label class='form-check-label proper' for='ayah-$penyakit'>ayah</label>
+                </div>
+              </div>
+              <div class='ml4'>
+                <div class='form-check form-switch'>
+                  <input class='form-check-input' type='checkbox' id='ibu-$penyakit' name='ibu-$penyakit' value='ibu-$penyakit' value=1>
+                  <label class='form-check-label proper' for='ibu-$penyakit'>ibu</label>
+                </div>
+              </div>
+            </div>
+          ";
+        }
+        $section__penyakit = $section . '__' . $penyakit;
+        $isi .= "
+          <div class='debuga red'>id='blok-$section-$penyakit' class='$section mb4 blok-pertanyaan tengah'</div>
+          <div id='blok-$section-$penyakit' class='$section mb4 blok-pertanyaan tengah'>
+            <div class='debuga red f10'>id='$section__penyakit' class='$section blok-pertanyaan'</div>
+            $icon
+            <div class='pertanyaan-$id_pertanyaan mb2 mt2'>$d2[pertanyaan]</div>
+            $opsi
           </div>
         ";
-      }
+      } // end while
 
       $ilustrasi = '';
       if ($d['image']) {
@@ -110,7 +154,7 @@ if (!$start) {
 
       $tr .= "
         <div class='gradasi-merah' style='margin: 0 -15px; padding: 60px 15px'>
-          <div class='f16 darkred proper mb2 mt4'>$i. riwayat penyakit $d[penyakit]</div>
+          <div class='f16 darkred proper mb2 mt4 tengah'>$i. riwayat penyakit $penyakit</div>
           $ilustrasi
           $isi
         </div>
@@ -133,3 +177,55 @@ if (!$start) {
     </div>
   ";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+<script>
+  $(function() {
+    $('.radio__riwayat-penyakit').click(function() {
+      let tid = $(this).prop('id');
+      let rid = tid.split('__');
+      let aksi = rid[0];
+      let id = rid[1];
+      let val = $(this).val();
+      console.log(aksi, id, val);
+      if (parseInt(val)) { // Ya
+        $('#blok-riwayat-perawatan-' + id).show();
+        console.log('#blok-riwayat-perawatan-' + id, 'show');
+
+      } else { // Tidak
+        $('#blok-riwayat-perawatan-' + id).hide();
+        console.log('#blok-riwayat-perawatan-' + id, 'hide');
+
+      }
+    });
+  });
+</script>

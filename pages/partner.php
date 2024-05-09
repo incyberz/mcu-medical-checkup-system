@@ -21,16 +21,16 @@ require_once 'include/resize_img.php';
 # PROCESSORS
 # ===============================================================
 
-if (isset($_POST['btn_add_gallery'])) {
+if (isset($_POST['btn_add_partner'])) {
   echo '<pre>';
   var_dump($_POST);
   echo '</pre>';
   echo '<pre>';
   var_dump($_FILES);
   echo '</pre>';
-  $new_image = "gallery-$_POST[new_nomor]-$detik.jpg";
-  $new_image_thumb = "gallery-$_POST[new_nomor]-$detik-thumb.jpg";
-  $s = "INSERT INTO tb_gallery (
+  $new_image = "partner-$_POST[new_nomor]-$detik.jpg";
+  $new_image_thumb = "partner-$_POST[new_nomor]-$detik-thumb.jpg";
+  $s = "INSERT INTO tb_partner (
     nomor,
     image
   ) VALUES (
@@ -40,8 +40,8 @@ if (isset($_POST['btn_add_gallery'])) {
   echo $s;
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $img_asal = $_FILES['image']['tmp_name'];
-  $img_baru = "$lokasi_gallery/$new_image";
-  $img_thumb = "$lokasi_gallery/$new_image_thumb";
+  $img_baru = "$lokasi_partner/$new_image";
+  $img_thumb = "$lokasi_partner/$new_image_thumb";
   move_uploaded_file($img_asal, $img_baru);
 
   echo resize_img($img_baru);
@@ -49,13 +49,13 @@ if (isset($_POST['btn_add_gallery'])) {
   echo div_alert('success', 'Upload image and creating thumbnail success');
   jsurl('', 2000);
   exit;
-} elseif (isset($_POST['btn_delete_gallery'])) {
-  $id_gallery = $_POST['btn_delete_gallery'];
+} elseif (isset($_POST['btn_delete_partner'])) {
+  $id_partner = $_POST['btn_delete_partner'];
   $image = $_POST['image'];
-  $s = "DELETE FROM tb_gallery WHERE id=$id_gallery";
+  $s = "DELETE FROM tb_partner WHERE id=$id_partner";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   // echo $s;
-  $img = "$lokasi_gallery/$image";
+  $img = "$lokasi_partner/$image";
   if (unlink($img)) {
     echo div_alert('success', 'Deleting image success.');
     $img_thumb = str_replace('.', '-thumb.', $img);
@@ -66,7 +66,7 @@ if (isset($_POST['btn_add_gallery'])) {
   }
 
   jsurl('', 1000);
-  // echo "unlink(\"$lokasi_gallery/$image\")";
+  // echo "unlink(\"$lokasi_partner/$image\")";
   exit;
 }
 
@@ -106,15 +106,15 @@ if (isset($_POST['btn_add_gallery'])) {
 # NORMAL FLOW
 # ===============================================================
 $divs = '';
-$s = "SELECT *,id as id_gallery FROM tb_gallery ORDER BY nomor";
+$s = "SELECT *,id as id_partner FROM tb_partner ORDER BY nomor";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 while ($d = mysqli_fetch_assoc($q)) {
-  $id_gallery = $d['id_gallery'];
+  $id_partner = $d['id_partner'];
   $thumb = str_replace('.', '-thumb.', $d['image']);
-  $lokasi_image = "$lokasi_gallery/$d[image]";
-  $lokasi_thumb = "$lokasi_gallery/$thumb";
+  $lokasi_image = "$lokasi_partner/$d[image]";
+  $lokasi_thumb = "$lokasi_partner/$thumb";
   if (!file_exists($lokasi_image)) { // jika image master hilang
-    $s2 = "DELETE FROM tb_gallery WHERE id=$id_gallery";
+    $s2 = "DELETE FROM tb_partner WHERE id=$id_partner";
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     if (file_exists($lokasi_thumb)) {
       unlink($lokasi_thumb); // delete thumb jika master hilang
@@ -128,10 +128,10 @@ while ($d = mysqli_fetch_assoc($q)) {
 
 
   $divs .= "
-    <div class='col-lg-3 col-md-4'>
-      <div class='gallery-item'>
+    <div class='col-lg-2 col-md-3'>
+      <div class='partner-item'>
         <a href='$lokasi_image' class='galelry-lightbox'>
-          <img src='$lokasi_thumb' alt='gallery-$d[nama]' class='img-fluid'>
+          <img src='$lokasi_thumb' alt='partner-$d[nama]' class='img-fluid'>
         </a>
       </div>
     </div>
@@ -164,13 +164,13 @@ while ($d = mysqli_fetch_assoc($q)) {
 # ===============================================================
 # EDIT SECTION
 # ===============================================================
-$edit_section = $role == 'admin' ? edit_section('gallery', 'gallery') : '';
+$edit_section = $role == 'admin' ? edit_section('partner', 'partner') : '';
 if ($edit_section) {
 
   $s = "SELECT a.*,
-  a.id as id_gallery,
-  (SELECT MAX(nomor) FROM tb_gallery) max_nomor 
-  FROM tb_gallery a order by a.nomor";
+  a.id as id_partner,
+  (SELECT MAX(nomor) FROM tb_partner) max_nomor 
+  FROM tb_partner a order by a.nomor";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
   $tr = '';
@@ -179,34 +179,34 @@ if ($edit_section) {
   $max_nomor = 0;
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
-    $id_gallery = $d['id_gallery'];
+    $id_partner = $d['id_partner'];
     $max_nomor = $d['max_nomor'];
     $td = '';
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
         || $key == 'date_created'
-        || $key == 'id_gallery'
+        || $key == 'id_partner'
         || $key == 'max_nomor'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
         $th .= "<th class='tengah'>$kolom</th>";
       }
-      $triple_id = $key . "__gallery__" . $id_gallery;
+      $triple_id = $key . "__partner__" . $id_partner;
       $editable = 'editable';
       $tengah = '';
       if ($key == 'image') {
         $editable = 'tengah';
-        $src = "$lokasi_gallery/$value";
+        $src = "$lokasi_partner/$value";
         if (file_exists($src)) {
           $value = "
             <a href='$src' target=_blank>
-              <img src='$lokasi_gallery/$d[image]' class='img-thumbnail' style='max-width:300px;max-height:300px;'>
+              <img src='$lokasi_partner/$d[image]' class='img-thumbnail' style='max-width:300px;max-height:300px;'>
             </a> 
             <form method=post style='display:inline'>
               <input type=hidden name=image value=$d[image]>
-              <button class='btn-transparan' name=btn_delete_gallery value=$id_gallery onclick='return confirm(\"Hapus gambar ini?\")'>$img_delete</button>
+              <button class='btn-transparan' name=btn_delete_partner value=$id_partner onclick='return confirm(\"Hapus gambar ini?\")'>$img_delete</button>
             </form>
           ";
         } else {
@@ -226,7 +226,7 @@ if ($edit_section) {
 
   $new_nomor = $max_nomor + 1;
 
-  $tb_gallery = "
+  $tb_partner = "
     <table class=table>
       <thead>$th</thead>
       $tr
@@ -238,7 +238,7 @@ if ($edit_section) {
               <input required class='form-control' type=file name=image accept=.jpg>
             </div>
             <div>
-              <button class='btn btn-success ' name='btn_add_gallery'>Add Gallery</button>
+              <button class='btn btn-success ' name='btn_add_partner'>Add Partner</button>
             </div>
           </form>
         </td>
@@ -248,16 +248,16 @@ if ($edit_section) {
 
 
   $edit_section .= "
-  <div class='hideita wadah gradasi-kuning mt2' id=edit_gallery>
-    <h3>Header Gallery</h3>
+  <div class='hideita wadah gradasi-kuning mt2' id=edit_partner>
+    <h3>Header Partner</h3>
     <form method=post>
-      <input required class='form-control mb2' name='gallery_header' value='$gallery_header' placeholder='Team Section Header...'>
-      <input required class='form-control mb2' name='gallery_desc' value='$gallery_desc' placeholder='Team Description...'>
+      <input required class='form-control mb2' name='partner_header' value='$partner_header' placeholder='Team Section Header...'>
+      <input required class='form-control mb2' name='partner_desc' value='$partner_desc' placeholder='Team Description...'>
       <button class='btn btn-success btn-sm' name=btn_save_settings value=tim>Save Settings</button>
     </form>
     <hr>
-    <h3>Edit Image Gallery</h3>
-    $tb_gallery
+    <h3>Edit Image Partner</h3>
+    $tb_partner
   </div>
   ";
 }
@@ -295,12 +295,12 @@ if ($edit_section) {
 
 
 ?>
-<section id="gallery" class="gallery p0">
+<section id="partner" class="partner p0">
   <div class="container">
 
     <div class="section-title">
-      <h2><?= $gallery_header ?></h2>
-      <p><?= $gallery_desc ?></p>
+      <h2><?= $partner_header ?></h2>
+      <p><?= $partner_desc ?></p>
     </div>
   </div>
 

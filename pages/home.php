@@ -9,6 +9,7 @@ include 'pages/produk.php';
 //include 'pages/departements.php'; 
 
 include 'pages/tim.php';
+include 'pages/partner.php';
 //include 'pages/faq.php'; 
 
 //include 'pages/testimonials.php'; 
