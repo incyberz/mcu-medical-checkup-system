@@ -12,9 +12,14 @@ if ($username == '') {
   //telah login
   $role = $_SESSION['mmc_role'] ?? 'user';
 
+  if ($role == 'admin' || $role == 'marketing') {
+    $tb = 'user';
+  } else {
+    $tb = $role;
+  }
   $s = "SELECT a.*, 
   a.nama as nama_user 
-  FROM tb_$role a 
+  FROM tb_$tb a 
   WHERE a.username='$username'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   if (!mysqli_num_rows($q)) {
@@ -28,8 +33,8 @@ if ($username == '') {
     $nama_user = $d['nama_user'];
     $gender = $d['gender'] ?? '';
 
-    if (!$role) {
-      $_SESSION['mmc_role'] = $role;
+    if (!$role || $role == 'user') {
+      $_SESSION['mmc_role'] = $d['role'];
       $role = $d['role'];
     }
 

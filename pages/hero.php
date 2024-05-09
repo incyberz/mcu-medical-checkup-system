@@ -10,10 +10,12 @@
   }
 </style>
 <?php
+
 // bg hero
 echo "<style>#hero{background: url('assets/img/$bg_hero') top center no-repeat;}</style>";
 $welcome_login = '';
 if ($username) {
+  // die('zzz');
   $welcome_login .= "Welcome <b class=darkblue>$nama_user</b>! Anda sedang login sebagai <b class='darkblue miring'>$role</b> dan dapat mengakses fitur tambahan sesuai dengan hak akses Anda";
   if ($role == 'admin') {
     // edit global variable

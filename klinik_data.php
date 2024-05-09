@@ -120,3 +120,5 @@ $team_header = $klinik['team_header'] ?? 'Dokter dan Team';
 $team_desc = $klinik['team_desc'] ?? 'Perkenalkan kami adalah Para Dokter Professional dan juga Tim Medis berpengalaman.';
 $gallery_header = $klinik['gallery_header'] ?? 'Gallery';
 $gallery_desc = $klinik['gallery_desc'] ?? 'Berikut adalah kegiatan kami saat proses Medical Checkup';
+$contact_header = $klinik['contact_header'] ?? 'Kontak Kami';
+$contact_desc = $klinik['contact_desc'] ?? 'Untuk perihal negosiasi harga, jenis pemeriksaan, atau tentang proses MCU yang kurang jelas, dapat Anda tanyakan kepada Tim Marketing kami via form berikut. Untuk alamat kantor kami adalah sebagai berikut:';

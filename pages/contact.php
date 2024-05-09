@@ -11,7 +11,19 @@
 </style>
 
 <?php
-$edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
+if ($role == 'admin') {
+  $edit_section = edit_section('contact', 'kontak kami');
+  $edit_section .= "
+  <div class='wadah gradasi-kuning hideita mt2' id=edit_contact>
+    <h3>Header Contact</h3>
+    <form method=post>
+      <input required class='form-control mb2' name='contact_header' value='$contact_header' placeholder='Contact Section Header...'>
+      <input required class='form-control mb2' name='contact_desc' value='$contact_desc' placeholder='Contact Description...'>
+      <button class='btn btn-success btn-sm' name=btn_save_settings value=tim>Save Settings</button>
+    </form>
+  </div>
+  ";
+}
 
 
 ?>
@@ -19,8 +31,8 @@ $edit_section = $role == 'admin' ? edit_section('contact', 'kontak kami') : '';
   <div class="container">
 
     <div class="section-title">
-      <h2>Kontak</h2>
-      <p>Untuk perihal negosiasi harga, jenis pemeriksaan, atau tentang proses MCU yang kurang jelas, dapat Anda tanyakan kepada Tim Marketing kami via form berikut. Untuk alamat kantor kami adalah sebagai berikut:</p>
+      <h2><?= $contact_header ?></h2>
+      <p><?= $contact_desc ?></p>
     </div>
   </div>
 
