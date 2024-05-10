@@ -1,4 +1,5 @@
 <?php
+// v.1.3.5 eta2 updated
 // v.1.3.4 seth2 dan key2kolom
 // v.1.3.3 tr_col colspan=100%
 // v.1.3.2 baca_csv update
@@ -84,6 +85,11 @@ function hm($nilai)
   } else {
     return false;
   }
+}
+
+function eta2($eta, $indo = 1)
+{
+  return eta(strtotime($eta) - strtotime('now'));
 }
 
 function eta($eta, $indo = 1)

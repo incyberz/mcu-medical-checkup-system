@@ -114,6 +114,12 @@ if (!mysqli_num_rows($q)) {
   $nikepeg = $d['nikepeg'];
   $nikepeg_or_strip = $nikepeg ?? '-';
   $status = $d['status'];
+
+  # ============================================================
+  # DEBUGGING
+  # ============================================================
+  // $status = 3; /// ZZZZZZZZ DEBUG
+
   if (!$d['status_pasien']) {
     $s = "UPDATE tb_pasien SET status=1 WHERE id=$id_pasien";
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -173,7 +179,7 @@ $blok_info_paket = "
         <tr><td class=kolom>Program</td><td>$d[program]</td></tr>
         <tr><td class=kolom>Didaftarkan oleh</td><td>$d[pendaftar]</td></tr>
         <tr><td class=kolom>Tanggal</td><td>$tanggal_order_show</td></tr>
-        <tr><td class=kolom>MCU Status</td><td>$d[status_pasien]</td></tr>
+        <tr><td class=kolom>MCU Status</td><td>$d[status_pasien] ($status)</td></tr>
         <tr>
           <td colspan=100%>
             <div class=''><span class='btn_aksi darkblue' id=detail_pemeriksaan__toggle>Lihat detail pemeriksaan $img_detail</span></div>
@@ -199,6 +205,8 @@ $blok_jadwal = '';
 if ($foto_profil) {
   include 'pasien_home-biodata.php';
   include 'pasien_home-jadwal.php';
+  include 'pasien_home-kuesioner.php';
+  if ($status >= 4) include ' pasien_home-keluhan.php';
 }
 
 
