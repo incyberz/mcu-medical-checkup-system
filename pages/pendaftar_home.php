@@ -9,14 +9,14 @@ $s = "SELECT
 a.order_no,
 a.tanggal_order,
 a.status,
-a.foto_profil,
 b.nama as nama_paket,
 c.nama as program,
-d.nama as status_order 
+d.nama as status_order,
+(SELECT foto_profil FROM tb_pendaftar WHERE username=a.username_pendaftar) foto_profil  
 FROM tb_order a 
 JOIN tb_paket b ON a.id_paket=b.id 
 JOIN tb_program c ON b.id_program=c.id 
-JOIN tb_status_order d ON a.status=d.status
+JOIN tb_status_order d ON a.status=d.status 
 WHERE username_pendaftar='$username'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) {

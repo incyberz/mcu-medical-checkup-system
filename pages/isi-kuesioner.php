@@ -40,12 +40,15 @@ if (isset($_POST['btn_submit_jawaban'])) {
   } elseif ($kolom == 'gaya_hidup') {
     $field_target = $kolom;
     $new_status = 5;
+  } elseif ($kolom == 'keluhan') {
+    $field_target = $kolom;
+    $new_status = 6;
   } else {
     die(div_alert('danger', "Field Target belum didefinisikan untuk kolom $kolom."));
   }
 
   // status lama
-  $s = "SELECT status FROM tb_pasien WHERE id=$id_pasien";
+  $s = "SELECT status FROM tb_pasien WHERE id=$id_user";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $d = mysqli_fetch_assoc($q);
   $status_lama = $d['status'];
@@ -60,7 +63,7 @@ if (isset($_POST['btn_submit_jawaban'])) {
   -- Gejala Penyakit (4)   
   WHERE id = '$id_user'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  echo $s;
+  // echo $s;
   echo div_alert('success', "Jawaban kolom $kolom berhasil disimpan.");
   jsurl('?pasien_home', 1000);
   exit;

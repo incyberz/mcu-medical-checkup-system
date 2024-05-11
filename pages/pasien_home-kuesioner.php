@@ -19,36 +19,27 @@ if ($status >= 3) {
 
   $arr = explode(',', $riwayat_penyakit);
   $li = '';
-  $array_riwayat = [];
   foreach ($arr as $key => $r) {
     if ($r) $li .= "<li>$r</li>";
   }
 
-  $riwayat_penyakit_show = "<ul class='pl3 f14'>$li</ul>";
+  $riwayat_penyakit_show = "<ul class='pl3 f14s '>$li</ul>";
   $tanggal_mengisi_riwayat_penyakit_show = date('d-M-Y H:i', strtotime($tanggal_mengisi_riwayat_penyakit));
-  $tanggal_mengisi_riwayat_penyakit_show .= '<div class="f12 abu miring">' . eta2($tanggal_mengisi_riwayat_penyakit) . '</div>';
+  $tanggal_mengisi_riwayat_penyakit_show .= '<span class="f12 abu miring"> ~ ' . eta2($tanggal_mengisi_riwayat_penyakit) . '</span>';
 
 
 
   // buat table untu info kuesioner
   $info_kuesioner = "
-    <table class=table>
-      <tr>
-        <td class='kolom'>Riwayat Penyakit</td>
-        <td>
-          $riwayat_penyakit_show
-          <div>
-            <a href='?isi-kuesioner&id_program=$id_program&id_pasien=$id_user'>
-              Kuesioner Ulang $img_edit
-            </a>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td class='kolom'>Tanggal Mengisi</td>
-        <td>$tanggal_mengisi_riwayat_penyakit_show</td>
-      </tr>
-    </table>
+    <h3 class='kolom tengah'>Riwayat Penyakit</h3>
+    $riwayat_penyakit_show
+    <div class='mb2 tengah mt1'>
+      <a href='?isi-kuesioner&id_program=$id_program&id_pasien=$id_user'>
+        Kuesioner Ulang $img_edit
+      </a>
+    </div>
+    <div class='f12 tengah mb4'>$tanggal_mengisi_riwayat_penyakit_show</div>
+    <hr>
   ";
 
   // belum mengisi gejala penyakit
@@ -56,34 +47,24 @@ if ($status >= 3) {
 
     $arr = explode(',', $gejala_penyakit);
     $li = '';
-    $array_gejala = [];
     foreach ($arr as $key => $r) {
       if ($r) $li .= "<li>$r</li>";
     }
 
-    $gejala_penyakit_show = "<ul class='pl3 f14'>$li</ul>";
+    $gejala_penyakit_show = "<ul class='pl3 '>$li</ul>";
     $tanggal_mengisi_gejala_penyakit_show = date('d-M-Y H:i', strtotime($tanggal_mengisi_gejala_penyakit));
-    $tanggal_mengisi_gejala_penyakit_show .= '<div class="f12 abu miring">' . eta2($tanggal_mengisi_gejala_penyakit) . '</div>';
+    $tanggal_mengisi_gejala_penyakit_show .= '<span class="f12 abu miring"> ~ ' . eta2($tanggal_mengisi_gejala_penyakit) . '</span>';
 
 
     $info_kuesioner .= "
-      <table class=table>
-        <tr>
-          <td class='kolom'>Gejala Penyakit</td>
-          <td>
-            $gejala_penyakit_show
-            <div>
-              <a href='?isi-kuesioner&id_program=$id_program&id_pasien=$id_user&kolom=gejala'>
-                Kuesioner Ulang $img_edit
-              </a>
-            </div>            
-          </td>
-        </tr>
-        <tr>
-          <td class='kolom'>Tanggal Mengisi</td>
-          <td>$tanggal_mengisi_gejala_penyakit_show</td>
-        </tr>
-      </table>
+      <h3 class='kolom tengah'>Gejala Penyakit</h3>
+      $gejala_penyakit_show
+      <div class='tengah mb2'>
+        <a href='?isi-kuesioner&id_program=$id_program&id_pasien=$id_user&kolom=gejala'>
+          Kuesioner Ulang $img_edit
+        </a>
+      </div>            
+      <div class='tengah f12'>$tanggal_mengisi_gejala_penyakit_show</div>
     ";
 
     $button_link = "

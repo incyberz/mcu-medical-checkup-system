@@ -181,7 +181,7 @@ $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
 $tr = '';
 if (mysqli_num_rows($q2)) {
   while ($d2 = mysqli_fetch_assoc($q2)) {
-    $blue = $d2['status'] == $status ? 'biru tebal' : 'abu f14';
+    $blue = $d2['status'] == $status ? 'biru tebal' : 'green f14';
     $blue = $d2['status'] > $status ? 'abu f14 miring' : $blue;
     $tr .= "
       <tr>
@@ -224,7 +224,7 @@ $blok_info_paket = "
         $d[status_pasien] ($status)
       </div>
       <div class=tengah><span class=btn_aksi id=list_status__toggle>$img_detail</span></div>
-      <div id=list_status>$list_status</div>
+      <div id=list_status class=hideit>$list_status</div>
 
     </div>
   </div>
@@ -241,11 +241,18 @@ include 'pasien_home-foto-profil.php';
 # ============================================================
 $blok_biodata = '';
 $blok_jadwal = '';
+$blok_kuesioner = '';
+$blok_gaya_hidup = '';
+$blok_keluhan = '';
+$blok_kesiapan = '';
+
 if ($foto_profil) {
   include 'pasien_home-biodata.php';
   include 'pasien_home-jadwal.php';
   include 'pasien_home-kuesioner.php';
   if ($status >= 4) include 'pasien_home-gaya-hidup.php';
+  if ($status >= 5) include 'pasien_home-keluhan.php';
+  if ($status >= 6) include 'pasien_home-kesiapan.php';
 }
 
 
@@ -265,6 +272,8 @@ $BLOK = "
     $blok_jadwal
     $blok_kuesioner
     $blok_gaya_hidup
+    $blok_keluhan
+    $blok_kesiapan
     
 
   </div>
