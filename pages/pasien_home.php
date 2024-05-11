@@ -115,10 +115,15 @@ if (!mysqli_num_rows($q)) {
   $nikepeg_or_strip = $nikepeg ?? '-';
   $status = $d['status'];
 
-  # ============================================================
-  # DEBUGGING
-  # ============================================================
-  // $status = 3; /// ZZZZZZZZ DEBUG
+  $riwayat_penyakit = $d['riwayat_penyakit'];
+  $tanggal_mengisi_riwayat_penyakit = $d['tanggal_mengisi_riwayat_penyakit'];
+  $gejala_penyakit = $d['gejala_penyakit'];
+  $tanggal_mengisi_gejala_penyakit = $d['tanggal_mengisi_gejala_penyakit'];
+  $gaya_hidup = $d['gaya_hidup'];
+  $tanggal_mengisi_gaya_hidup = $d['tanggal_mengisi_gaya_hidup'];
+  $keluhan = $d['keluhan'];
+  $tanggal_mengisi_keluhan = $d['tanggal_mengisi_keluhan'];
+
 
   if (!$d['status_pasien']) {
     $s = "UPDATE tb_pasien SET status=1 WHERE id=$id_pasien";
@@ -168,6 +173,33 @@ $id_pasien_show = substr("000$id_pasien", -4);
 
 
 # ============================================================
+# LIST STATUS PASIEN
+# ============================================================
+$s2 = "SELECT a.* 
+FROM tb_status_pasien a ";
+$q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+$tr = '';
+if (mysqli_num_rows($q2)) {
+  while ($d2 = mysqli_fetch_assoc($q2)) {
+    $blue = $d2['status'] == $status ? 'biru tebal' : 'abu f14';
+    $blue = $d2['status'] > $status ? 'abu f14 miring' : $blue;
+    $tr .= "
+      <tr>
+        <td><span class='$blue'>$d2[nama] ($d2[status])</span></td>
+      </tr>
+    ";
+  }
+}
+
+$list_status = $tr ? "<table class=table>$tr</table>" : div_alert('danger', "Data status_pasien tidak ditemukan.");
+$list_status = "<div class='wadah gradasi-kuning mt2 tengah'><h4>Info Status Pasien</h4>$list_status</div>";
+
+
+
+
+
+
+# ============================================================
 # BLOK INFO PAKET
 # ============================================================
 $blok_info_paket = "
@@ -179,7 +211,6 @@ $blok_info_paket = "
         <tr><td class=kolom>Program</td><td>$d[program]</td></tr>
         <tr><td class=kolom>Didaftarkan oleh</td><td>$d[pendaftar]</td></tr>
         <tr><td class=kolom>Tanggal</td><td>$tanggal_order_show</td></tr>
-        <tr><td class=kolom>MCU Status</td><td>$d[status_pasien] ($status)</td></tr>
         <tr>
           <td colspan=100%>
             <div class=''><span class='btn_aksi darkblue' id=detail_pemeriksaan__toggle>Lihat detail pemeriksaan $img_detail</span></div>
@@ -187,6 +218,14 @@ $blok_info_paket = "
           </td>
         </tr>
       </table>
+
+      <h3 class='mt4 green'>Status Anda</h3>
+      <div class='tengah biru tebal'>
+        $d[status_pasien] ($status)
+      </div>
+      <div class=tengah><span class=btn_aksi id=list_status__toggle>$img_detail</span></div>
+      <div id=list_status>$list_status</div>
+
     </div>
   </div>
 ";
@@ -206,7 +245,7 @@ if ($foto_profil) {
   include 'pasien_home-biodata.php';
   include 'pasien_home-jadwal.php';
   include 'pasien_home-kuesioner.php';
-  if ($status >= 4) include ' pasien_home-keluhan.php';
+  if ($status >= 4) include 'pasien_home-gaya-hidup.php';
 }
 
 
@@ -224,6 +263,8 @@ $BLOK = "
     $blok_foto_profil
     $blok_biodata
     $blok_jadwal
+    $blok_kuesioner
+    $blok_gaya_hidup
     
 
   </div>

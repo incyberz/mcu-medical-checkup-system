@@ -29,10 +29,29 @@ if (isset($_POST['btn_submit_jawaban'])) {
   // var_dump($_POST);
   // echo '</pre>';
 
-  // update tb_pasien
-  $field_target = $kolom == 'riwayat' ? 'riwayat_penyakit' : 'gejala_penyakit';
-  $new_status = $kolom == 'riwayat' ? 3 : 4;
 
+  // field target
+  if ($kolom == 'riwayat') {
+    $field_target = 'riwayat_penyakit';
+    $new_status = 3;
+  } elseif ($kolom == 'gejala') {
+    $field_target = 'gejala_penyakit';
+    $new_status = 4;
+  } elseif ($kolom == 'gaya_hidup') {
+    $field_target = $kolom;
+    $new_status = 5;
+  } else {
+    die(div_alert('danger', "Field Target belum didefinisikan untuk kolom $kolom."));
+  }
+
+  // status lama
+  $s = "SELECT status FROM tb_pasien WHERE id=$id_pasien";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $d = mysqli_fetch_assoc($q);
+  $status_lama = $d['status'];
+  if ($status_lama > $new_status) $new_status = $status_lama;
+
+  // update tb_pasien
   $s = "UPDATE tb_pasien SET 
   $field_target = '$_POST[jawaban]', 
   tanggal_mengisi_$field_target = CURRENT_TIMESTAMP,
@@ -42,8 +61,8 @@ if (isset($_POST['btn_submit_jawaban'])) {
   WHERE id = '$id_user'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   echo $s;
-  echo div_alert('success', "Jawaban $kolom-penyakit berhasil disimpan.");
-  // jsurl('?pasien_home', 1000);
+  echo div_alert('success', "Jawaban kolom $kolom berhasil disimpan.");
+  jsurl('?pasien_home', 1000);
   exit;
 }
 
@@ -64,6 +83,7 @@ if (isset($_POST['btn_submit_jawaban'])) {
 
 
 $judul = 'Kuesioner ' . ucwords(strtolower($kolom)) . ' Penyakit';
+if ($kolom == 'gaya_hidup') $judul = 'Kuesioner Gaya Hidup';
 $care = "<img src='assets/img/icons/care.png' height=35px />";
 $parent = "<img src='assets/img/icons/parent.png' height=35px />";
 
@@ -75,6 +95,10 @@ if ($kolom == 'riwayat') {
   $kalimat_pembuka = "Agar proses pemeriksaan Medical Checkup Anda lebih cepat, sangat disarankan Anda menjawab kuesioner berikut dengan sejujur-jujurnya agar kami dapat menyimpulkan dan merekomendasikan tentang kesehatan Anda secara tepat.";
 } else if ($kolom == 'gejala') {
   $kalimat_pembuka = "Silahkan Anda lanjutkan ke pengisian Kuesioner Gejala Penyakit agar Dokter dapat dengan mudah menganalisis kesehatan Anda";
+} else if ($kolom == 'gaya_hidup') {
+  $kalimat_pembuka = "Silahkan Anda jelaskan keseharian Anda dengan memilih opsi-opsi berikut, agar Dokter dapat dengan mudah menganalisis kesehatan Anda";
+} else {
+  die(div_alert('danger', "kalimat_pembuka untuk kolom $kolom belum didefinisikan."));
 }
 
 $sub_judul = "<span class=blue>Yth. $Saudara $nama_user! <br><br>$kalimat_pembuka</span>";
@@ -90,6 +114,11 @@ if (!$start) {
     $link_mulai = "<a class='btn btn-primary w-100' href='?$arr[1]&start=1'>Mulai Mengisi Kuesioner</a>";
   } elseif ($kolom == 'gejala') {
     $link_mulai = "<a class='btn btn-primary w-100' href='?$arr[1]&start=1'>Mulai Isi Gejala</a>";
+  } elseif ($kolom == 'gaya_hidup') {
+    $link_mulai = '';
+    include 'isi-kuesioner-gaya-hidup.php';
+  } else {
+    die(div_alert('danger', "Kuesioner $kolom belum dibuat"));
   }
 
   echo $link_mulai;
@@ -309,16 +338,19 @@ if (!$start) {
   }
 
   function set_jawaban(jawaban, add = true) {
-    let new_jawaban = $('#jawaban').val();
-    let str = jawaban + ',';
-    if (add) {
-      new_jawaban += str;
-      console.log('add new jawaban', new_jawaban);
-    } else {
-      new_jawaban = new_jawaban.replace(str, '')
-      console.log('remove new jawaban', new_jawaban);
+    if (jawaban) {
+      let new_jawaban = $('#jawaban').val();
+      let str = jawaban + ',';
+      if (add) {
+        new_jawaban += str;
+        console.log('add new jawaban', new_jawaban);
+      } else {
+        new_jawaban = new_jawaban.replace(str, '')
+        console.log('remove new jawaban', new_jawaban);
+      }
+      $('#jawaban').val(new_jawaban);
+
     }
-    $('#jawaban').val(new_jawaban);
 
   }
 
