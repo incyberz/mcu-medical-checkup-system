@@ -87,8 +87,8 @@ if (isset($_POST['btn_submit_jawaban'])) {
 
 $judul = 'Kuesioner ' . ucwords(strtolower($kolom)) . ' Penyakit';
 if ($kolom == 'gaya_hidup') $judul = 'Kuesioner Gaya Hidup';
-$care = "<img src='assets/img/icons/care.png' height=35px />";
-$parent = "<img src='assets/img/icons/parent.png' height=35px />";
+$care = "<img src='assets/img/icon/care.png' height=35px />";
+$parent = "<img src='assets/img/icon/parent.png' height=35px />";
 
 
 $Saudara = $gender == 'l' ? 'Saudara' : 'Saudari';

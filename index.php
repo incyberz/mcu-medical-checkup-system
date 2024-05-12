@@ -24,6 +24,7 @@ $id_klinik = 1; //klinik MMC
 $lokasi_pages = 'pages';
 $lokasi_pdf = 'assets/pdf';
 $lokasi_img = 'assets/img';
+$lokasi_icon = 'assets/img/icon';
 $lokasi_paket = 'assets/img/paket';
 $lokasi_tim = 'assets/img/dokter-dan-tim';
 $lokasi_gallery = 'assets/img/gallery';

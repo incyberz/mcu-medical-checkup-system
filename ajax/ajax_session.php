@@ -5,10 +5,12 @@ $role = $_SESSION['mmc_role'] ?? die('Silahkan Login terlebih dahulu. Err#2');
 include '../conn.php';
 // include '../user_vars.php';
 
-function only($sebagai)
+function ajax_only($sebagai)
 {
-  if ($sebagai != $_SESSION['mmc_role'])
-    die("Maaf, hak akses Anda tidak sesuai. Silahkan login sebagai $sebagai !");
+  if (!in_array($_SESSION['mmc_role'], $sebagai)) {
+    die("Maaf, hak akses Anda tidak sesuai dengan fitur ini !");
+  }
+
 
 
   // die("<div class='alert alert-danger mt-2'><span class=red>Maaf Anda tidak berhak mengakses fitur ini.</span> Silahkan <a href='?logout' onclick='return confirm(\"Yakin untuk Logout?\")'>relogin sebagai $sebagai</a></div>");

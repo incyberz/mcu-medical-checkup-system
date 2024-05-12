@@ -7,7 +7,7 @@
 # 1.0.2 - aksi assign dengan double acuan
 # =============================================================
 include 'ajax_session.php';
-only('admin');
+ajax_only(['admin', 'marketing', 'perawat']);
 
 $tb = $_GET['tb'] ?? die(erid('tb'));
 if (!$tb) die(erid('tb::empty'));
@@ -15,6 +15,22 @@ $aksi = $_GET['aksi'] ?? die(erid('aksi'));
 if (!$aksi) die(erid('aksi::empty'));
 $id = $_GET['id'] ?? die(erid('id'));
 if (!$id) die(erid('id::empty'));
+
+if ($tb == 'tb_paket_sticker') {
+  $value = $_GET['value'];
+  if (!$value) die(erid('id::empty'));
+
+  if ($aksi == 'insert') {
+    $s = "INSERT INTO tb_paket_sticker (kode) VALUES ('$value')";
+  } elseif ($aksi == 'delete') {
+    $s = "DELETE FROM tb_paket_sticker WHERE kode='$value'";
+  } else {
+    die("Belum ada handler untuk aksi: $aksi");
+  }
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+
+  die('sukses');
+}
 
 $tb = str_replace('edit_', '', $tb);
 

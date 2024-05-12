@@ -11,7 +11,7 @@
 <?php
 function img_icon($nama, $w = 20, $h = 20)
 {
-  $me = "img/icons/$nama.png";
+  $me = "img/icon/$nama.png";
   $width = $w . 'px';
   $height = $h . 'px';
   if (file_exists($me)) {

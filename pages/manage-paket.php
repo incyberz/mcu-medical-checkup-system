@@ -4,7 +4,7 @@ $sub_judul = '';
 set_title($judul);
 set_h2($judul, $sub_judul);
 only(['admin', 'marketing']);
-
+$img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
 
 
 
@@ -77,7 +77,10 @@ b.nama as nama_program,
   WHERE id_paket=a.id) count_paket_detail,
 (
   SELECT COUNT(1) FROM tb_order
-  WHERE id_paket=a.id) count_order
+  WHERE id_paket=a.id) count_order,
+(
+  SELECT COUNT(1) FROM tb_paket_sticker
+  WHERE kode LIKE CONCAT(a.id,'-%')) count_sticker
 FROM tb_paket a 
 JOIN tb_program b ON a.id_program=b.id
 JOIN tb_jenis_program c ON b.jenis=c.jenis
@@ -95,6 +98,7 @@ if (!mysqli_num_rows($q)) {
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $id_paket = $d['id_paket'];
+    $nama_paket = $d['nama_paket'];
     $count_paket_detail = $d['count_paket_detail'];
     $count_order = $d['count_order'];
     $status = $d['status'];
@@ -133,6 +137,8 @@ if (!mysqli_num_rows($q)) {
         $value = $image_info;
       } elseif ($key == 'status') {
         $value = $value ? "<span class='f12 green'><span onclick='alert(\"Paket aktif dan ditampilkan ke pengunjung. Klik nama paket untuk manage lebih lanjut\")'>$img_check</span> active</span>" : '<span class="f12 abu miring">disabled</span>';
+      } elseif ($key == 'count_sticker') {
+        $value .= " <a href='?manage-sticker&id_paket=$id_paket&nama_paket=$nama_paket'>$img_sticker</a>";
       }
 
       $style_non_aktif = $status ? '' : 'f12 abu miring';

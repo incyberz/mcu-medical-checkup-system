@@ -1,8 +1,8 @@
 <?php
 session_start();
-$_SESSION['mmc_role'] = 'pasien';
-$_SESSION['mmc_username'] = 'mcu-2';
+$_SESSION['mmc_role'] = 'pendaftar';
+$_SESSION['mmc_username'] = 'iinsholihin';
 ?>
 <script>
-  location.replace('index.php?isi-kuesioner&id_program=1&id_pasien=2&start=1')
+  location.replace('index.php?pendaftar_home')
 </script>

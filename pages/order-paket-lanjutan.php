@@ -106,7 +106,7 @@ echo "
         <option value=3>Rendahnya respon Pelayanan</option>
         <option value=4>Alasan lainnya...</option>
       </select>
-      <textarea name=alasan_lainnya class='form-control' placeholder='Alasan lainnya...'></textarea>
+      <textarea required minlength=1 name=alasan_lainnya class='form-control' placeholder='Alasan lainnya... isi dg strip jika tidak ada.'></textarea>
       <button class='btn btn-danger mt2' name=btn_batalkan_order>Batalkan</button>
     </form>
   </div>
