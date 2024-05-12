@@ -1,36 +1,100 @@
 <?php
+$print = $_GET['print'] ?? '';
+$nama_paket = $_GET['nama_paket'] ?? die(div_alert('danger', 'Index nama_paket belum terdefinisi.'));
+$id_paket = $_GET['id_paket'] ?? die(div_alert('danger', 'Index id_paket belum terdefinisi.'));
+if ($print) {
+  $id_klinik = 1; ///zzz debug
+  include '../conn.php';
+  $lokasi_img = "../assets/img";
+}
+
 $judul = 'Print Label';
 $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', 'Index id_pasien belum terdefinisi.'));
-$where_id = $id_pasien == 'random' ? "1 ORDER BY RAND() LIMIT 1" : "id='$id_pasien'";
 
+$where_id = "WHERE id='$id_pasien'";
+$mode = '';
+if ($id_pasien == 'random' || $id_pasien == 'random-klinik') {
 
-$s = "SELECT a.*, 
-a.id as id_pasien 
-FROM tb_pasien a WHERE $where_id";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$tr = '';
-if (!mysqli_num_rows($q)) {
-  die(div_alert('danger', "Data pasien tidak ditemukan."));
-} else {
-  while ($d = mysqli_fetch_assoc($q)) {
-    $id_pasien = $d['id_pasien'];
-    $tr .= "
-      <tr>
-        <td>$id_pasien</td>
-      </tr>
+  if ($id_pasien == 'random') {
+    $mode = "Random Pasien pada Paket $nama_paket.";
+    $where_id = "
+      WHERE a.id_klinik=$id_klinik 
+      AND b.id_paket=$id_paket
+      ORDER BY RAND() 
+      LIMIT 1
+    ";
+  } elseif ($id_pasien == 'random-klinik') {
+    $mode = 'Random Pasien pada Klinik ini.';
+    $where_id = "
+      WHERE a.id_klinik=$id_klinik 
+      ORDER BY RAND() 
+      LIMIT 1
     ";
   }
 }
-
-$tb = "<table class=table>$tr</table>";
-echo "$tb";
+$mode = $mode ? "<div class='red bold mb2'>Print mode: $mode (testing only)</div>" : '';
 
 
-$sub_judul = "<a href='?manage-paket'>Back</a> | Manage Sticker untuk <b class='biru'>$nama_paket</b>";
-set_title($judul);
-set_h2($judul, $sub_judul);
-only(['admin', 'marketing']);
-$img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
+$s = "SELECT a.*, 
+a.id as id_pasien,
+b.perusahaan 
+FROM tb_pasien a 
+JOIN tb_order b ON a.order_no=b.order_no 
+$where_id
+";
+
+// echo $s;
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$tr = '';
+if (!mysqli_num_rows($q)) {
+  if ($id_pasien == 'random') {
+    $pesan = "
+      Belum ada pasien untuk paket <u>$nama_paket</u>
+      <hr>
+      <a href='?print-label&id_pasien=random-klinik&id_paket=$id_paket&nama_paket=$nama_paket'>
+        Test Print Label untuk Pasien Klinik (Random)
+      </a>
+    ";
+  } elseif ($id_pasien == 'random-klinik') {
+    $pesan = "Belum ada pasien di klinik ini. ";
+  } else {
+    $pesan = "Data pasien tidak ditemukan. ";
+  }
+  die(div_alert('danger', $pesan));
+} else {
+  $d = mysqli_fetch_assoc($q);
+  $id_pasien = $d['id_pasien']; // replace id_pasien jika random pasien
+  $nama_pasien = $d['nama'];
+  $nik_pasien = $d['nikepeg'];
+  $nomor_mcu = $d['nomor'];
+  $perusahaan = $d['perusahaan'];
+}
+
+
+if (!$print) {
+  $sub_judul = "
+    $mode
+    <a href='?manage-sticker&id_paket=$id_paket&nama_paket=$nama_paket'>Back</a> 
+    | 
+    Print Label untuk 
+    <b class='biru'>
+      $nama_pasien | 
+      MCU-$nomor_mcu | 
+      NIK. $nik_pasien | 
+      $perusahaan
+    </b>
+    <hr>
+    <a target=_blank href='pages/print-label.php?id_pasien=$id_pasien&id_paket=$id_paket&nama_paket=$nama_paket&print=1' class='btn btn-primary'><i class='bx bx-printer'></i> Cetak ke Printer</a>
+    <div class='f12 abu miring mt2'>
+      Lihat pada preview dibawah ini, jika <u>tidak ada kesalahan</u>, silahkan Anda dapat langsung Cetak ke Printer, kemudian seting Printer dengan tidak menyertakan header/footer web dan semua margin harus nol.
+    </div>
+    <hr>
+  ";
+  set_title($judul);
+  set_h2($judul, $sub_judul);
+  only(['admin', 'marketing']);
+}
+// $img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
 
 
 
@@ -47,33 +111,6 @@ $img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom poin
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_add_paket'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-
-  $s = "SELECT 1 FROM tb_paket WHERE id_program=$_POST[id_program]";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  $nomor = mysqli_num_rows($q) + 1;
-
-
-  $s = "INSERT INTO tb_paket (
-    id_program,
-    no,
-    nama,
-    deskripsi
-  ) VALUES (
-    $_POST[id_program],
-    $nomor,
-    '$_POST[new_paket]',
-    'deskripsi paket baru...'
-  )";
-  // echo $s;
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  echo div_alert('success', "Add Paket sukses. Silahkan pilih paket tersebut untuk editing selanjutnya.");
-  jsurl('', 3000);
-} elseif (isset($_POST['btn_delete_paket'])) {
-  $s = "DELETE FROM tb_paket WHERE id = $_POST[btn_delete_paket]";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   echo div_alert('success', "Delete Paket sukses.");
   jsurl('', 3000);
 }
@@ -90,101 +127,118 @@ if (isset($_POST['btn_add_paket'])) {
 
 
 
+$stickers = [];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-$s = "SELECT 
-*,
-(SELECT COUNT(1) FROM tb_paket_sticker WHERE kode = CONCAT('$id_paket-',a.id)) ada 
-FROM tb_sticker a 
-WHERE a.id_klinik=$id_klinik
-";
+$s = "SELECT id,nama FROM tb_sticker WHERE id_klinik= '$id_klinik'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+while ($d = mysqli_fetch_assoc($q)) {
+  $id = $d['id'];
+  $nama = $d['nama'];
+  $stickers[$id] = $nama;
+}
+
+
+
+?>
+<style>
+  #tb_label {
+    max-width: 5cm;
+  }
+
+  #tb_label tr {
+    max-width: 5cm;
+  }
+
+  #tb_label td {
+    /* border: solid 1px red !important; */
+    vertical-align: top;
+
+  }
+
+  .img-qr {
+    margin-top: 0.2cm;
+    height: 1.8cm;
+  }
+
+  .nama_sticker {
+    margin-top: 0.35cm;
+    font-family: consolas;
+    font-size: 11px;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 16px;
+  }
+
+  .nomor_mcu {
+    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 18px;
+  }
+
+  .nama_pasien {
+    font-size: 9px;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 13px;
+  }
+
+  .nik_pasien {
+    font-size: 11px;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 16px;
+  }
+
+  .nama_sticker,
+  .nama_pasien,
+  .nomor_mcu,
+  .nik_pasien {
+    /* border: solid 1px red; */
+    border: none
+  }
+</style>
+<?php
+echo "
+  <div class='flexy' style='justify-content:center'>
+    <div>
+      <table id=tb_label>
+        ";
+
+$s = "SELECT kode FROM tb_paket_sticker WHERE kode  like '$id_paket-%'";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$tr = '';
 if (!mysqli_num_rows($q)) {
-  echo div_alert('danger', 'Belum ada data sticker pada klinik ini.');
+  die(div_alert('danger', "Paket ini belum mempunyai sticker. | Silahkan <a href='?manage_sticker&id_paket=$id_paket'>Manage Sticker</a>!"));
 } else {
-  $i = 0;
-  $tr = '';
   while ($d = mysqli_fetch_assoc($q)) {
-    $i++;
-    $id_sticker = $d['id'];
-    $id_check = "check__$id_sticker";
-    $checked = $d['ada'] ? 'checked' : '';
-    $tebal_biru = $d['ada'] ? 'tebal_biru' : '';
-    $tr .= "
+    $arr = explode('-', $d['kode']);
+    $id_paket = $arr[0];
+    $id_sticker = $arr[1];
+
+    $nama_sticker = strtoupper($stickers[$id_sticker]);
+
+    echo  "
       <tr>
-        <td>$i</td>
-        <td class=hideit>$nama_paket</td>
         <td>
-          <div class='form-check form-switch'>
-            <input class='form-check-input check-sticker checkbox-parent' type='checkbox' id='$id_check' name='checkbox-$id_check' $checked>
-            <label class='form-check-label proper pointer $tebal_biru' for='$id_check' id='label-$id_check'>
-              $d[nama]
-            </label>
-          </div>
+          <img src='$lokasi_img/qr.png' class='img-qr'/>
+        </td>
+        <td>
+          <div class='nama_sticker'>$nama_sticker</div>
+          <div class='nomor_mcu'>MCU-$nomor_mcu</div>
+          <div class='nama_pasien'>$nama_pasien</div>
+          <div class='nik_pasien'>NIK. $nik_pasien</div>
         </td>
       </tr>
     ";
   }
-  echo "
-    <style>.tebal_biru{color:blue;font-weight:bold}</style>
-    <span class=hideit id=id_paket>$id_paket</span>
-    <table class='table table-hover table-striped'>
-      $tr
-    </table>
-    <a class='btn btn-primary' href='?print-label&id_pasien=test'><i class='bx bx-printer'></i> Test Print</a>
-  ";
 }
-?>
-<script>
-  $(function() {
-    $('.check-sticker').click(function() {
-      let tid = $(this).prop('id');
-      let checked = $(this).prop('checked');
-      let rid = tid.split('__');
-      let aksi = rid[0];
-      let id_sticker = rid[1];
-      let id_paket = $('#id_paket').text();
-
-      console.log(aksi, id_sticker, id_paket, checked);
-
-      let kode = `${id_paket}-${id_sticker}`;
-      if (checked) {
-        aksi = 'insert';
-      } else {
-        aksi = 'delete';
-      }
-      let link_ajax = `ajax/crud.php?tb=tb_paket_sticker&aksi=${aksi}&id=kode&kolom=kode&value=${kode}`;
-
-      $.ajax({
-        url: link_ajax,
-        success: function(a) {
-          console.log('reply from AJAX: ', a);
-          if (a.trim() == 'sukses') {
-            if (checked) {
-              $('#label-' + tid).addClass('tebal_biru');
-            } else {
-              $('#label-' + tid).removeClass('tebal_biru');
-
-            }
-          } else {
-            alert(a);
-          }
-        }
-      })
 
 
-    })
-  })
-</script>
+
+echo "
+      </table>
+    </div>
+  </div>
+";
+if ($print) echo "<script>window.print()</script>";

@@ -119,7 +119,7 @@ if (!mysqli_num_rows($q)) {
     <table class='table table-hover table-striped'>
       $tr
     </table>
-    <a class='btn btn-primary' href='?print-label&id_pasien=test'><i class='bx bx-printer'></i> Test Print</a>
+    <a class='btn btn-primary' href='?print-label&id_pasien=random&id_paket=$id_paket&nama_paket=$nama_paket'><i class='bx bx-printer'></i> Test Print</a>
   ";
 }
 ?>
