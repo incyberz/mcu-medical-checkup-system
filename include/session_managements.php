@@ -1,4 +1,5 @@
 <?php
+// v. 2.0.1 updated with array or non-array input users
 
 function login_only($pesan = 'Maaf, Anda harus login untuk melihat page ini.<hr>Redirecting to homepage...', $timeout = 3000)
 {
@@ -32,10 +33,23 @@ function only($roles = ['admin'], $pesan = "Maaf, Anda harus login dengan role y
   $allowed = 0;
   if (isset($_SESSION['mmc_username'])) {
     if (isset($_SESSION['mmc_role'])) {
-      foreach ($roles as $role) {
-        if ($_SESSION['mmc_role'] == $role) {
+      if (is_array($roles)) {
+        foreach ($roles as $role) {
+          // allowed for all user
+          if (
+            $role == 'users' // all user
+            || $_SESSION['mmc_role'] == $role
+          ) {
+            $allowed = 1;
+            break;
+          }
+        }
+      } else { // bukan array
+        if (
+          $roles == 'users' // all user
+          || $_SESSION['mmc_role'] == $roles
+        ) {
           $allowed = 1;
-          break;
         }
       }
     }

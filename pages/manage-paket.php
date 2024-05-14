@@ -4,7 +4,6 @@ $sub_judul = '';
 set_title($judul);
 set_h2($judul, $sub_judul);
 only(['admin', 'marketing']);
-$img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
 
 
 
@@ -138,6 +137,8 @@ if (!mysqli_num_rows($q)) {
       } elseif ($key == 'status') {
         $value = $value ? "<span class='f12 green'><span onclick='alert(\"Paket aktif dan ditampilkan ke pengunjung. Klik nama paket untuk manage lebih lanjut\")'>$img_check</span> active</span>" : '<span class="f12 abu miring">disabled</span>';
       } elseif ($key == 'count_sticker') {
+        $label = $d['count_sticker'] ? 'label_green' : 'label_gray';
+        $img_sticker = "<img src='$lokasi_icon/$label.png' height=20px class='zoom pointer' style='display:inline-block;margin-left: 10px' />";
         $value .= " <a href='?manage-sticker&id_paket=$id_paket&nama_paket=$nama_paket'>$img_sticker</a>";
       }
 

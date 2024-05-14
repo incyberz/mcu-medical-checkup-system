@@ -4,7 +4,8 @@ if ($username == '') {
   // belum login
   $id_user = '';
   $is_login = '';
-  $id_role = 0;
+  $id_role = '';
+  $id_klinik = '';
   $role = 'Pengunjung';
   $nama_user = '';
   $src_profile = $profile_na;
@@ -12,13 +13,14 @@ if ($username == '') {
   //telah login
   $role = $_SESSION['mmc_role'] ?? 'user';
 
-  if ($role == 'admin' || $role == 'marketing') {
-    $tb = 'user';
-  } else {
+  if ($role == 'pasien' || $role == 'pendaftar') {
     $tb = $role;
+  } else {
+    $tb = 'user';
   }
   $s = "SELECT a.*, 
-  a.nama as nama_user 
+  a.nama as nama_user,
+  (SELECT jabatan FROM tb_role WHERE role=a.role) jabatan 
   FROM tb_$tb a 
   WHERE a.username='$username'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -29,9 +31,12 @@ if ($username == '') {
     $d = mysqli_fetch_assoc($q);
 
     $id_user = $d['id'];
+    $id_klinik = $d['id_klinik'];
     $is_login = 1;
     $nama_user = $d['nama_user'];
     $gender = $d['gender'] ?? '';
+    $Role = $d['jabatan'] ?? '';
+    $jabatan = $Role;
 
     if (!$role || $role == 'user') {
       $_SESSION['mmc_role'] = $d['role'];

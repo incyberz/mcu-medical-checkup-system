@@ -68,10 +68,19 @@ if (!mysqli_num_rows($q)) {
   $nik_pasien = $d['nikepeg'];
   $nomor_mcu = $d['nomor'];
   $perusahaan = $d['perusahaan'];
+  $status = $d['status'];
+  if ($status == 7 and $print) {
+    $s2 = "UPDATE tb_pasien SET status=8 WHERE id=$id_pasien";
+    $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+  }
 }
 
 
 if (!$print) {
+  $caption_upd_status = $status == 7 ? ' dan Update Status Pasien' : '';
+  $status_pasien_info = $status != 7 ? '' : "
+      Status pasien sudah Siap Pemeriksaan (7) maka otomatis akan diubah status ke Sudah Cetak Label (8)
+  ";
   $sub_judul = "
     $mode
     <a href='?manage-sticker&id_paket=$id_paket&nama_paket=$nama_paket'>Back</a> 
@@ -84,15 +93,19 @@ if (!$print) {
       $perusahaan
     </b>
     <hr>
-    <a target=_blank href='pages/print-label.php?id_pasien=$id_pasien&id_paket=$id_paket&nama_paket=$nama_paket&print=1' class='btn btn-primary'><i class='bx bx-printer'></i> Cetak ke Printer</a>
+    <a target=_blank href='pages/print-label.php?id_pasien=$id_pasien&id_paket=$id_paket&nama_paket=$nama_paket&print=1' class='btn btn-primary'><i class='bx bx-printer'></i> Print Preview $caption_upd_status</a>
     <div class='f12 abu miring mt2'>
-      Lihat pada preview dibawah ini, jika <u>tidak ada kesalahan</u>, silahkan Anda dapat langsung Cetak ke Printer, kemudian seting Printer dengan tidak menyertakan header/footer web dan semua margin harus nol.
+      Lihat pada preview dibawah ini, jika <u>tidak ada kesalahan</u>, silahkan Anda dapat Print Preview, kemudian seting Printer dengan tidak menyertakan header/footer web dan semua margin harus nol.
     </div>
+    <div class='mt2'>
+      $status_pasien_info
+    </div>
+    
     <hr>
   ";
   set_title($judul);
   set_h2($judul, $sub_judul);
-  only(['admin', 'marketing']);
+  only(['admin', 'marketing', 'cs']);
 }
 // $img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
 
@@ -209,7 +222,7 @@ $s = "SELECT kode FROM tb_paket_sticker WHERE kode  like '$id_paket-%'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (!mysqli_num_rows($q)) {
-  die(div_alert('danger', "Paket ini belum mempunyai sticker. | Silahkan <a href='?manage_sticker&id_paket=$id_paket'>Manage Sticker</a>!"));
+  die(div_alert('danger', "Paket ini belum mempunyai sticker. | Silahkan <a href='?manage-paket'>Manage Paket</a>"));
 } else {
   while ($d = mysqli_fetch_assoc($q)) {
     $arr = explode('-', $d['kode']);
