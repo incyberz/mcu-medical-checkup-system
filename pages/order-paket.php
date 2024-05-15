@@ -130,26 +130,26 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
   if ($customizable) {
     $s2 = "SELECT 
-    a.id as id_pemeriksaan,
+    a.id as id_paket_sub,
     a.nama as nama_pemeriksaan,
     a.deskripsi 
 
-    FROM tb_pemeriksaan a 
+    FROM tb_paket_sub a 
     WHERE a.id_klinik=$id_klinik ";
     $lihat_detail = 'Lihat Pilihan Pemeriksaan';
 
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     $pilihan = '';
     while ($detail = mysqli_fetch_assoc($q2)) {
-      $id_pemeriksaan = $detail['id_pemeriksaan'];
+      $id_paket_sub = $detail['id_paket_sub'];
       $deskripsi = $detail['deskripsi'];
       $pilihan .= "
         <tr>
           <td>
-            <input type=checkbox name=pemeriksaan__$id_pemeriksaan id=pemeriksaan__$id_pemeriksaan>
+            <input type=checkbox name=pemeriksaan__$id_paket_sub id=pemeriksaan__$id_paket_sub>
           </td>
           <td>
-            <label for=pemeriksaan__$id_pemeriksaan class=pointer>
+            <label for=pemeriksaan__$id_paket_sub class=pointer>
               $detail[nama_pemeriksaan] 
               <div class='f12 abu miring'>$deskripsi</div>
             </label>
@@ -213,7 +213,7 @@ while ($paket = mysqli_fetch_assoc($q)) {
     b.nama as nama_pemeriksaan
 
     FROM tb_paket_detail a 
-    JOIN tb_pemeriksaan b ON a.id_pemeriksaan =b.id 
+    JOIN tb_paket_sub b ON a.id_paket_sub =b.id 
     WHERE a.id_paket=$paket[id_paket] ORDER BY no";
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     $details = '';

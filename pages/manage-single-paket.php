@@ -43,7 +43,7 @@ if (!$count_paket_detail) {
   // get list pemeriksaan
   $s = "SELECT b.nama as nama_pemeriksaan 
   FROM tb_paket_detail a 
-  JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
+  JOIN tb_paket_sub b ON a.id_paket_sub=b.id 
   WHERE id_paket = $id_paket";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   while ($d = mysqli_fetch_assoc($q)) {

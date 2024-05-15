@@ -1,5 +1,8 @@
 <?php
-$section = 'tb-bb';
+set_title('Awal Input Data');
+set_judul('Awal Input Data');
+
+$section = 'awal-input-data';
 
 $arr = [
   'berat_badan' => [
@@ -58,48 +61,23 @@ foreach ($arr as $key => $v) {
   }
   $val_range = intval(($max_range - $min_range) / 2) + $min_range;
   $required = $v['required'] ? 'required' : '';
-
-  $blok_inputs .= "
-    <div class='wadah gradasi-toska'>
-      <div class='flexy flex-center'>
-        <div class='f14 darkblue miring pt1'>$v[label]</div>
-        <div>
-          <input 
-            id='$key' 
-            name='$key' 
-            placeholder='$v[placeholder]' 
-            type='$v[type]' 
-            $required
-            class='form-control $v[class]' 
-            min='$v[min]' 
-            max='$v[max]' 
-            minlength='$v[minlength]' 
-            maxlength='$v[maxlength]' 
-            style='max-width:100px'
-          >          
-        </div>
-        <div class='f14 abu miring pt1'>$v[satuan]</div>
-      </div>
-      <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range'>
-      <div class='flexy flex-between f12 consolas abu'>
-        $div_range
-      </div>
-    </div>  
-  ";
 }
 
 $tanggal_show = date('d-F-Y H:i');
+$tanggal = date('d-F-Y');
+$pukul = date('H:i');
 
 $form_pemeriksaan = "
   <form method='post' class='form-pemeriksaan wadah bg-white'>
-
-    $blok_inputs
+    <div class='wadah gradasi-toska'>
+      <img src='assets/img/ilustrasi/medical-checkup.jpg' class='img-fluid img-thumbnail' />
+    </div>  
     <div class='flexy mb2 flex-center'>
       <input type=checkbox required id=cek>
-      <label for=cek>Saya menyatakan bahwa data diatas sudah benar.</label>
+      <label for=cek>Pasien mulai masuk pemeriksaan pada tanggal <b class=darkblue>$tanggal</b> pukul <b class=darkblue>$pukul</b>.</label>
     </div>
-    <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$section'>Submit Data Pasien</button>
-    <div class='tengah f12 mt1 abu'>Diperiksa oleh <span class='darkblue'>$nama_user</span> pada tanggal <span class=consolas>$tanggal_show</span></div>
+    <button class='btn btn-primary w-100' name=btn_mulai_pemeriksaan value='$section'>Mulai Pemeriksaan</button>
+    <div class='tengah f12 mt1 abu'>Disubmit oleh <span class='darkblue'>$nama_user</span> pada tanggal <span class=consolas>$tanggal_show</span></div>
   </form>
 
 ";

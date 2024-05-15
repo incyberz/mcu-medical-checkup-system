@@ -71,9 +71,13 @@ if (!$order_no) {
   a.riwayat_penyakit,
   a.gejala_penyakit,
   a.gaya_hidup,
-  a.keluhan
+  a.keluhan,
+  c.nama as nama_paket 
 
-  FROM tb_pasien a WHERE id='$id_pasien'";
+  FROM tb_pasien a 
+  JOIN tb_order b ON a.order_no=b.order_no -- Pasien Non Mandiri
+  JOIN tb_paket c ON b.id_paket=c.id 
+  WHERE a.id='$id_pasien'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $tr = '';
   if (mysqli_num_rows($q)) {
@@ -82,6 +86,7 @@ if (!$order_no) {
     $d = mysqli_fetch_assoc($q);
     $foto_profil = $d['foto_profil'];
     $status = $d['status'];
+    $nama_paket = $d['nama_paket'];
     $NIK = $d['NIK'];
     $nomor_MCU = $d['nomor_MCU'];
     // ) {
@@ -125,21 +130,9 @@ if (!$order_no) {
     }
   }
 
-  $arr_fitur_dokter = [
-    'pemfis' => 'Pemeriksaan Fisik Dokter MCU',
-  ];
+  include 'include/arr_fitur_nakes.php';
+  include 'include/arr_fitur_dokter.php';
 
-  $arr_fitur_nakes = [
-    'tb-bb' => 'TB/BB/LP',
-    'tensi' => 'Tensi/BW/Res',
-    'mata' => 'Visus Mata',
-    'dl' => 'Darah Lengkap (DL)',
-    'dk' => 'Darah Kimia (DK)',
-    'rontgen' => 'Rontgen',
-    'ekg' => 'EKG',
-    'spiro' => 'Spiro',
-    'audio' => 'Audio',
-  ];
 
   $src = "$lokasi_pasien/$foto_profil";
 
@@ -150,7 +143,7 @@ if (!$order_no) {
     $fiturs = $arr_fitur_nakes;
   }
 
-  $fitur_pasien_header = "<div>Fitur untuk <span class='tebal darkblue'>$jabatan ($role)</span></div>";
+  $fitur_pasien_header = "<div>Pemeriksaan <b class=darkblue>$nama_paket</b> bagi role  <span class='tebal darkblue'>$jabatan ($role)</span></div>";
   if ($fiturs) {
     $fitur_pemeriksaan = '';
     foreach ($fiturs as $fitur => $Fitur) {

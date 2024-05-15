@@ -150,8 +150,8 @@ if (!mysqli_num_rows($q)) {
 
 $s2 = "SELECT 
 a.nama as nama_pemeriksaan 
-FROM tb_pemeriksaan a 
-JOIN tb_paket_detail b ON a.id=b.id_pemeriksaan
+FROM tb_paket_sub a 
+JOIN tb_paket_detail b ON a.id=b.id_paket_sub
 WHERE b.id_paket='$id_paket'";
 $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
 $li = '';

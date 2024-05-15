@@ -132,10 +132,13 @@ $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class=
 # ===========================================================
 $s = "SELECT 1 FROM tb_mcu WHERE id_pasien=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+if (!mysqli_num_rows($q)) {
+  $fitur = 'awal-input-data';
+}
 
 
 $form_pemeriksaan = div_alert('danger', "Belum ada form untuk fitur pemeriksaan <span class=darkblue>$fitur</span><hr>Mohon segera lapor developer.");
-$file_form = "$lokasi_pages/form-pemeriksaan/form-pemeriksaan-$fitur.php";
+$file_form = "$lokasi_pages/form-pemeriksaan/$fitur.php";
 if (file_exists($file_form)) {
   include $file_form;
 } else {
