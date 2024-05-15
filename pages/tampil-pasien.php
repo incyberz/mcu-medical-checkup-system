@@ -72,6 +72,7 @@ if (!$order_no) {
   a.gejala_penyakit,
   a.gaya_hidup,
   a.keluhan,
+  c.id as id_paket, 
   c.nama as nama_paket 
 
   FROM tb_pasien a 
@@ -86,6 +87,7 @@ if (!$order_no) {
     $d = mysqli_fetch_assoc($q);
     $foto_profil = $d['foto_profil'];
     $status = $d['status'];
+    $id_paket = $d['id_paket'];
     $nama_paket = $d['nama_paket'];
     $NIK = $d['NIK'];
     $nomor_MCU = $d['nomor_MCU'];
@@ -130,30 +132,46 @@ if (!$order_no) {
     }
   }
 
-  include 'include/arr_fitur_nakes.php';
-  include 'include/arr_fitur_dokter.php';
+  // include 'include/arr_fitur_nakes.php';
+  // include 'include/arr_fitur_dokter.php';
 
 
-  $src = "$lokasi_pasien/$foto_profil";
 
-  $fiturs = [];
-  if ($role == 'dokter') {
-    $fiturs = $arr_fitur_dokter;
-  } elseif ($role == 'nakes') {
-    $fiturs = $arr_fitur_nakes;
-  }
+  // $fiturs = [];
+  // if ($role == 'dokter') {
+  //   $fiturs = $arr_fitur_dokter;
+  // } elseif ($role == 'nakes') {
+  //   $fiturs = $arr_fitur_nakes;
+  // }
+
+  // if ($fiturs) {
+  //   $fitur_pemeriksaan = '';
+  //   foreach ($fiturs as $pemeriksaan => $nama_pemeriksaan) {
+  //     $fitur_pemeriksaan .= "<div><a class='btn btn-primary ' href='?pemeriksaan&pemeriksaan=$pemeriksaan&id_pasien=$id_pasien'>$nama_pemeriksaan</a></div> ";
+  //   }
+  // } else {
+  //   $fitur_pemeriksaan = div_alert('danger', 'Maaf, tidak ada Fitur Pemeriksaan Pasien untuk Anda.');
+  // }
 
   $fitur_pasien_header = "<div>Pemeriksaan <b class=darkblue>$nama_paket</b> bagi role  <span class='tebal darkblue'>$jabatan ($role)</span></div>";
-  if ($fiturs) {
-    $fitur_pemeriksaan = '';
-    foreach ($fiturs as $fitur => $Fitur) {
-      $fitur_pemeriksaan .= "<div><a class='btn btn-primary ' href='?pemeriksaan&fitur=$fitur&id_pasien=$id_pasien'>$Fitur</a></div> ";
-    }
-  } else {
-    $fitur_pemeriksaan = div_alert('danger', 'Maaf, tidak ada Fitur Pemeriksaan Pasien untuk Anda.');
+
+  $fitur_pemeriksaan = '';
+  $s = "SELECT 
+  b.pemeriksaan,
+  c.nama as nama_pemeriksaan  
+  FROM tb_paket_sticker a 
+  JOIN tb_sticker b ON a.id_sticker=b.id 
+  JOIN tb_pemeriksaan c ON b.pemeriksaan=c.pemeriksaan 
+  WHERE a.id_paket=$id_paket 
+  ORDER BY b.nomor
+  ";
+  $q2 = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  while ($d2 = mysqli_fetch_assoc($q2)) {
+    $fitur_pemeriksaan .= "<div><a class='btn btn-primary ' href='?pemeriksaan&pemeriksaan=$d2[pemeriksaan]&id_pasien=$id_pasien'>$d2[nama_pemeriksaan]</a></div> ";
   }
 
   $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class="f12 red">Belum pernah login</span>';
+  $src = "$lokasi_pasien/$foto_profil";
 
   echo "
     <div class='wadah tengah gradasi-hijau'>

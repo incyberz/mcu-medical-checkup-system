@@ -21,7 +21,8 @@ if ($tb == 'tb_paket_sticker') {
   if (!$value) die(erid('id::empty'));
 
   if ($aksi == 'insert') {
-    $s = "INSERT INTO tb_paket_sticker (kode) VALUES ('$value')";
+    $arr = explode('-', $value);
+    $s = "INSERT INTO tb_paket_sticker (kode,id_paket,id_sticker) VALUES ('$value',$arr[0],$arr[1]) ON DUPLICATE KEY UPDATE id_sticker=$arr[1]";
   } elseif ($aksi == 'delete') {
     $s = "DELETE FROM tb_paket_sticker WHERE kode='$value'";
   } else {

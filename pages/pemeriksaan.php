@@ -8,7 +8,7 @@ set_title($judul);
 set_h2($judul, $sub_judul);
 only('users');
 $id_pasien = $_GET['id_pasien'] ?? die('Page ini membutuhkan index [id_pasien].');
-$fitur = $_GET['fitur'] ?? die('Page ini membutuhkan index [fitur].');
+$pemeriksaan = $_GET['pemeriksaan'] ?? die('Page ini membutuhkan index [pemeriksaan].');
 
 
 
@@ -133,16 +133,16 @@ $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class=
 $s = "SELECT 1 FROM tb_mcu WHERE id_pasien=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) {
-  $fitur = 'awal-input-data';
+  $pemeriksaan = 'awal-input-data';
 }
 
 
-$form_pemeriksaan = div_alert('danger', "Belum ada form untuk fitur pemeriksaan <span class=darkblue>$fitur</span><hr>Mohon segera lapor developer.");
-$file_form = "$lokasi_pages/form-pemeriksaan/$fitur.php";
+$form_pemeriksaan = div_alert('danger', "Belum ada form untuk pemeriksaan <span class=darkblue>$pemeriksaan</span><hr>Mohon segera lapor developer.");
+$file_form = "$lokasi_pages/form-pemeriksaan/$pemeriksaan.php";
 if (file_exists($file_form)) {
   include $file_form;
 } else {
-  echolog("Belum ada file-form-pemeriksaan untuk fitur: <span class='tebal darkblue'>$fitur</span>");
+  echolog("Belum ada file-form-pemeriksaan untuk pemeriksaan: <span class='tebal darkblue'>$pemeriksaan</span>");
 }
 
 echo "
