@@ -341,4 +341,9 @@
   td {
     background: none !important;
   }
+
+  .kolom {
+    color: #888 !important;
+    font-style: italic;
+  }
 </style>

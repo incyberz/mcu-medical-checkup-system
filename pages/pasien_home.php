@@ -7,10 +7,7 @@
     padding-bottom: 10px;
   }
 
-  .kolom {
-    color: #888 !important;
-    font-style: italic;
-  }
+
 
   .radio-toolbar label {
     padding: 7px 10px;

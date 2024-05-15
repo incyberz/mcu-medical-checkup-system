@@ -37,9 +37,4 @@
     padding: 30px 0;
     border-bottom: solid 3px #ddd;
   }
-
-  /* tmp */
-  .flex-center {
-    justify-content: center;
-  }
 </style>

@@ -1,4 +1,6 @@
 <?php
+// v.1.3.7 set_h2 id, set_judul, set_sub_judul
+// v.1.3.6 function gender
 // v.1.3.5 eta2 updated
 // v.1.3.4 seth2 dan key2kolom
 // v.1.3.3 tr_col colspan=100%
@@ -11,8 +13,8 @@ function set_h2($judul, $sub_judul = '')
 {
   echo "
     <div class='section-title'>
-      <h2>$judul</h2>
-      <p>$sub_judul</p>
+      <h2 id=judul>$judul</h2>
+      <p id=sub_judul>$sub_judul</p>
     </div>
   ";
 }
@@ -217,11 +219,50 @@ function jsreload()
 //   return $hasil;
 // }
 
-function set_title($a)
+function set_title($text)
 {
-  echo '<script>$(function(){$("title").text("' . $a . '");})</script>';
+  echo '<script>$(function(){$("title").text("' . $text . '");})</script>';
 }
 
+function set_judul($text, $sub_judul = '')
+{
+  $set_sub_judul = !$sub_judul ? '' : "$('#sub_judul').text('$sub_judul');";
+  echo "
+    <script>
+      $(function(){
+        $('#judul').text('$text');
+        $set_sub_judul
+      })
+    </script>
+  ";
+}
+
+
+function gender($lp)
+{
+  if ((strtolower($lp) == 'l')) {
+    return 'Laki-laki';
+  } elseif (strtolower($lp) == 'p') {
+    return 'Perempuan';
+  } elseif (strtolower($lp) == '') {
+    return '<i>null</i>';
+  } else {
+    return "<i style=color:red>gender $lp undefined</i>";
+  }
+}
+
+function tanggal($date, $format = 'd-M-Y')
+{
+  if (strtotime($date) > 0) {
+    return date($format, strtotime($date));
+  } else {
+    if ($date == '') {
+      return '<i>null</i>';
+    } else {
+      return '<i style=color:red>tanggal invalid</i>';
+    }
+  }
+}
 
 ?>
 <script>

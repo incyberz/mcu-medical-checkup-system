@@ -62,6 +62,7 @@ while ($d = mysqli_fetch_assoc($q)) {
       ";
   }
 
+  $btn_print = ''; // fitur aborted
   $src = "assets/img/profile_na.jpg";
   if ($d['foto_profil']) {
     $src = "assets/img/pasien/$d[foto_profil]";
@@ -71,12 +72,17 @@ while ($d = mysqli_fetch_assoc($q)) {
     }
   }
 
+  $href = "?cari-pasien&id_pasien=$id_pasien";
   $tr .= "
     <tr>
       <td>$i</td>
-      <td><img src='$src' class='foto_profil' /></td>
       <td>
-        <div>$d[nama_pasien] $d[kode_status]</div>
+        <a href='$href'>
+          <img src='$src' class='foto_profil' />
+        </a>
+      </td>
+      <td>
+        <div><a href='$href'>$d[nama_pasien]</a></div>
         <div>NIK. $d[nik_pasien]</div>
         <div>MCU-$d[nomor] | $d[singkatan_paket]</div>
         <div>$status_show</div>
