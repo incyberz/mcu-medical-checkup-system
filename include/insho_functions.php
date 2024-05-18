@@ -241,9 +241,9 @@ function set_judul($text, $sub_judul = '')
 function gender($lp)
 {
   if ((strtolower($lp) == 'l')) {
-    return 'Laki-laki';
+    return 'laki-laki';
   } elseif (strtolower($lp) == 'p') {
-    return 'Perempuan';
+    return 'perempuan';
   } elseif (strtolower($lp) == '') {
     return '<i>null</i>';
   } else {

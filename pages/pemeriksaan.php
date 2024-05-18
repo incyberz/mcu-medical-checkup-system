@@ -1,18 +1,23 @@
 <?php
 $judul = 'Pemeriksaan Pasien';
+$id_pasien = $_GET['id_pasien'] ?? die('Page ini membutuhkan index [id_pasien].');
+$pemeriksaan = $_GET['pemeriksaan'] ?? die('Page ini membutuhkan index [pemeriksaan].');
 // $id_paket = $_GET['id_paket'] ?? die(div_alert('danger', 'Index id_paket belum terdefinisi.'));
 // $nama_paket = $_GET['nama_paket'] ?? die(div_alert('danger', 'Index nama_paket belum terdefinisi.'));
 // $sub_judul = "<a href='?manage-paket'>Back</a> | Manage Sticker untuk <b class='biru'>$nama_paket</b>";
-$sub_judul = '';
+
+# ============================================================
+# INCLUDES 
+# ============================================================
+include 'include/arr_status_pasien.php';
+include 'include/arr_pemeriksaan.php';
+include 'pemeriksaan-functions.php';
+
+
+$sub_judul = "<span class='f20 darkblue'>Pemeriksaan $arr_pemeriksaan[$pemeriksaan]</span>";
 set_title($judul);
 set_h2($judul, $sub_judul);
 only('users');
-$id_pasien = $_GET['id_pasien'] ?? die('Page ini membutuhkan index [id_pasien].');
-$pemeriksaan = $_GET['pemeriksaan'] ?? die('Page ini membutuhkan index [pemeriksaan].');
-
-
-
-
 
 
 
@@ -25,24 +30,11 @@ $pemeriksaan = $_GET['pemeriksaan'] ?? die('Page ini membutuhkan index [pemeriks
 # ===========================================================
 # PROCESSORS
 # ===========================================================
-if (isset($_POST['btn_submit_data_pasien'])) {
-  $section = $_POST['btn_submit_data_pasien'];
-  unset($_POST['btn_submit_data_pasien']);
-
-  $sets = '';
-  foreach ($_POST as $key => $value) {
-    echo "<br>$section | $key | $value";
-  }
-
-
-  echo div_alert('success', "Update Data Pasien sukses.");
-  // jsurl('', 8000);
-}
+include 'pemeriksaan-processors.php';
 
 
 
 
-include 'include/arr_status_pasien.php';
 
 # ============================================================
 # MAIN SELECT PASIEN
@@ -61,26 +53,29 @@ a.foto_profil,
 a.riwayat_penyakit,
 a.gejala_penyakit,
 a.gaya_hidup,
-a.keluhan
+a.keluhan,
+(SELECT 1 FROM tb_mcu WHERE id_pasien=a.id) punya_data
 
 FROM tb_pasien a WHERE id='$id_pasien'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
+$punya_data = '';
 if (mysqli_num_rows($q)) {
   $i = 0;
   // while (
-  $d = mysqli_fetch_assoc($q);
-  $foto_profil = $d['foto_profil'];
-  $order_no = $d['order_no'];
-  $status = $d['status'];
-  $gender = $d['gender'];
-  $NIK = $d['NIK'];
-  $nomor_MCU = $d['nomor_MCU'];
+  $pasien = mysqli_fetch_assoc($q);
+  $foto_profil = $pasien['foto_profil'];
+  $order_no = $pasien['order_no'];
+  $status = $pasien['status'];
+  $gender = $pasien['gender'];
+  $NIK = $pasien['NIK'];
+  $nomor_MCU = $pasien['nomor_MCU'];
+  $punya_data = $pasien['punya_data'];
 
   $gender_icon = $gender ? "<img src='$lokasi_icon/gender-$gender.png' height=20px>" : $img_warning;
-  // ) {
-  // $i++;
-  foreach ($d as $key => $value) {
+  $gender_show = gender($gender);
+
+  foreach ($pasien as $key => $value) {
     if (
       $key == 'id'
       || $key == 'foto_profil'
@@ -119,37 +114,288 @@ if (mysqli_num_rows($q)) {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# GET DATA MCU 
+# ============================================================
+if ($pasien['punya_data']) {
+  $s = "SELECT * FROM tb_mcu WHERE id_pasien=$id_pasien";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $mcu = mysqli_fetch_assoc($q);
+} else {
+  $mcu = [];
+}
+
+
+
+
+
+
+
+
+
 include 'include/arr_fitur_dokter.php';
 include 'include/arr_fitur_nakes.php';
 
 $src = "$lokasi_pasien/$foto_profil";
-
 $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class="f12 red">Belum pernah login</span>';
 
 
 # ===========================================================
-# AUTO CREATE TB-MCU IF NOT EXISTS
+# CREATE TB-MCU IF NOT EXISTS
 # ===========================================================
-$s = "SELECT 1 FROM tb_mcu WHERE id_pasien=$id_pasien";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-if (!mysqli_num_rows($q)) {
-  $pemeriksaan = 'awal-input-data';
-}
+if (!$punya_data) {
+  include 'awal-pemeriksaan.php';
+} else { // punya data MCU
+
+  // $s = "SELECT 1 FROM tb_mcu WHERE id_pasien=$id_pasien";
+  // $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  // if (!mysqli_num_rows($q)) {
+  // }
 
 
-$form_pemeriksaan = div_alert('danger', "Belum ada form untuk pemeriksaan <span class=darkblue>$pemeriksaan</span><hr>Mohon segera lapor developer.");
-$file_form = "$lokasi_pages/form-pemeriksaan/$pemeriksaan.php";
-if (file_exists($file_form)) {
-  include $file_form;
-} else {
-  echolog("Belum ada file-form-pemeriksaan untuk pemeriksaan: <span class='tebal darkblue'>$pemeriksaan</span>");
-}
+  $form_pemeriksaan = div_alert('danger', "Belum ada form untuk pemeriksaan <span class=darkblue>$pemeriksaan</span><hr>Mohon segera lapor developer.");
+  $file_form = "$lokasi_pages/form-pemeriksaan/$pemeriksaan.php";
+  if (file_exists($file_form)) {
+    // $form_pemeriksaan diubah pada sub-file ini
+    include $file_form;
 
+
+    $hide_form = '';
+    $hasil_form = '';
+    $caption = 'Submit';
+    $btn_notif = "Diperiksa oleh <span class='darkblue'>$nama_user</span> pada tanggal <span class=consolas>$tanggal_show</span>";
+    $tanggal_pemeriksaan = $mcu['tanggal_simpan_' . $pemeriksaan] ?? '';
+
+    if ($tanggal_pemeriksaan) {
+      # ============================================================
+      # MODE SUDAH MENGISI
+      # ============================================================
+      include 'include/arr_user.php';
+
+
+      $hide_form = 'hideit';
+      $caption = 'Update';
+      $obesitas = '<span class="red bold">obesitas</span>';
+
+      $hasil_form = '';
+      foreach ($arr as $key => $value) {
+        $kolom = key2kolom($key);
+        $satuan = $value['satuan'] ?? '';
+        $hasil_form .= "
+          <tr>
+            <td class='kiri miring darkblue'>$kolom</td>
+            <td class='kanan darkblue tebal'>$mcu[$key] $satuan</td>
+          </tr>
+        ";
+      }
+
+      $pemeriksa = $arr_user[$mcu['pemeriksa_' . $pemeriksaan]];
+      $tanggal_show = date('d F Y, H:i:s', strtotime($mcu['tanggal_simpan_tb_bb']));
+      $eta = eta2($mcu['tanggal_simpan_tb_bb']);
+
+
+      # ============================================================
+      # INCLUDE HASIL PENGUKURAN
+      # ============================================================
+      // include "$lokasi_pages/form-pemeriksaan/hasil-$pemeriksaan.php";
+      if ($pemeriksaan == 'tb_bb') {
+        $imt = round($mcu['berat_badan'] / (($mcu['tinggi_badan'] / 100) * ($mcu['tinggi_badan'] / 100)), 2);
+
+        if ($imt >= 27) {
+          $obesitas = $obesitas;
+        } elseif (
+          $imt >= 25
+        ) {
+          $obesitas = 'gemuk';
+        } elseif ($imt >= 18.5) {
+          $obesitas = 'normal';
+        } elseif ($imt >= 17) {
+          $obesitas = 'kurus';
+        } else {
+          $obesitas = 'sangat kurus';
+        }
+
+        $blp = $gender == 'l' ? 90 : 80;
+        $obesitas2 = $mcu['lingkar_perut'] >= $blp ? $obesitas : 'dalam batas normal';
+        $kesimpulan = "
+          <h4 class='darkblue miring f18'>Index Masa Tubuh</h4>
+          <ul>
+            <li>Index Masa Tubuh (IMT) = $imt</li>
+            <li>Kesimpulan Berat Tubuh : $obesitas</li>
+          </ul>
+
+          <h4 class='darkblue miring f18'>Lingkar Perut</h4>
+          <ul>
+            <li>Batas lingkar perut untuk $gender_show yaitu $blp</li>
+            <li>Kesimpulan Lingkar Perut : $obesitas2</li>
+          </ul>
+
+        ";
+      } else {
+        $kesimpulan = "Belum ada analogi kesimpulan untuk pemeriksaan $pemeriksaan.";
+      }
+
+
+
+      $hasil_form = "
+      <div id=blok_hasil>
+          <h2>HASIL PEMERIKSAAN</h2>
+          <div>
+            <b class=blue>Telah Diperiksa</b> oleh <span class='darkblue'>$pemeriksa</span> pada tanggal <span class=consolas>$tanggal_show</span> | <span class='abu f12'>$eta</span>
+          </div>
+  
+          <div class='flex-center'>
+            <div style='max-width:500px'>
+              <table class='table table-hover'>
+                $hasil_form
+              </table>
+            </div>
+          </div>
+  
+          <div class='wadah gradasi-toska kiri'>
+            <h3 class=mb4>Kesimpulan Pemeriksaan $arr_pemeriksaan[$pemeriksaan]</h3>
+            $kesimpulan
+          </div>
+        </div>
+  
+        
+        <button class='btn btn-secondary btn-sm mb2' id=btn_ubah_nilai>Ubah Nilai</button>
+      ";
+
+      echo "
+      <script>
+        $(function() {
+          $('#btn_ubah_nilai').click(function() {
+            $('#blok_hasil').slideToggle();
+            $('#blok_form').slideToggle();
+            if ($(this).text() == 'Ubah Nilai') {
+              $(this).text('Lihat Hasil');
+            } else {
+              $(this).text('Ubah Nilai');
+            }
+          })
+        })
+      </script>
+      ";
+
+      $tanggal_show = date('d-F-Y H:i:s', strtotime($mcu['tanggal_simpan_tb_bb'])) . ' | ' . eta2($mcu['tanggal_simpan_tb_bb']);
+      $btn_notif = "<b class=blue>Telah Diperiksa</b> oleh <span class='darkblue'>$pemeriksa</span> pada tanggal <span class=consolas>$tanggal_show</span>";
+    }
+
+    $blok_inputs = '';
+    foreach ($arr as $key => $v) {
+
+      $div_range = '';
+      $min_range = 0;
+      $max_range = 0;
+      $i = 0;
+      $range = $v['range'] ?? [];
+      if ($range) {
+        foreach ($v['range'] as $key2 => $range_value) {
+          $i++;
+          if ($i == 1) $min_range = $range_value;
+          $div_range .= "<div>$range_value</div>";
+          $max_range = $range_value;
+        }
+      }
+      $val_range = intval(($max_range - $min_range) / 2) + $min_range;
+      $required = $v['required'] ?? 'required';
+
+      if ($v['blok'] == 'input-range') {
+        $blok_sub_input = "
+          <div class='flexy flex-center'>
+            <div class='f14 darkblue miring pt1'>$v[label]</div>
+            <div>
+              <input 
+                id='$key' 
+                name='$key' 
+                value='$v[value]' 
+                placeholder='$v[placeholder]' 
+                type='$v[type]' 
+                $required
+                class='form-control $v[class]' 
+                min='$v[min]' 
+                max='$v[max]' 
+                minlength='$v[minlength]' 
+                maxlength='$v[maxlength]' 
+                style='max-width:100px'
+              >          
+            </div>
+            <div class='f14 abu miring pt1'>$v[satuan]</div>
+          </div>
+          <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range'>
+          <div class='flexy flex-between f12 consolas abu'>
+            $div_range
+          </div>
+        ";
+      } elseif ($v['blok'] == 'radio') {
+        // $pakai_kacamata = radio_tf('Apakah Anda memakai kacamata?', 'kacamata', '', 'Pakai', 0);
+
+        $Ya = $v['label_ya'] ?? 'Ya';
+        $Tidak = $v['label_tidak'] ?? 'Tidak';
+        $value_tidak = $v['value_tidak'] ?? 0;
+        $value_ya = $v['value_ya'] ?? 1;
+
+        $blok_sub_input = create_radio_yt(
+          $v['label'], // label radio 
+          $key, // name radio
+          '', // nilai default
+          '', // caption
+          $Ya, // Ya
+          $Tidak, // Tidak
+          '', // class label
+          $value_tidak,
+          $value_ya
+        );
+      }
+      $blok_inputs .= "
+        <div class='wadah gradasi-toska' >
+          $blok_sub_input
+        </div>  
+      ";
+    }
+
+    $tanggal_show = date('d-F-Y H:i');
+
+    $form_pemeriksaan = "
+      $hasil_form
+      <form method='post' class='$hide_form form-pemeriksaan wadah bg-white' id=blok_form>
+        $blok_inputs
+        <div class='flexy mb2 flex-center'>
+          <input type=checkbox required id=cek>
+          <label for=cek>Saya menyatakan bahwa data diatas sudah benar.</label>
+        </div>
+        <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$pemeriksaan'>$caption Data $arr_pemeriksaan[$pemeriksaan]</button>
+        <div class='tengah f12 mt1 abu'>
+          $btn_notif
+        </div>
+      </form>
+  
+    ";
+  } else {
+    // hanya notif
+    echolog("Belum ada data konfigurasi untuk pemeriksaan: <span class='tebal darkblue'>$pemeriksaan</span>");
+  }
+} // end punya data MCU
+
+# ============================================================
+# FINAL ECHO
+# ============================================================
 echo "
   <div class='wadah tengah gradasi-hijau'>
     <div><a href='?tampil-pasien&id_pasien=$id_pasien'>$img_prev</a></div>
     <div><img src='$src' class='foto_profil'></div>
-    <div class='mb1'>$gender_icon $d[nama]</div>
+    <div class='mb1'>$gender_icon $pasien[nama]</div>
     <div class='border-bottom mb2 pb2 biru f12'>$NIK | MCU-$nomor_MCU | $status_show</div>
     <div class=''>
       $form_pemeriksaan
@@ -163,7 +409,6 @@ echo "
     </table>
   </div>
 ";
-
 
 
 

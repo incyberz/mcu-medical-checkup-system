@@ -1,0 +1,63 @@
+<?php
+$arr = [
+  'tekanan_sistolik' => [
+    'blok' => 'number-range',
+    'label' => 'Tekanan Sistolik',
+    'type' => 'number',
+    'placeholder' => '...',
+    'value' => $mcu['tekanan_sistolik'],
+    'required' => 1,
+    'class' => 'mb2 f18 darkblue tengah',
+    'min' => 60,
+    'max' => 150,
+    'minlength' => 0,
+    'maxlength' => 0,
+    'range' => [80, 90, 100, 110, 120, 130],
+    'satuan' => 'mmHg'
+  ],
+  'tekanan_diastol' => [
+    'blok' => 'number-range',
+    'label' => 'Tekanan Diastol',
+    'type' => 'number',
+    'placeholder' => '...',
+    'value' => $mcu['tekanan_diastol'],
+    'required' => 1,
+    'class' => 'mb2 f18 darkblue tengah',
+    'min' => 40,
+    'max' => 110,
+    'minlength' => 0,
+    'maxlength' => 0,
+    'range' => [40, 50, 60, 70, 80, 90, 100],
+    'satuan' => 'mmHg'
+  ],
+  'pernafasan' => [
+    'blok' => 'number-range',
+    'label' => 'Pernafasan',
+    'type' => 'number',
+    'placeholder' => '...',
+    'value' => $mcu['pernafasan'],
+    'required' => 1,
+    'class' => 'mb2 f18 darkblue tengah',
+    'min' => 8,
+    'max' => 30,
+    'minlength' => 0,
+    'maxlength' => 0,
+    'range' => [10, 12, 14, 16, 18, 20, 22],
+    'satuan' => 'per menit'
+  ],
+  'saturasi' => [
+    'blok' => 'number-range',
+    'label' => 'Saturasi Oksigen',
+    'type' => 'number',
+    'placeholder' => '...',
+    'value' => $mcu['saturasi'],
+    'required' => 1,
+    'class' => 'mb2 f18 darkblue tengah',
+    'min' => 50,
+    'max' => 100,
+    'minlength' => 0,
+    'maxlength' => 0,
+    'range' => [80, 85, 90, 95, 100],
+    'satuan' => 'persen'
+  ],
+];
