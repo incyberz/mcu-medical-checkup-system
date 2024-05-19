@@ -1,7 +1,7 @@
 <?php
 $arr = [
   'berat_badan' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Berat Badan',
     'type' => 'number',
     'placeholder' => '...',
@@ -16,7 +16,7 @@ $arr = [
     'satuan' => 'kg'
   ],
   'tinggi_badan' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Tinggi Badan',
     'type' => 'number',
     'placeholder' => '...',
@@ -31,7 +31,7 @@ $arr = [
     'satuan' => 'cm'
   ],
   'lingkar_perut' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Lingkar Perut',
     'type' => 'number',
     'placeholder' => '...',

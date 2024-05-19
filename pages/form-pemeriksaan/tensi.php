@@ -1,7 +1,7 @@
 <?php
 $arr = [
   'tekanan_sistolik' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Tekanan Sistolik',
     'type' => 'number',
     'placeholder' => '...',
@@ -16,7 +16,7 @@ $arr = [
     'satuan' => 'mmHg'
   ],
   'tekanan_diastol' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Tekanan Diastol',
     'type' => 'number',
     'placeholder' => '...',
@@ -31,7 +31,7 @@ $arr = [
     'satuan' => 'mmHg'
   ],
   'pernafasan' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Pernafasan',
     'type' => 'number',
     'placeholder' => '...',
@@ -46,7 +46,7 @@ $arr = [
     'satuan' => 'per menit'
   ],
   'saturasi' => [
-    'blok' => 'number-range',
+    'blok' => 'input-range',
     'label' => 'Saturasi Oksigen',
     'type' => 'number',
     'placeholder' => '...',

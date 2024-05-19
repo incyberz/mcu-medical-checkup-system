@@ -41,6 +41,19 @@ $arr = [
     'label_ya' => 'Anemis (AN)',
     'label_tidak' => 'An Anemis (AA)',
   ],
+  'bola_mata_kanan' => [
+    'blok' => 'multi-radio',
+    'question' => 'Bentuk Bola Mata Kanan?',
+    'value_default' => $mcu['bola_mata_kanan'] ?? '',
+    'values' => ['N', 'S', 'L'],
+    'labels' => ['Normal', 'Strabismus', 'Lainnya'],
+  ],
+  'ukuran_pupil_kanan' => [
+    'blok' => 'multi-radio',
+    'question' => 'Ukuran Pupil Kanan? (mm)',
+    'value_default' => $mcu['ukuran_pupil_kanan'] ?? '',
+    'values' => [1, 2, 3, 4, 5, 6, 7, 8],
+  ],
 
 
   'visus_kiri' => [
@@ -76,4 +89,18 @@ $arr = [
     'label_ya' => 'Anemis (AN)',
     'label_tidak' => 'An Anemis (AA)',
   ],
+  'bola_mata_kiri' => [
+    'blok' => 'multi-radio',
+    'question' => 'Bentuk Bola Mata Kanan?',
+    'value_default' => $mcu['bola_mata_kiri'] ?? '',
+    'values' => ['N', 'S', 'L'],
+    'labels' => ['Normal', 'Strabismus', 'Lainnya'],
+  ],
+  'ukuran_pupil_kiri' => [
+    'blok' => 'multi-radio',
+    'question' => 'Ukuran Pupil Kanan? (mm)',
+    'value_default' => $mcu['ukuran_pupil_kiri'] ?? '',
+    'values' => [1, 2, 3, 4, 5, 6, 7, 8],
+  ],
+
 ];

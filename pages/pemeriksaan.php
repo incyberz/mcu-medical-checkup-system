@@ -13,8 +13,8 @@ include 'include/arr_status_pasien.php';
 include 'include/arr_pemeriksaan.php';
 include 'pemeriksaan-functions.php';
 
-
-$sub_judul = "<span class='f20 darkblue'>Pemeriksaan $arr_pemeriksaan[$pemeriksaan]</span>";
+$p = $arr_pemeriksaan[$pemeriksaan] ?? die(div_alert('danger', "Belum ada pemeriksaan $pemeriksaan pada database."));
+$sub_judul = "<span class='f20 darkblue'>Pemeriksaan $p</span>";
 set_title($judul);
 set_h2($judul, $sub_judul);
 only('users');
@@ -188,20 +188,32 @@ if (!$punya_data) {
       $obesitas = '<span class="red bold">obesitas</span>';
 
       $hasil_form = '';
-      foreach ($arr as $key => $value) {
-        $kolom = key2kolom($key);
-        $satuan = $value['satuan'] ?? '';
-        $hasil_form .= "
-          <tr>
-            <td class='kiri miring darkblue'>$kolom</td>
-            <td class='kanan darkblue tebal'>$mcu[$key] $satuan</td>
-          </tr>
-        ";
+      if ($pemeriksaan == 'gigi') {
+        include "$lokasi_pages/hasil-pemeriksaan/hasil-pemeriksaan-gigi.php";
+      } else {
+        // echo '<pre>';
+        // var_dump($arr);
+        // echo '</pre>';
+        // exit;
+        foreach ($arr as $key => $value) {
+          if (strlen($key) < 3) {
+            $hasil_form .= "<tr><td colspan=100%><hr style='border: solid 5px #ccc'></td></tr>";
+          } else {
+            $kolom = key2kolom($key);
+            $satuan = $value['satuan'] ?? '';
+            $hasil_form .= "
+              <tr>
+                <td class='kiri miring darkblue'>$kolom</td>
+                <td class='kanan darkblue tebal'>$mcu[$key] $satuan</td>
+              </tr>
+            ";
+          }
+        }
       }
 
       $pemeriksa = $arr_user[$mcu['pemeriksa_' . $pemeriksaan]];
-      $tanggal_show = date('d F Y, H:i:s', strtotime($mcu['tanggal_simpan_tb_bb']));
-      $eta = eta2($mcu['tanggal_simpan_tb_bb']);
+      $tanggal_show = date('d F Y, H:i:s', strtotime($mcu['tanggal_simpan_' . $pemeriksaan]));
+      $eta = eta2($mcu['tanggal_simpan_' . $pemeriksaan]);
 
 
       # ============================================================
@@ -212,17 +224,17 @@ if (!$punya_data) {
         $imt = round($mcu['berat_badan'] / (($mcu['tinggi_badan'] / 100) * ($mcu['tinggi_badan'] / 100)), 2);
 
         if ($imt >= 27) {
-          $obesitas = $obesitas;
+          $obesitas1 = $obesitas;
         } elseif (
           $imt >= 25
         ) {
-          $obesitas = 'gemuk';
+          $obesitas1 = 'gemuk';
         } elseif ($imt >= 18.5) {
-          $obesitas = 'normal';
+          $obesitas1 = 'normal';
         } elseif ($imt >= 17) {
-          $obesitas = 'kurus';
+          $obesitas1 = 'kurus';
         } else {
-          $obesitas = 'sangat kurus';
+          $obesitas1 = 'sangat kurus';
         }
 
         $blp = $gender == 'l' ? 90 : 80;
@@ -231,7 +243,7 @@ if (!$punya_data) {
           <h4 class='darkblue miring f18'>Index Masa Tubuh</h4>
           <ul>
             <li>Index Masa Tubuh (IMT) = $imt</li>
-            <li>Kesimpulan Berat Tubuh : $obesitas</li>
+            <li>Kesimpulan Berat Tubuh : $obesitas1</li>
           </ul>
 
           <h4 class='darkblue miring f18'>Lingkar Perut</h4>
@@ -255,7 +267,7 @@ if (!$punya_data) {
           </div>
   
           <div class='flex-center'>
-            <div style='max-width:500px'>
+            <div style=''>
               <table class='table table-hover'>
                 $hasil_form
               </table>
@@ -295,23 +307,34 @@ if (!$punya_data) {
     $blok_inputs = '';
     foreach ($arr as $key => $v) {
 
-      $div_range = '';
-      $min_range = 0;
-      $max_range = 0;
-      $i = 0;
-      $range = $v['range'] ?? [];
-      if ($range) {
+      $required = $v['required'] ?? 'required';
+
+      if ($v == 'separator') {
+        $blok_sub_input = '';
+      } elseif ($v['blok'] == 'input-range') {
+        $div_range = '';
+        $min_range = 0;
+        $max_range = 0;
+        $i = 0;
         foreach ($v['range'] as $key2 => $range_value) {
           $i++;
           if ($i == 1) $min_range = $range_value;
           $div_range .= "<div>$range_value</div>";
           $max_range = $range_value;
         }
-      }
-      $val_range = intval(($max_range - $min_range) / 2) + $min_range;
-      $required = $v['required'] ?? 'required';
+        $val_range = intval(($max_range - $min_range) / 2) + $min_range;
+        $value = $v['value'] ?? '';
+        $value = $v['value'] ?? $mcu[$key]; // zzz test
+        $step = $v['step'] ?? 1;
+        $placeholder = $v['placeholder'] ?? '...';
+        $type = $v['type'] ?? 'text';
+        $min = $v['min'] ?? '';
+        $max = $v['max'] ?? '';
+        $minlength = $v['minlength'] ?? '';
+        $maxlength = $v['maxlength'] ?? '';
+        $class = $v['class'] ?? '';
+        $satuan = $v['satuan'] ?? '';
 
-      if ($v['blok'] == 'input-range') {
         $blok_sub_input = "
           <div class='flexy flex-center'>
             <div class='f14 darkblue miring pt1'>$v[label]</div>
@@ -319,21 +342,22 @@ if (!$punya_data) {
               <input 
                 id='$key' 
                 name='$key' 
-                value='$v[value]' 
-                placeholder='$v[placeholder]' 
-                type='$v[type]' 
+                value='$value' 
+                step='$step' 
+                placeholder='$placeholder' 
+                type='$type' 
                 $required
-                class='form-control $v[class]' 
-                min='$v[min]' 
-                max='$v[max]' 
-                minlength='$v[minlength]' 
-                maxlength='$v[maxlength]' 
+                class='form-control $class' 
+                min='$min' 
+                max='$max' 
+                minlength='$minlength' 
+                maxlength='$maxlength' 
                 style='max-width:100px'
               >          
             </div>
-            <div class='f14 abu miring pt1'>$v[satuan]</div>
+            <div class='f14 abu miring pt1'>$satuan</div>
           </div>
-          <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range'>
+          <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range' step='$step'>
           <div class='flexy flex-between f12 consolas abu'>
             $div_range
           </div>
@@ -357,8 +381,29 @@ if (!$punya_data) {
           $value_tidak,
           $value_ya
         );
+      } elseif ($v['blok'] == 'multi-radio') {
+        $blok_sub_input = create_radio(
+          $v['question'], // $question,
+          $v['labels'] ?? [], // $labels,
+          $v['values'], // $values,
+          $key, // $name,
+          $v['value_default'] ?? '', // $value_default = '',
+          '', // $required = 'required',
+          '', // $question_class = '',
+          '', // $radios_class = '',
+          '', // $wrapper_radio_class = '',
+          '', // $global_class = '',
+
+        );
+      } elseif ($v['blok'] == 'array_gigi') {
+        $blok_sub_input = array_gigi(
+          $v['question'], // $question,
+          $v['array_gigi'], // $value_default = '',
+        );
+      } else {
+        die(div_alert('danger', "Belum ada UI untuk input-blok: $v[blok]. Harap segera lapor developer!"));
       }
-      $blok_inputs .= "
+      $blok_inputs .= !$blok_sub_input ? '<hr style="border: solid 5px #ccc; margin:50px 0">' : "
         <div class='wadah gradasi-toska' >
           $blok_sub_input
         </div>  
