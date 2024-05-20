@@ -39,6 +39,7 @@ $s = "SELECT order_no FROM tb_pasien WHERE id=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
 
+$order_no = '';
 if (!mysqli_num_rows($q)) {
   div_alert('danger', 'Data pasien tidak ditemukan');
 } else {
@@ -48,7 +49,7 @@ if (!mysqli_num_rows($q)) {
 
 
 if (!$order_no) {
-  echo div_alert('danger', 'belum ada handler untuk pasien mandiri. Silahkan hubungi developer!');
+  echo div_alert('danger', 'Pasien ini mendaftar pada jalur mandiri (tanpa order_no)<hr>System belum menyediakan handler untuk pasien mandiri. Silahkan hubungi developer!');
 } else {
   # ============================================================
   # KHUSUS PASIEN PERUSAHAAN
@@ -73,7 +74,9 @@ if (!$order_no) {
   a.gaya_hidup,
   a.keluhan,
   c.id as id_paket, 
-  c.nama as nama_paket 
+  c.nama as nama_paket,
+  (
+    SELECT 1 FROM tb_mcu WHERE id_pasien=a.id) punya_data 
 
   FROM tb_pasien a 
   JOIN tb_order b ON a.order_no=b.order_no -- Pasien Non Mandiri
@@ -91,6 +94,12 @@ if (!$order_no) {
     $nama_paket = $d['nama_paket'];
     $NIK = $d['NIK'];
     $nomor_MCU = $d['nomor_MCU'];
+    $punya_data = $d['punya_data'];
+
+    $gender = $d['gender'];
+    $gender_icon = $gender ? "<img src='$lokasi_icon/gender-$gender.png' height=20px>" : $img_warning;
+    $gender_show = gender($gender);
+
     // ) {
     // $i++;
     foreach ($d as $key => $value) {
@@ -166,8 +175,50 @@ if (!$order_no) {
   ORDER BY b.nomor
   ";
   $q2 = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $tr_progress = '';
+  $no = 0;
   while ($d2 = mysqli_fetch_assoc($q2)) {
-    $fitur_pemeriksaan .= "<div><a class='btn btn-primary ' href='?pemeriksaan&pemeriksaan=$d2[pemeriksaan]&id_pasien=$id_pasien'>$d2[nama_pemeriksaan]</a></div> ";
+    $no++;
+    $s3 = "SELECT 
+    a.tanggal_simpan_$d2[pemeriksaan] as tanggal_periksa, 
+    (SELECT nama FROM tb_user WHERE id=a.pemeriksa_$d2[pemeriksaan] ) as pemeriksa 
+    FROM tb_mcu a WHERE a.id_pasien=$id_pasien";
+    // echo $s3;
+    $q3 = mysqli_query($cn, $s3) or die(mysqli_error($cn));
+    $d3 = mysqli_fetch_assoc($q3);
+    $tanggal_periksa_show = '<span class="consolas darkblue">' . date('d-F-Y H:i:s', strtotime($d3['tanggal_periksa'])) . '</span> ~ <span class="f12 abu miring">  ' . eta2($d3['tanggal_periksa']) . '</span>';
+    if (mysqli_num_rows($q3) and $d3['tanggal_periksa']) {
+      $btn = 'secondary';
+      $info_pemeriksaan = "<span class=darkabu>Telah diperiksa oleh <b class=darkblue>$d3[pemeriksa]</b>, $tanggal_periksa_show</span> $img_check";
+    } else {
+      $btn = 'primary';
+      $info_pemeriksaan = '<span class="f12 miring abu">belum menjalani pemeriksaan di bagian ini.</span>';
+    }
+
+    $tr_progress .= "
+      <tr>
+        <td>
+          $no
+        </td>
+        <td class=kiri>
+          $d2[nama_pemeriksaan]
+        </td>
+        <td class=kiri>
+          $info_pemeriksaan
+        </td>
+      </tr>
+    ";
+
+    // die($s3);
+
+    $fitur_pemeriksaan .= "<div><a class='btn btn-$btn ' href='?pemeriksaan&pemeriksaan=$d2[pemeriksaan]&id_pasien=$id_pasien'>$d2[nama_pemeriksaan]</a></div> ";
+  }
+
+  $tb_progress = '';
+  if ($punya_data) {
+    $tb_progress = "<table class='table table-striped table-hover mt4'>$tr_progress</table>";
+  } else {
+    $tb_progress = div_alert('info mt2', 'Pasien ini belum menjalani pemeriksaan');
   }
 
   $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class="f12 red">Belum pernah login</span>';
@@ -177,12 +228,17 @@ if (!$order_no) {
     <div class='wadah tengah gradasi-hijau'>
       <div><a href='?cari-pasien'>$img_prev</a></div>
       <div><img src='$src' class='foto_profil'></div>
-      <div class='mb1'>$d[nama]</div>
+      <div class='mb1'>$gender_icon $d[nama]</div>
       <div class='border-bottom mb2 pb2 biru f12'>$NIK | MCU-$nomor_MCU | $status_show</div>
       <div class=''>
         $fitur_pasien_header
         <div class='flexy mt2 flex-center'>
           $fitur_pemeriksaan
+        </div>
+      </div>
+      <div class='flexy flex-center'>
+        <div>
+          $tb_progress
         </div>
       </div>
     </div>

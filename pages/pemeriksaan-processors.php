@@ -26,10 +26,10 @@ if (isset($_POST['btn_submit_data_pasien'])) {
   $sets = str_replace('__,', '', $sets);
 
   $s = "UPDATE tb_mcu SET $sets WHERE id_pasien=$id_pasien";
-  echo $s;
+  // echo $s;
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
-  echo div_alert('success', "Update Data Pasien sukses. $s");
+  echo div_alert('success', "Update Data Pasien sukses. ");
   jsurl('', 1000);
   exit;
 }

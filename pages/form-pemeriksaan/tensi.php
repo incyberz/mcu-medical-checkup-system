@@ -10,8 +10,6 @@ $arr = [
     'class' => 'mb2 f18 darkblue tengah',
     'min' => 60,
     'max' => 150,
-    'minlength' => 0,
-    'maxlength' => 0,
     'range' => [80, 90, 100, 110, 120, 130],
     'satuan' => 'mmHg'
   ],
@@ -25,8 +23,6 @@ $arr = [
     'class' => 'mb2 f18 darkblue tengah',
     'min' => 40,
     'max' => 110,
-    'minlength' => 0,
-    'maxlength' => 0,
     'range' => [40, 50, 60, 70, 80, 90, 100],
     'satuan' => 'mmHg'
   ],
@@ -40,8 +36,6 @@ $arr = [
     'class' => 'mb2 f18 darkblue tengah',
     'min' => 8,
     'max' => 30,
-    'minlength' => 0,
-    'maxlength' => 0,
     'range' => [10, 12, 14, 16, 18, 20, 22],
     'satuan' => 'per menit'
   ],
@@ -55,9 +49,19 @@ $arr = [
     'class' => 'mb2 f18 darkblue tengah',
     'min' => 50,
     'max' => 100,
-    'minlength' => 0,
-    'maxlength' => 0,
     'range' => [80, 85, 90, 95, 100],
     'satuan' => 'persen'
+  ],
+  'buta_warna' => [
+    'blok' => 'input-range',
+    'label' => 'Kemampuan membedakan warna',
+    'type' => 'number',
+    'placeholder' => '...',
+    'value' => $mcu['buta_warna'],
+    'required' => 1,
+    'class' => 'mb2 f18 darkblue tengah',
+    'min' => 3,
+    'max' => 12,
+    'range' => [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   ],
 ];

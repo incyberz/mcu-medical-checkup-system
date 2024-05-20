@@ -67,11 +67,11 @@ if (mysqli_num_rows($q)) {
   $foto_profil = $pasien['foto_profil'];
   $order_no = $pasien['order_no'];
   $status = $pasien['status'];
-  $gender = $pasien['gender'];
   $NIK = $pasien['NIK'];
   $nomor_MCU = $pasien['nomor_MCU'];
   $punya_data = $pasien['punya_data'];
 
+  $gender = $pasien['gender'];
   $gender_icon = $gender ? "<img src='$lokasi_icon/gender-$gender.png' height=20px>" : $img_warning;
   $gender_show = gender($gender);
 
@@ -322,9 +322,8 @@ if (!$punya_data) {
           $div_range .= "<div>$range_value</div>";
           $max_range = $range_value;
         }
-        $val_range = intval(($max_range - $min_range) / 2) + $min_range;
-        $value = $v['value'] ?? '';
-        $value = $v['value'] ?? $mcu[$key]; // zzz test
+        $value = $v['value'] ?? $mcu[$key];
+        $val_range = $value ? $value : intval(($max_range - $min_range) / 2) + $min_range;
         $step = $v['step'] ?? 1;
         $placeholder = $v['placeholder'] ?? '...';
         $type = $v['type'] ?? 'text';
@@ -347,7 +346,7 @@ if (!$punya_data) {
                 placeholder='$placeholder' 
                 type='$type' 
                 $required
-                class='form-control $class' 
+                class='form-control mb2 $class' 
                 min='$min' 
                 max='$max' 
                 minlength='$minlength' 
