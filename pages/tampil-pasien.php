@@ -100,6 +100,13 @@ if (!$order_no) {
     $gender_icon = $gender ? "<img src='$lokasi_icon/gender-$gender.png' height=20px>" : $img_warning;
     $gender_show = gender($gender);
 
+    if ($status == 8 and $punya_data) {
+      // update status pasien menjadi 9 (pasien sedang periksa)
+      $s2 = "UPDATE tb_pasien SET status=9 WHERE id='$id_pasien'";
+      $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+      jsurl();
+    }
+
     // ) {
     // $i++;
     foreach ($d as $key => $value) {
@@ -141,27 +148,6 @@ if (!$order_no) {
     }
   }
 
-  // include 'include/arr_fitur_nakes.php';
-  // include 'include/arr_fitur_dokter.php';
-
-
-
-  // $fiturs = [];
-  // if ($role == 'dokter') {
-  //   $fiturs = $arr_fitur_dokter;
-  // } elseif ($role == 'nakes') {
-  //   $fiturs = $arr_fitur_nakes;
-  // }
-
-  // if ($fiturs) {
-  //   $fitur_pemeriksaan = '';
-  //   foreach ($fiturs as $pemeriksaan => $nama_pemeriksaan) {
-  //     $fitur_pemeriksaan .= "<div><a class='btn btn-primary ' href='?pemeriksaan&pemeriksaan=$pemeriksaan&id_pasien=$id_pasien'>$nama_pemeriksaan</a></div> ";
-  //   }
-  // } else {
-  //   $fitur_pemeriksaan = div_alert('danger', 'Maaf, tidak ada Fitur Pemeriksaan Pasien untuk Anda.');
-  // }
-
   $fitur_pasien_header = "<div>Pemeriksaan <b class=darkblue>$nama_paket</b> bagi role  <span class='tebal darkblue'>$jabatan ($role)</span></div>";
 
   $fitur_pemeriksaan = '';
@@ -175,20 +161,26 @@ if (!$order_no) {
   ORDER BY b.nomor
   ";
   $q2 = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $jumlah_pemeriksaan = mysqli_num_rows($q2);
   $tr_progress = '';
   $no = 0;
+  $jumlah_pemeriksaan_selesai = 0;
   while ($d2 = mysqli_fetch_assoc($q2)) {
     $no++;
     $s3 = "SELECT 
     a.tanggal_simpan_$d2[pemeriksaan] as tanggal_periksa, 
-    (SELECT nama FROM tb_user WHERE id=a.pemeriksa_$d2[pemeriksaan] ) as pemeriksa 
-    FROM tb_mcu a WHERE a.id_pasien=$id_pasien";
+    (
+      SELECT nama FROM tb_user 
+      WHERE id=a.pemeriksa_$d2[pemeriksaan] ) as pemeriksa 
+    FROM tb_mcu a 
+    WHERE a.id_pasien=$id_pasien";
     // echo $s3;
     $q3 = mysqli_query($cn, $s3) or die(mysqli_error($cn));
     $d3 = mysqli_fetch_assoc($q3);
     $tanggal_periksa_show = '<span class="consolas darkblue">' . date('d-F-Y H:i:s', strtotime($d3['tanggal_periksa'])) . '</span> ~ <span class="f12 abu miring">  ' . eta2($d3['tanggal_periksa']) . '</span>';
     if (mysqli_num_rows($q3) and $d3['tanggal_periksa']) {
       $btn = 'secondary';
+      $jumlah_pemeriksaan_selesai++;
       $info_pemeriksaan = "<span class=darkabu>Telah diperiksa oleh <b class=darkblue>$d3[pemeriksa]</b>, $tanggal_periksa_show</span> $img_check";
     } else {
       $btn = 'primary';
@@ -212,6 +204,17 @@ if (!$order_no) {
     // die($s3);
 
     $fitur_pemeriksaan .= "<div><a class='btn btn-$btn ' href='?pemeriksaan&pemeriksaan=$d2[pemeriksaan]&id_pasien=$id_pasien'>$d2[nama_pemeriksaan]</a></div> ";
+  }
+
+  $info_pemeriksaan = '';
+  if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan) {
+    if ($status == 9) {
+      //update status pasien menjadi 10 (pasien selesai)
+      $s2 = "UPDATE tb_pasien SET status=10 WHERE id='$id_pasien'";
+      $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+      jsurl();
+    }
+    $info_pemeriksaan = "<div class='alert alert-success mt2'>Pasien telah menjalani semua pemeriksaan $img_check</div>";
   }
 
   $tb_progress = '';
@@ -239,6 +242,7 @@ if (!$order_no) {
       <div class='flexy flex-center'>
         <div>
           $tb_progress
+          $info_pemeriksaan
         </div>
       </div>
     </div>

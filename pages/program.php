@@ -31,6 +31,7 @@ echo "
   } else {
     // echo div_alert('danger m3', "Maaf belum ada handler untuk jenis program $jenis. Anda boleh melaporkan ke kami via Whatsapp di paling atas. Terimakasih.");
     $s = "SELECT *,a.id as id_program FROM tb_program a WHERE a.jenis='$jenis' AND a.id_klinik=$id_klinik";
+    // echo $s;
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     if (!mysqli_num_rows($q)) {
       echo div_alert('danger m3', "Maaf, belum ada data untuk klasifikasi program <b class='darkblue consolas'>$jenis</b>.");

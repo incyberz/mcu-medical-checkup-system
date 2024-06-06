@@ -5,7 +5,7 @@ if ($username == '') {
   $id_user = '';
   $is_login = '';
   $id_role = '';
-  $id_klinik = '';
+  // $id_klinik = '';
   $role = 'Pengunjung';
   $nama_user = '';
   $src_profile = $profile_na;
