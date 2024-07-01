@@ -108,16 +108,19 @@ if (!mysqli_num_rows($q)) {
     // image info
     $image_info = "$img_image";
     $image_info = '';
+    $href = "?upload_image_paket&id_paket=$id_paket";
     if ($d['image']) { // ada data image di DB
-      $href = "$lokasi_paket/$d[image]";
-      if (file_exists($href)) {
-        $image_info = "<a target=_blank href='$href' onclick='return confirm(\"Lihat image di Tab baru?\")'>$img_image</a>";
+      $src = "$lokasi_paket/$d[image]";
+      if (file_exists($src)) {
+        $image_info = $img_image;
       } else {
         $image_info = '<span class=red>image hilang</span>';
       }
     } else {
-      $image_info = '-'; // no data
+      $image_info = img_icon('upload');
     }
+    $link_upload_image = "<a href='$href' onclick='return confirm(\"Upload Image?\")'>$image_info</a>";
+
 
     $td = "<td>$i</td>";
     foreach ($d as $key => $value) {
@@ -133,7 +136,7 @@ if (!mysqli_num_rows($q)) {
         $icon_detail = $detail_info;
         $value = "<a href='?manage-single-paket&id_paket=$id_paket'>$value</a>";
       } elseif ($key == 'image') {
-        $value = $image_info;
+        $value = $link_upload_image;
       } elseif ($key == 'status') {
         $value = $value ? "<span class='f12 green'><span onclick='alert(\"Paket aktif dan ditampilkan ke pengunjung. Klik nama paket untuk manage lebih lanjut\")'>$img_check</span> active</span>" : '<span class="f12 abu miring">disabled</span>';
       } elseif ($key == 'count_sticker') {

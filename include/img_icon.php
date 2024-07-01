@@ -11,14 +11,14 @@
 <?php
 function img_icon($nama, $w = 20, $h = 20)
 {
-  $me = "img/icon/$nama.png";
+  $me = "assets/img/icon/$nama.png";
   $width = $w . 'px';
   $height = $h . 'px';
-  if (file_exists($me)) {
-    return "<img class=img_icon src='$me' width=$width height=$height />";
-  } else {
-    return '<span class=red>icon-not-found</span>';
-  }
+  return "<img class=img_icon src='$me' width=$width height=$height />";
+  // if (file_exists($me)) {
+  // } else {
+  //   return "<span class=red>icon-$nama-not-found</span>";
+  // }
 }
 
 

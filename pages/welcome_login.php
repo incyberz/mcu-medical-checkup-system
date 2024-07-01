@@ -88,7 +88,7 @@ if ($role == 'admin') {
   $fitur_login = "
     <div class='wadah gradasi-kuning mt4'>
       <p>$welcome_login</p>
-      <a class='btn btn-primary' href='?manage-paket'>Manage Paket</a>
+      <a class='btn btn-primary' href='?manage_paket'>Manage Paket</a>
       <a class='btn btn-primary' href='?manage-order'>Manage Order</a>
     </div>
   ";

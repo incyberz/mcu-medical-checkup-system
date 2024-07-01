@@ -222,7 +222,7 @@ $s = "SELECT kode FROM tb_paket_sticker WHERE kode  like '$id_paket-%'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (!mysqli_num_rows($q)) {
-  die(div_alert('danger', "Paket ini belum mempunyai sticker. | Silahkan <a href='?manage-paket'>Manage Paket</a>"));
+  die(div_alert('danger', "Paket ini belum mempunyai sticker. | Silahkan <a href='?manage_paket'>Manage Paket</a>"));
 } else {
   while ($d = mysqli_fetch_assoc($q)) {
     $arr = explode('-', $d['kode']);

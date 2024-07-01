@@ -2,7 +2,7 @@
 $judul = 'Penerimaan Pasien';
 // $id_paket = $_GET['id_paket'] ?? die(div_alert('danger', 'Index id_paket belum terdefinisi.'));
 // $nama_paket = $_GET['nama_paket'] ?? die(div_alert('danger', 'Index nama_paket belum terdefinisi.'));
-// $sub_judul = "<a href='?manage-paket'>Back</a> | Manage Sticker untuk <b class='biru'>$nama_paket</b>";
+// $sub_judul = "<a href='?manage_paket'>Back</a> | Manage Sticker untuk <b class='biru'>$nama_paket</b>";
 $sub_judul = '';
 set_title($judul);
 set_h2($judul, $sub_judul);

@@ -88,6 +88,7 @@ include 'user_data.php';
 # ================================================
 include 'include/insho_functions.php';
 include 'include/crud_icons.php';
+include 'include/img_icon.php';
 include 'include/date_managements.php';
 include 'include/session_managements.php';
 

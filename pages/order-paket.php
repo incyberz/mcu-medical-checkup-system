@@ -202,9 +202,17 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
         <div class='darkabu mb1'>Perkiraan Jumlah Peserta MCU</div>
         <input required type=number min=10 max=100000 class='form-control mb1' name=jumlah_peserta id=jumlah_peserta>
-        <div class='mb2 f12 abu miring'>Silahkan masukan estimasi jumlah peserta MCU yang akan Anda daftarkan! Jumlah peserta sangat mempengaruhi terhadap negosiasi biaya paket.</div>
-
+        <div class='mb4 f12 abu miring'>Silahkan masukan estimasi jumlah peserta MCU yang akan Anda daftarkan! Jumlah peserta sangat mempengaruhi terhadap negosiasi biaya paket.</div>
+        
         <div class=mt2><button disabled class='btn btn-primary w-100' name=btn_order_paket id=btn_order_paket value=$id_paket>Order Paket</button></div>
+        
+        <div class='mb4 biru mt2 tengah'>
+          <div class=bold>Order Anda akan diteruskan ke Tim Marketing kami.</div>
+          <hr>
+          Kami akan segera melakukan follow-up dengan memberikan Surat Penawaran untuk pelaksanaan Medical Checkup.
+
+        </div>
+
 
       </form>
     ";
