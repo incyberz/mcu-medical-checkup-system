@@ -1,15 +1,32 @@
+<style>
+  .img_ilustrasi {
+    max-width: 70%;
+    max-height: 200px;
+
+  }
+</style>
 <?php
 $as = $_GET['as'] ?? '';
 if (!$as) {
   set_title('Login Sebagai...');
-  set_h2('Pilih Role Login');
+  set_h2('Login');
 ?>
   <div class="row">
     <div class="col-lg-4 mb2">
       <div class="card">
         <div class="card-body tengah">
-          <p>Saya adalah pasien Medical Checkup.</p>
-          <a class="btn btn-primary w-100" href="?login&as=pasien">Login as Pasien</a>
+          <a class="" href="?login&as=pasien">
+            <div class="mb2">
+              <img src="assets/img/ilustrasi/pasien2.png" alt="pasien" class="img_ilustrasi">
+
+            </div>
+            <button class="btn btn-primary w-100">
+
+              Login as Pasien
+            </button>
+
+          </a>
+          <div class='abu miring f14 mt1'>Saya adalah pasien Medical Checkup.</div>
 
         </div>
       </div>
@@ -17,8 +34,18 @@ if (!$as) {
     <div class="col-lg-4 mb2">
       <div class="card">
         <div class="card-body tengah">
-          <p>Saya adalah Pendaftar (perwakilan dari perusahaan).</p>
-          <a class="btn btn-primary w-100" href="?login&as=pendaftar">Login as Pendaftar</a>
+          <a class="" href="?login&as=pendaftar">
+            <div class="mb2">
+              <img src="assets/img/ilustrasi/hr2.png" alt="hr" class="img_ilustrasi">
+
+            </div>
+            <button class="btn btn-primary w-100">
+
+              Login as Pendaftar
+            </button>
+
+          </a>
+          <div class='abu miring f14 mt1'>Saya adalah Pendaftar (perwakilan dari perusahaan).</div>
 
         </div>
       </div>
@@ -26,8 +53,37 @@ if (!$as) {
     <div class="col-lg-4 mb2">
       <div class="card">
         <div class="card-body tengah">
-          <p>Saya adalah admin website ini.</p>
-          <a class="btn btn-secondary w-100" href="?login&as=user">Login as Admin</a>
+          <a class="" href="?login&as=user">
+            <div class="mb2">
+              <img src="assets/img/ilustrasi/admin2.png" alt="admin" class="img_ilustrasi">
+
+            </div>
+            <button class="btn btn-primary w-100">
+
+              Login as Admin
+            </button>
+
+          </a>
+          <div class='abu miring f14 mt1'>Saya adalah admin website ini.</div>
+
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 mb2">
+      <div class="card">
+        <div class="card-body tengah">
+          <a class="" href="blog/wp-admin/">
+            <div class="mb2">
+              <img src="assets/img/ilustrasi/web_master.png" alt="web_master" class="img_ilustrasi">
+
+            </div>
+            <button class="btn btn-primary w-100">
+
+              Login as Blog Admin
+            </button>
+
+          </a>
+          <div class='abu miring f14 mt1'>Saya adalah admin blog</div>
 
         </div>
       </div>

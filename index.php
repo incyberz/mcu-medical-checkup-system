@@ -26,6 +26,7 @@ $lokasi_pdf = 'assets/pdf';
 $lokasi_img = 'assets/img';
 $lokasi_icon = 'assets/img/icon';
 $lokasi_paket = 'assets/img/paket';
+$lokasi_carousel = 'assets/img/carousel-img';
 $lokasi_tim = 'assets/img/dokter-dan-tim';
 $lokasi_gallery = 'assets/img/gallery';
 $lokasi_partner = 'assets/img/partner';
@@ -127,8 +128,8 @@ function edit_section($page, $caption = '', $icon = '')
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Mutiara Medical Center</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <meta content="Penyedia Jasa Medical Checkup Paket Karyawan dan Individu dengan harga paling terjangkau di Bekasi dan Jawab Barat" name="description">
+  <meta content="medical check up karyawan,pemeriksaan kesehatan perusahaan,program kesehatan karyawan,pemeriksaan medis untuk staf,paket medical check up perusahaan,screening kesehatan karyawan,layanan kesehatan perusahaan,check up kesehatan untuk pekerja,kesehatan kerja karyawan,biaya medical check up perusahaan,manfaat medical check up karyawan,klinik kesehatan perusahaan,pemeriksaan kesehatan rutin karyawan,kesehatan dan keselamatan kerja,program wellness perusahaan,konsultasi kesehatan karyawan,pelayanan medis di tempat kerja,tes kesehatan karyawan,check up kesehatan karyawan perusahaan,kebijakan kesehatan perusahaan" name="keywords">
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
@@ -171,7 +172,12 @@ function edit_section($page, $caption = '', $icon = '')
   <?php include 'pages/topbar.php'; ?>
   <?php include 'pages/header.php'; ?>
   <?php include 'pages/save_settings_process.php'; ?>
-  <?php if (!$parameter) include 'pages/hero.php'; ?>
+  <?php
+  if (!$parameter) {
+    include 'pages/hero.php';
+    include 'pages/carousel/carousel.php';
+  }
+  ?>
 
   <main id="main">
     <?php

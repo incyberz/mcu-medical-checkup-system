@@ -1,5 +1,6 @@
 <?php
-$judul = 'Upload Image Paket';
+$carousel = $_GET['carousel'] ?? '';
+$judul = $carousel ? 'Upload Carousel Image' : 'Upload Image Paket';
 $sub_judul = "<a href='?manage_paket'>$img_prev</a>";
 set_title($judul);
 set_h2($judul, $sub_judul);
@@ -18,32 +19,45 @@ if (isset($_POST['btn_upload'])) {
   $date = date('ymdHis');
 
 
-  $path = 'assets/img/paket';
-  $new_image = "$id_paket-$date.jpg";
-  $tmp_image = $_FILES['image']['tmp_name'];
+  if ($carousel) {
+    $path =  $lokasi_carousel;
+    $new_image = "carousel-$id_paket-$date.jpg";
+    $tmp_image = $_FILES['carousel']['tmp_name'];
+  } else {
+    $path =  $lokasi_paket;
+    $new_image = "$id_paket-$date.jpg";
+    $tmp_image = $_FILES['image']['tmp_name'];
+  }
 
-  echolog('move_uploaded_file');
+  $Image = $carousel ? 'Carousel' : 'Image';
+  echolog("move_uploaded_file $Image");
   if (move_uploaded_file($tmp_image, "$path/$new_image")) {
 
     // resize image
-    echolog('resize image');
-    resize_img("$path/$new_image");
+    echolog("resize $Image");
+    resize_img("$path/$new_image", '', 1280, 1000, 200, 200);
 
     // deleting image_old
-    if (unlink("$path/$_POST[image_old]")) {
-      // update database
-      echolog('update data paket');
-      $s = "UPDATE tb_paket SET image='$new_image' WHERE id=$id_paket";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if ($_POST['image_old']) {
+      if (unlink("$path/$_POST[image_old]")) {
+        echolog("hapus $Image lama berhasil");
+      } else {
+        echo div_alert('danger', "Gagal menghapus $Image lama");
+      }
     } else {
-      echo div_alert('danger', 'Gagal menghapus image lama');
+      echo div_alert('info', "$Image pertama kali diupload untuk paket ini");
     }
+    // update database
+    echolog("update data paket kolom $Image");
+    $kolom = $carousel ? 'carousel_image' : 'image';
+    $s = "UPDATE tb_paket SET $kolom='$new_image' WHERE id=$id_paket";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   } else {
-    echo div_alert('danger', 'Gagal move_uploaded_file');
+    echo div_alert('danger', "Gagal move_uploaded_file $Image");
   }
 
-  echo div_alert('success', 'Upload sukses');
-  jsurl('', 2000);
+  echo div_alert('success', "<a href='?manage_paket'>$img_prev Back to Manage Paket</a> | Upload $Image sukses");
+  jsurl('', 5000);
   exit;
 }
 
@@ -53,7 +67,8 @@ a.id,
 a.nama,
 a.singkatan,
 a.deskripsi,
-a.image
+a.image,
+a.carousel_image as carousel
 
 
 FROM tb_paket a WHERE id='$id_paket'";
@@ -74,16 +89,44 @@ if (mysqli_num_rows($q)) {
       # ============================================================
       # IMAGE UPLOAD FORM
       # ============================================================
-      $src = "assets/img/paket/$value";
-      if ($key == 'image') {
+      if ($key == 'image' and !$carousel) {
+        $src = "assets/img/paket/$value";
+        $belum_ada = '<span class="red miring">belum ada image</span>';
+        $img = ($value and file_exists($src)) ? "<img src='$src' class='img-thumbnail' style='max-width:300px' >" : $belum_ada;
+
         $value = "
         <form method=post enctype='multipart/form-data'>
           <input type=hidden name=image_old value='$d[image]'>
 
-          <img src='$src' class='img-thumbnail' style='max-width:300px' >
+          $img
           <div class='flexy mt2 mb4'>
             <div>
               <input type=file name=image accept=.jpg required class='form-control'>
+            </div>
+            <div>
+              <button class='btn btn-primary' name=btn_upload value=$d[id]>Upload</button>
+            </div>
+
+          </div>
+        </form>
+        ";
+      } elseif ($key == 'image' and $carousel) {
+        $value = "<a href='?upload_image_paket&id_paket=$id_paket'>" . img_icon('upload_gray') . ' Upload Image</a>';
+      } elseif ($key == 'carousel' and !$carousel) {
+        $value = "<a href='?upload_image_paket&id_paket=$id_paket&carousel=1'>" . img_icon('upload_gray') . ' Upload Carousel</a>';
+      } elseif ($key == 'carousel' and $carousel) {
+        $src = "$lokasi_carousel/$value";
+        $belum_ada = '<span class="red miring">belum ada carousel image</span>';
+        $img = ($value and file_exists($src)) ? "<img src='$src' class='img-thumbnail' style='max-width:300px' >" : $belum_ada;
+
+        $value = "
+        <form method=post enctype='multipart/form-data'>
+          <input type=hidden name=image_old value='$d[carousel]'>
+
+          $img
+          <div class='flexy mt2 mb4'>
+            <div>
+              <input type=file name=carousel accept=.jpg required class='form-control'>
             </div>
             <div>
               <button class='btn btn-primary' name=btn_upload value=$d[id]>Upload</button>

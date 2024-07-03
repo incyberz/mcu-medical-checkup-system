@@ -8,10 +8,16 @@ if (!$parameter) {
         <li><a class='nav-link scrollto' href='#produk'>Paket MCU</a></li>
         <li><a class='nav-link scrollto' href='#tim'>Dokter dan Tim</a></li>
         <li><a class='nav-link scrollto' href='#contact'>Kontak</a></li>
+        <li><a class='nav-link scrollto' href='blog/'>Blog</a></li>
   ";
 }
 
 ?>
+<style>
+  header {
+    /* background: #ffffff88 !important; */
+  }
+</style>
 <header id="header" class="fixed-top">
   <div class="container d-flex align-items-center">
 

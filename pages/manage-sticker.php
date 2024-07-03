@@ -114,7 +114,6 @@ if (!mysqli_num_rows($q)) {
     ";
   }
   echo "
-    <style>.tebal_biru{color:blue;font-weight:bold}</style>
     <span class=hideit id=id_paket>$id_paket</span>
     <table class='table table-hover table-striped'>
       $tr

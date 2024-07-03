@@ -3,6 +3,7 @@
 # AJAX CRUD by InSho
 # =============================================================
 # Revised: 
+# 1.0.4 - NULL update value handler
 # 1.0.3 - ajax_session.php revised + NULL update value handler
 # 1.0.2 - aksi assign dengan double acuan
 # =============================================================
@@ -26,7 +27,7 @@ if ($tb == 'tb_paket_sticker') {
   } elseif ($aksi == 'delete') {
     $s = "DELETE FROM tb_paket_sticker WHERE kode='$value'";
   } else {
-    die("Belum ada handler untuk aksi: $aksi");
+    die("Belum ada handler untuk aksi: $aksi di tb_paket_sticker");
   }
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
@@ -39,11 +40,15 @@ if ($aksi == 'update') {
   $kolom = $_GET['kolom'] ?? die(erid('kolom'));
   if (!$kolom) die(erid('kolom::empty'));
   $value = $_GET['value'] ?? die(erid('value'));
-  if (!$value) die(erid('value::empty'));
+  if ($value == '') die(erid('value::empty'));
 
   $value = strip_tags(clean_sql($value));
   $value = ($value == '' || $value == 'NULL') ? 'NULL' : "'$value'";
-  $s = "UPDATE tb_$tb SET $kolom = $value WHERE id = $id";
+  if ($id) {
+    $s = "UPDATE tb_$tb SET $kolom = $value WHERE id = '$id'";
+  } else {
+    die("Aksi update tidak bisa dijalankan karena id belum ditentukan");
+  }
 } elseif ($aksi == 'insert') {
   $koloms = 'kode,nama';
   $values = "'AAA-NEW','NEW $tb'";

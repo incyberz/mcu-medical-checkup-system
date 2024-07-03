@@ -43,6 +43,8 @@ a.deskripsi,
 a.info_biaya,
 a.biaya,
 a.customizable,
+a.image,
+b.nama as nama_program,
 (
   SELECT COUNT(1) FROM tb_paket_detail 
   WHERE id_paket=a.id) count_pemeriksaan
@@ -131,26 +133,40 @@ while ($paket = mysqli_fetch_assoc($q)) {
   $shout = $id_program == 1 ?  $paket['info_biaya'] : 'Rp' . $biaya_show;
   $shout = $shout == 'Rp' ? 'Custom Biaya' : $shout;
 
-  $src = "assets/img/paket/$id_paket.jpg";
+  $src = "assets/img/paket/$paket[image]";
   if (file_exists($src)) {
-    $paket =  "<img src='$src' class='w-100 br5'>";
+    $paket_show =  "<img src='$src' class='w-100 br5'>";
   } else {
-    $paket = "        
+    $paket_show = "        
       <h3 >$paket[nama_paket]</h3>
       <div class='f14  mt1 mb2'>$paket[deskripsi]</div>
     ";
   }
 
+  $text_wa = "Selamat $waktu Customer Service $nama_sistem!%0a%0aSaya ingin bertanya lebih lanjut perihal *$paket[nama_paket] | $paket[nama_program]*%0a%0a";
+  $href_wa = "$href_wa&text=$text_wa";
+
   $divs .= "
   <div class='col-xl-4 col-md-6'>
     <div class='wadah p2 item-corporate gradasi-toska'>
       <div>
-        $paket
+        $paket_show
       </div>
       <div class='f18 consolass darkblue mt1 mb1'>$shout</div>
       <div>
         <span class='btn_aksi pointer f12' id=$id_toggle> $img_detail $lihat_detail</span>
-        <div id=detail$id_paket class='hideit wadah gradasi-kuning mt1 '>$details</div>
+        <div id=detail$id_paket class='hideit wadah gradasi-kuning mt2 '>
+          $paket[deskripsi]
+          <hr>
+          $details
+          <hr>
+          <div class='mt2 mb4 '>
+            <a href='$href_wa' target=_blank>
+              $img_wa
+              Info lebih lanjut...
+            </a>
+          </div>
+        </div>
       </div>
       <div>
         $btn_pilih

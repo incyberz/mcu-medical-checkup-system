@@ -70,6 +70,7 @@ a.id as id_paket,
 a.nama as nama_paket,
 a.status,
 a.image,
+a.carousel_image as carousel,
 b.nama as nama_program,
 (
   SELECT COUNT(1) FROM tb_paket_detail
@@ -105,21 +106,39 @@ if (!mysqli_num_rows($q)) {
     // detail info
     $detail_info = "$img_detail";
 
-    // image info
-    $image_info = "$img_image";
+    # ============================================================
+    # PAKET IMAGE UPLOAD
+    # ============================================================
     $image_info = '';
     $href = "?upload_image_paket&id_paket=$id_paket";
     if ($d['image']) { // ada data image di DB
       $src = "$lokasi_paket/$d[image]";
-      if (file_exists($src)) {
-        $image_info = $img_image;
+      if (!file_exists($src)) {
+        $image_info = '<span class=red>paket image hilang</span>';
       } else {
-        $image_info = '<span class=red>image hilang</span>';
+        $image_info = $img_image;
       }
     } else {
-      $image_info = img_icon('upload');
+      $image_info = img_icon('upload_gray');
     }
     $link_upload_image = "<a href='$href' onclick='return confirm(\"Upload Image?\")'>$image_info</a>";
+
+    # ============================================================
+    # CAROUSEL IMAGE UPLOAD
+    # ============================================================
+    $carousel_info = '';
+    $href = "?upload_image_paket&id_paket=$id_paket&carousel=1";
+    if ($d['carousel']) { // ada data carousel di DB
+      $src = "$lokasi_carousel/$d[carousel]";
+      if (!file_exists($src)) {
+        $carousel_info = '<span class=red>carousel image hilang</span>';
+      } else {
+        $carousel_info = $img_image;
+      }
+    } else {
+      $carousel_info = img_icon('upload_gray');
+    }
+    $link_upload_carousel = "<a href='$href' onclick='return confirm(\"Upload Carousel Image?\")'>$carousel_info</a>";
 
 
     $td = "<td>$i</td>";
@@ -137,8 +156,26 @@ if (!mysqli_num_rows($q)) {
         $value = "<a href='?manage-single-paket&id_paket=$id_paket'>$value</a>";
       } elseif ($key == 'image') {
         $value = $link_upload_image;
+      } elseif ($key == 'carousel') {
+        $value = $link_upload_carousel;
       } elseif ($key == 'status') {
-        $value = $value ? "<span class='f12 green'><span onclick='alert(\"Paket aktif dan ditampilkan ke pengunjung. Klik nama paket untuk manage lebih lanjut\")'>$img_check</span> active</span>" : '<span class="f12 abu miring">disabled</span>';
+        # ============================================================
+        # STATUS PAKET
+        # ============================================================
+        $label = $value ? 'active' : 'disabled';
+        $id_check = "check__$id_paket";
+        $checked = $value ? 'checked' : '';
+        $tebal_biru = $value ? 'tebal_biru' : '';
+
+        $value = "
+          <div class='form-check form-switch'>
+            <input class='form-check-input check-sticker checkbox-parent' type='checkbox' id='$id_check' name='checkbox-$id_check' $checked>
+            <label class='form-check-label proper pointer $tebal_biru f12' for='$id_check' id='label-$id_check'>
+              $label
+            </label>
+          </div>
+
+        ";
       } elseif ($key == 'count_sticker') {
         $label = $d['count_sticker'] ? 'label_green' : 'label_gray';
         $img_sticker = "<img src='$lokasi_icon/$label.png' height=20px class='zoom pointer' style='display:inline-block;margin-left: 10px' />";
@@ -219,3 +256,97 @@ echo "
     $tr_tambah
   </table>
 ";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+<script>
+  $(function() {
+    $('.check-sticker').click(function() {
+      let tid = $(this).prop('id');
+      let checked = $(this).prop('checked');
+      let rid = tid.split('__');
+      let aksi = rid[0];
+      let id_paket = rid[1];
+
+
+      let status = checked ? '1' : "0";
+      // if (checked) {
+      //   aksi = 'insert';
+      // } else {
+      //   aksi = 'delete';
+      // }
+      // return;
+      let link_ajax = `ajax/crud.php?tb=paket&aksi=update&id=${id_paket}&kolom=status&value=${status}`;
+      console.log(aksi, id_paket, checked, link_ajax);
+
+      $.ajax({
+        url: link_ajax,
+        success: function(a) {
+          console.log('reply from AJAX: ', a);
+          if (a.trim() == 'sukses') {
+            if (checked) {
+              $('#label-' + tid).addClass('tebal_biru');
+              $('#label-' + tid).text('Active');
+            } else {
+              $('#label-' + tid).removeClass('tebal_biru');
+              $('#label-' + tid).text('disabled');
+
+            }
+          } else {
+            alert(a);
+          }
+        }
+      })
+
+
+    })
+  })
+</script>

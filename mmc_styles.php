@@ -334,10 +334,7 @@
   .tim .member .social div:hover {
     background: #cc7719;
   }
-</style>
 
-
-<style>
   td {
     background: none !important;
   }
@@ -345,5 +342,10 @@
   .kolom {
     color: #888 !important;
     font-style: italic;
+  }
+
+  .tebal_biru {
+    color: blue;
+    font-weight: bold
   }
 </style>
