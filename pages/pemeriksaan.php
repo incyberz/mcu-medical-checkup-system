@@ -437,7 +437,7 @@ if (!$punya_data) {
 # ============================================================
 echo "
   <div class='wadah tengah gradasi-hijau'>
-    <div><a href='?tampil-pasien&id_pasien=$id_pasien'>$img_prev</a></div>
+    <div><a href='?tampil_pasien&id_pasien=$id_pasien'>$img_prev</a></div>
     <div><img src='$src' class='foto_profil'></div>
     <div class='mb1'>$gender_icon $pasien[nama]</div>
     <div class='border-bottom mb2 pb2 biru f12'>$NIK | MCU-$nomor_MCU | $status_show</div>

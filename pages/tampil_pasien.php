@@ -48,6 +48,27 @@ if (!mysqli_num_rows($q)) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if (!$order_no) {
   echo div_alert('danger', 'Pasien ini mendaftar pada jalur mandiri (tanpa order_no)<hr>System belum menyediakan handler untuk pasien mandiri. Silahkan hubungi developer!');
 } else {
@@ -67,6 +88,7 @@ if (!$order_no) {
   a.tanggal_lahir,
   a.nikepeg as NIK,
   a.username,
+  a.password,
   a.status,
   a.foto_profil,
   a.riwayat_penyakit,
@@ -76,7 +98,7 @@ if (!$order_no) {
   c.id as id_paket, 
   c.nama as nama_paket,
   (
-    SELECT 1 FROM tb_mcu WHERE id_pasien=a.id) punya_data 
+    SELECT 1 FROM tb_mcu WHERE id_pasien=a.id) data_pemeriksaan 
 
   FROM tb_pasien a 
   JOIN tb_order b ON a.order_no=b.order_no -- Pasien Non Mandiri
@@ -94,33 +116,43 @@ if (!$order_no) {
     $nama_paket = $d['nama_paket'];
     $NIK = $d['NIK'];
     $nomor_MCU = $d['nomor_MCU'];
-    $punya_data = $d['punya_data'];
+    $data_pemeriksaan = $d['data_pemeriksaan'];
 
     $gender = $d['gender'];
     $gender_icon = $gender ? "<img src='$lokasi_icon/gender-$gender.png' height=20px>" : $img_warning;
     $gender_show = gender($gender);
 
-    if ($status == 8 and $punya_data) {
+    if ($status == 8 and $data_pemeriksaan) {
       // update status pasien menjadi 9 (pasien sedang periksa)
       $s2 = "UPDATE tb_pasien SET status=9 WHERE id='$id_pasien'";
       $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
       jsurl();
     }
 
-    // ) {
-    // $i++;
+    # ============================================================
+    # LIST PROPERTIES PASIEN
+    # ============================================================
+    $belum = '<span class="red f12 miring">belum mengisi</span>';
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
         || $key == 'foto_profil'
+        || $key == 'id_paket'
+        || $key == 'NIK'
       ) continue;
 
       if ($key == 'gender') {
-        $value = gender($value);
+        $value = $value ? gender($value) : $null;
+      } elseif ($key == 'usia') {
+        $value = $value ? "$value <span class='abu f12 miring'>tahun</span>" : $null;
       } elseif ($key == 'nomor_MCU') {
         $value = "MCU-$value";
       } elseif ($key == 'tanggal_lahir') {
-        $value = tanggal($value);
+        $value = $value ? tanggal($value) : $null;
+      } elseif ($key == 'username') {
+        $value = $value ? " $username ~ <a target=_blank href='?login_as&role=pasien&username=$value' onclick='return confirm(`Login sebagai pasien: $d[nama] ?`)'>$img_login_as login as pasien</a>" : die(erid('username'));
+      } elseif ($key == 'password') {
+        $value = $value ? '<span class="f12 green">sudah diubah</span>' : $d['username'] . ' <span class="f12 miring abu">( masih default )</span>';
       } elseif ($key == 'status') {
         if ($value) {
           $value = '<span class="blue tebal">' . $arr_status_pasien[$value] . " ($value)</span>";
@@ -131,12 +163,17 @@ if (!$order_no) {
         $key == 'riwayat_penyakit'
         || $key == 'gejala_penyakit'
         || $key == 'gaya_hidup'
+        || $key == 'keluhan'
       ) {
         $arr = explode(',', $value);
         $value = '';
         foreach ($arr as $k => $v) if ($v) $value .= "<li>$v</li>";
-        $value = "<ol class=pl4>$value</ol>";
+        $value = $value ? "<ol class=pl4>$value</ol>" : $belum;
+      } elseif ($key == 'data_pemeriksaan') {
+        $value = $value ? 'Ada' : '<span class="f12 miring abu">belum menjalani pemeriksaan</span>';
       }
+
+      $value = $value ? $value : $null;
 
       $kolom = key2kolom($key);
       $tr .= "
@@ -148,6 +185,43 @@ if (!$order_no) {
     }
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # ============================================================
+  # LIST PEMERIKSAAN
+  # ============================================================
   $fitur_pasien_header = "<div>Pemeriksaan <b class=darkblue>$nama_paket</b> bagi role  <span class='tebal darkblue'>$jabatan ($role)</span></div>";
 
   $fitur_pemeriksaan = '';
@@ -218,7 +292,7 @@ if (!$order_no) {
   }
 
   $tb_progress = '';
-  if ($punya_data) {
+  if ($data_pemeriksaan) {
     $tb_progress = "<table class='table table-striped table-hover mt4'>$tr_progress</table>";
   } else {
     $tb_progress = div_alert('info mt2', 'Pasien ini belum menjalani pemeriksaan');
@@ -227,6 +301,9 @@ if (!$order_no) {
   $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class="f12 red">Belum pernah login</span>';
   $src = "$lokasi_pasien/$foto_profil";
 
+  # ============================================================
+  # FINAL ECHO
+  # ============================================================
   echo "
     <div class='wadah tengah gradasi-hijau'>
       <div><a href='?cari-pasien'>$img_prev</a></div>
@@ -248,7 +325,7 @@ if (!$order_no) {
     </div>
     <div class='tengah mb4'><span class=btn_aksi id=tb_detail__toggle>$img_detail</span></div>
 
-    <div class=hideit id=tb_detail>
+    <div class=hideita id=tb_detail>
       <table class='table '>
         $tr
       </table>

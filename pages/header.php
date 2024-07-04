@@ -1,23 +1,37 @@
+<style>
+  .menu_nakes {
+    display: inline-block;
+    padding: 10px !important;
+    color: blue
+  }
+</style>
 <?php
 // hide other info menu when parameter terisi
-$li_anchor = '';
-if (!$parameter) {
-  $li_anchor = "
-        <li><a class='nav-link scrollto' href='#why-us'>Keunggulan</a></li>
-        <li><a class='nav-link scrollto' href='#about'>Tentang</a></li>
-        <li><a class='nav-link scrollto' href='#produk'>Paket MCU</a></li>
-        <li><a class='nav-link scrollto' href='#tim'>Dokter dan Tim</a></li>
-        <li><a class='nav-link scrollto' href='#contact'>Kontak</a></li>
-        <li><a class='nav-link scrollto' href='blog/'>Blog</a></li>
-  ";
+$li_public = '';
+$li_nakes = '';
+// if (!$parameter) {
+if ($username and $role != 'pasien') {
+  $li_nakes = "
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pemeriksaan-cari_pasien'>Pemeriksaan</a></li>
+    ";
+} elseif (!$username) {
+  $li_public = "
+    <li><a class='nav-link scrollto' href='#why-us'>Keunggulan</a></li>
+          <li><a class='nav-link scrollto' href='#about'>Tentang</a></li>
+          <li><a class='nav-link scrollto' href='#produk'>Paket MCU</a></li>
+          <li><a class='nav-link scrollto' href='#tim'>Dokter dan Tim</a></li>
+          <li><a class='nav-link scrollto' href='#contact'>Kontak</a></li>
+          <li><a class='nav-link scrollto' href='blog/'>Blog</a></li>
+          ";
+}
+// } else
+
+if (isset($_SESSION['mmc_username_master'])) {
+  $li_public = "<li><a style='display:inline-block; padding: 10px; color:blue' class='nav-link scrollto gradasi-hijau bold' href='?login_as&unlog'>UNLOG</a></li>";
 }
 
 ?>
-<style>
-  header {
-    /* background: #ffffff88 !important; */
-  }
-</style>
 <header id="header" class="fixed-top">
   <div class="container d-flex align-items-center">
 
@@ -28,7 +42,8 @@ if (!$parameter) {
     <nav id="navbar" class="navbar order-last order-lg-0">
       <ul>
         <li><a class="nav-link scrollto active" href="?">Home</a></li>
-        <?= $li_anchor ?>
+        <?= $li_public ?>
+        <?= $li_nakes ?>
         <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
           <ul>
             <li><a href="#">Drop Down 1</a></li>
@@ -48,9 +63,10 @@ if (!$parameter) {
         </li> -->
         <?php
         if ($username) {
-          // login
+          // login or login_as
+          $Login_as = isset($_SESSION['mmc_username_master']) ? '<span class="blue bold">Login as</span>' : '';
           echo "
-            <li class='dropdown'><a href='#'><span class='tebal darkblue'>$username</span> <i class='bi bi-chevron-down'></i></a>
+            <li class='dropdown'><a href='#'><span class='tebal darkblue'>$Login_as $username</span> <i class='bi bi-chevron-down'></i></a>
               <ul>
                 <li><a href='#' onclick='onDev()'>Foto Profile</a></li>
                 <li><a href='#' onclick='onDev()'>Biodata</a></li>

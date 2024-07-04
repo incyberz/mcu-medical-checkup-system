@@ -1,9 +1,12 @@
 <?php
 // $jadwal =  date('d-m-Y', strtotime('+13 day', strtotime($d['tanggal_order'])));
-$jadwal = '10-05-2024'; // zzz
+$jadwal = '10-05-2022 13:20'; // zzz
 $jadwal_sesi = 'Sesi 3 (siang)'; // zzz
 $jadwal_pukul = '13:20 - 15:00 WIB'; // zzz
 $lokasi = 'Onsite di Perusahaan'; // zzz
+
+$eta = eta2($jadwal);
+$jadwal_show = tanggal($jadwal) . " | <span class='abu miring'>$eta</span>";
 
 $type_btn_jadwal = 'primary';
 $blok_jadwal = $status < 2 ? '' : "
@@ -17,7 +20,7 @@ $blok_jadwal = $status < 2 ? '' : "
             <span class='green f50'>$id_pasien_show</span>
           </td>
         </tr>
-        <tr><td class=kolom>Jadwal</td><td>$jadwal</td></tr>
+        <tr><td class=kolom>Jadwal</td><td>$jadwal_show</td></tr>
         <tr><td class=kolom>Sesi</td><td>$jadwal_sesi</td></tr>
         <tr><td class=kolom>Pukul</td><td>$jadwal_pukul</td></tr>
         <tr><td class=kolom>Lokasi</td><td>$lokasi</td></tr>

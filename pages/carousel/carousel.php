@@ -335,6 +335,10 @@ header a{
     animation: contentOut 1.5s linear 1 forwards !important;
   }
 
+  .shadow_black {
+    text-shadow: 0 0 3px black;
+  }
+
   @keyframes contentOut {
     to {
       transform: translateY(-150px);
@@ -394,10 +398,10 @@ if (!mysqli_num_rows($q)) {
       <div class='item'>
         <img src='assets/img/carousel-img/$paket[carousel_image]'>
         <div class='content'>
-          <div class='nama_paket'>
+          <div class='nama_paket f14 shadow_black'>
             $paket[nama_paket]
           </div>
-          <div class='description'>
+          <div class='description f12 miring shadow_black'>
             $paket[nama_program]
           </div>
         </div>

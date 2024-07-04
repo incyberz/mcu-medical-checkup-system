@@ -35,11 +35,13 @@ $lokasi_ilustrasi = 'assets/img/ilustrasi';
 $lokasi_excel = 'assets/xls';
 $lokasi_xls = 'assets/xls';
 
-$whatsapp_klinik_show = '0852-1257-2979';
-$whatsapp_klinik = '6285212572979';
+// $whatsapp_klinik = '6285212572979'; // pa ahmad
+// $whatsapp_klinik = '6285975096020'; // MMC
+// $whatsapp_klinik_show = '0859-7509-6020';
 
 // set auto login
-// $_SESSION['mmc_username'] = 'wh';
+$_SESSION['mmc_username'] = 'nakes1';
+$_SESSION['mmc_role'] = 'nakes';
 
 // set logout
 // unset($_SESSION['mmc_username']);
@@ -64,6 +66,7 @@ if (isset($_SESSION['mmc_username'])) {
   $is_login = 1;
   $username = $_SESSION['mmc_username'];
 }
+
 
 
 
@@ -101,6 +104,10 @@ $parameter = '';
 foreach ($_GET as $key => $value) {
   $parameter = $key;
   break;
+}
+
+if (!$parameter and $username and $role != 'pasien') {
+  jsurl('?dashboard_nakes');
 }
 
 # ================================================
@@ -174,8 +181,9 @@ function edit_section($page, $caption = '', $icon = '')
   <?php include 'pages/save_settings_process.php'; ?>
   <?php
   if (!$parameter) {
-    include 'pages/hero.php';
     include 'pages/carousel/carousel.php';
+    echo '<div>&nbsp;</div>';
+    include 'pages/hero.php';
   }
   ?>
 

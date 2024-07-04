@@ -251,10 +251,17 @@ function gender($lp)
   }
 }
 
-function tanggal($date, $format = 'd-M-Y')
+function tanggal($date, $format = 'd-M-Y', $indo = 1, $hari = false)
 {
   if (strtotime($date) > 0) {
-    return date($format, strtotime($date));
+    if ($indo) {
+      $arr_nama_hari = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      $arr_nama_bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      $nama_bulan = $arr_nama_bulan[intval(date('m', strtotime($date)) - 1)];
+      return date('d', strtotime($date)) . " $nama_bulan " . date('Y', strtotime($date));
+    } else {
+      return date($format, strtotime($date));
+    }
   } else {
     if ($date == '') {
       return '<i>null</i>';

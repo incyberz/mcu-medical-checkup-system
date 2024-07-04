@@ -24,6 +24,7 @@ AND (
   a.nama LIKE '%$keyword%' 
   OR a.nomor LIKE '%$keyword%' 
   OR a.nikepeg LIKE '%$keyword%' 
+  OR a.username LIKE '%$keyword' 
 )
 ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
