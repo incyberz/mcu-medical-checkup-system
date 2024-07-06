@@ -96,7 +96,7 @@ if ($role == 'admin') {
   $fitur_login = "
     <div class='wadah gradasi-kuning mt4'>
       <p>$welcome_login</p>
-      <a class='btn btn-primary' href='?pemeriksaan-cari_pasien'>Pemeriksaan TB/BB/LP</a>
+      <a class='btn btn-primary' href='?cari_pasien'>Pemeriksaan TB/BB/LP</a>
       <a class='btn btn-primary' href='?pemeriksaan-2'>Pemeriksaan zzz kedua</a>
       <a class='btn btn-primary' href='?pemeriksaan-3'>Pemeriksaan zzz ketiga</a>
     </div>

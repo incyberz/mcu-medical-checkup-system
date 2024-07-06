@@ -1,4 +1,29 @@
 <?php
+function radio_toolbar($arr_radio, $full_width = true)
+
+{
+  if (!is_array($arr_radio)) die('radio_toolbar function membutuhkan parameter berupa array');
+  $html = '';
+  $i = 0;
+  foreach ($arr_radio as $key => $radio) {
+    $i++;
+    $name = $radio['name'] ?? die('radio_toolbar function need index: name');
+    $id = $radio['id'] ?? die('radio_toolbar function need index: id');
+    $classes = $radio['classes'] ?? die('radio_toolbar function need index: classes');
+    $value = $radio['value'] ?? die('radio_toolbar function need index: value');
+    $checked = $radio['checked'] ?? die('radio_toolbar function need index: checked');
+    $caption = $radio['caption'] ?? die('radio_toolbar function need index: caption');
+    $flex_1 = $full_width ? 'flex:1' : '';
+    $html .= "
+      <div class='radio-toolbar abu mb2 mt2' style='$flex_1'>
+        <input type='radio' name='$name' id='$id' class='opsi_radio $classes' required value='$value' $checked >
+        <label class='proper' for='$id'>$caption</label>
+      </div>
+    ";
+  }
+  return "<div style='display:flex; gap:5px'>$html</div>";
+}
+
 function radio($name, $id, $value, $caption, $checked = '', $classess = '')
 
 {
@@ -86,4 +111,20 @@ function tr_input($kolom, $satuan = '', $name, $placeholder, $type, $min, $max, 
       <td>$isi</td>
     </tr>
   ";
+}
+
+
+function ilustrasi($nama, $w = 180, $h = 'auto', $ext = 'png')
+{
+  $me = "assets/img/ilustrasi/$nama.$ext";
+  $na = "assets/img/img_na.jpg";
+  $width =  $w . 'px';
+  $height = $h == 'auto' ? '' : $h . 'px';
+  if (file_exists($me)) {
+    return "<img class='img-thumbnail' src='$me' width=$width height=$height />";
+  } else {
+    return "<img class='img-thumbnail' src='$na' width=$width height=$height />
+    <div class='tengah f12 miring'>ilustrasi $nama n/a</div>
+    ";
+  }
 }

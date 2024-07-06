@@ -13,7 +13,8 @@ $li_nakes = '';
 if ($username and $role != 'pasien') {
   $li_nakes = "
       <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran</a></li>
-      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pemeriksaan-cari_pasien'>Pemeriksaan</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=mcu'>MCU</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=lab'>Laboratorium</a></li>
     ";
 } elseif (!$username) {
   $li_public = "

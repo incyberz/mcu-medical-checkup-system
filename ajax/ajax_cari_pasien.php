@@ -1,7 +1,23 @@
 <?php
 include "../conn.php";
-$keyword = $_GET['keyword'] ?? die("Error @ajax :: keyword index belum terdefinisi.");;
-$order_no = $_GET['order_no'] ?? die("Error @ajax :: order_no index belum terdefinisi.");;
+$keyword = $_GET['keyword'] ?? die("Error @ajax :: [keyword] belum terdefinisi.");;
+$order_no = $_GET['order_no'] ?? die("Error @ajax :: [order_no] belum terdefinisi.");;
+$jenis = $_GET['jenis'] ?? die("Error @ajax :: [jenis] belum terdefinisi.");
+
+if (!$jenis) die("Error @ajax :: [jenis] is empty.");
+
+$sql_order_no = 1;
+$join_tb_order = '';
+$join_tb_paket = '';
+$c_id = "''";
+$c_singkatan = "''";
+if ($jenis == 'cor') {
+  $sql_order_no = "a.order_no = '$order_no'";
+  $join_tb_order = "JOIN tb_order b ON a.order_no=b.order_no";
+  $join_tb_paket = "JOIN tb_paket c ON b.id_paket=c.id";
+  $c_id = 'c.id';
+  $c_singkatan = 'c.singkatan';
+}
 
 $s = "SELECT  
 a.id as id_pasien,
@@ -10,29 +26,35 @@ a.nikepeg as nik_pasien,
 a.status as kode_status,
 a.foto_profil,
 a.nomor, -- nomor MCU
-c.id as id_paket,
-c.singkatan as singkatan_paket,
+d.nama as jenis_pasien,
+$c_id as id_paket, $c_singkatan as singkatan_paket,
 (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
 
 
 
 FROM tb_pasien a 
-JOIN tb_order b ON a.order_no=b.order_no 
-JOIN tb_paket c ON b.id_paket=c.id 
-WHERE a.order_no = '$order_no' -- Order yang aktif saja
+$join_tb_order 
+$join_tb_paket 
+JOIN tb_jenis_pasien d ON a.jenis=d.jenis
+WHERE $sql_order_no -- Order yang aktif saja
 AND (
   a.nama LIKE '%$keyword%' 
   OR a.nomor LIKE '%$keyword%' 
   OR a.nikepeg LIKE '%$keyword%' 
   OR a.username LIKE '%$keyword' 
 )
+AND a.jenis = '$jenis'
 ";
+// die($s);
+// echo '<pre>';
+// var_dump($s);
+// echo '</pre>';
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $jumlah_pasien = mysqli_num_rows($q);
 
 
 $i = 0;
-if (mysqli_num_rows($q) == 0) die(div_alert('danger', "Data pasien dengan keyword <b>$keyword</b> tidak ditemukan"));
+if (mysqli_num_rows($q) == 0) die(div_alert('danger', "Pasien dg keyword <b>$keyword</b> jenis <b>$jenis</b>  tidak ditemukan"));
 $tr = '';
 $limited_info = '';
 while ($d = mysqli_fetch_assoc($q)) {
@@ -40,7 +62,7 @@ while ($d = mysqli_fetch_assoc($q)) {
   $id_pasien = $d['id_pasien'];
   $id_paket = $d['id_paket'];
   $singkatan_paket = $d['singkatan_paket'];
-  $status_show = '<div class="f12 red mt1">Status: belum pernah login</div>';
+  $status_show = $jenis == 'cor' ? '<div class="f12 red mt1">Status: belum pernah login</div>' : '';
 
   $btn_print = "<a target=_blank class='btn btn-warning w-100' href='?print-label&id_pasien=$id_pasien&id_paket=$id_paket&nama_paket=$singkatan_paket'>Print Label Medis zzz</a>";
 
@@ -73,7 +95,15 @@ while ($d = mysqli_fetch_assoc($q)) {
     }
   }
 
-  $href = "?cari-pasien&id_pasien=$id_pasien";
+  $href = "?tampil_pasien&id_pasien=$id_pasien&jenis=$jenis";
+
+  if ($jenis == 'cor') {
+    $info_paket = "MCU-$d[nomor] | $d[singkatan_paket]";
+  } else {
+    $info_paket = "Pasien $d[jenis_pasien]";
+    $status_show = $d['status_pasien'] ?? '<i class="f14 abu">belum pemeriksaan</i>';
+  }
+
   $tr .= "
     <tr>
       <td>$i</td>
@@ -84,8 +114,7 @@ while ($d = mysqli_fetch_assoc($q)) {
       </td>
       <td>
         <div><a href='$href'>$d[nama_pasien]</a></div>
-        <div>NIK. $d[nik_pasien]</div>
-        <div>MCU-$d[nomor] | $d[singkatan_paket]</div>
+        <div>$info_paket</div>
         <div>$status_show</div>
         $btn_print
       </td>
@@ -115,4 +144,5 @@ $jumlah_pasien_info
 <table class=table>
   $tr
 </table>
+$jumlah_pasien_info
 ";

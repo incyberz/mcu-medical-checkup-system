@@ -23,10 +23,6 @@ $img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom poin
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_add_paket'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-
   $s = "SELECT 1 FROM tb_paket WHERE id_program=$_POST[id_program]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $nomor = mysqli_num_rows($q) + 1;
@@ -81,10 +77,18 @@ if (isset($_POST['btn_add_paket'])) {
 
 
 $s = "SELECT 
-*,
-(SELECT COUNT(1) FROM tb_paket_sticker WHERE kode = CONCAT('$id_paket-',a.id)) ada 
+a.*,
+b.nama as nama_pemeriksaan,
+c.nama as jenis_pemeriksaan,
+
+(
+  SELECT COUNT(1) FROM tb_paket_sticker WHERE kode = CONCAT('$id_paket-',a.id)) ada 
+
 FROM tb_sticker a 
-WHERE a.id_klinik=$id_klinik
+JOIN tb_pemeriksaan b ON a.pemeriksaan=b.pemeriksaan 
+JOIN tb_jenis_pemeriksaan c ON b.jenis=c.jenis 
+WHERE a.id_klinik=$id_klinik 
+ORDER BY c.nama, a.nama 
 ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) {
@@ -109,6 +113,9 @@ if (!mysqli_num_rows($q)) {
               $d[nama]
             </label>
           </div>
+        </td>
+        <td>
+          $d[jenis_pemeriksaan]
         </td>
       </tr>
     ";

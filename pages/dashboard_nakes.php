@@ -18,7 +18,7 @@ only(['admin', 'nakes']);
   </div>
   <div class="col lg-2">
     <div class="wadah">
-      <a href="?pemeriksaan-cari_pasien">Pemeriksaan</a>
+      <a href="?cari_pasien">Pemeriksaan</a>
       <hr>
       zz
       <hr>

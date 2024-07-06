@@ -179,7 +179,7 @@ if (!mysqli_num_rows($q)) {
       } elseif ($key == 'count_sticker') {
         $label = $d['count_sticker'] ? 'label_green' : 'label_gray';
         $img_sticker = "<img src='$lokasi_icon/$label.png' height=20px class='zoom pointer' style='display:inline-block;margin-left: 10px' />";
-        $value .= " <a href='?manage-sticker&id_paket=$id_paket&nama_paket=$nama_paket'>$img_sticker</a>";
+        $value .= " <a href='?assign_sticker&id_paket=$id_paket&nama_paket=$nama_paket'>$img_sticker</a>";
       }
 
       $style_non_aktif = $status ? '' : 'f12 abu miring';

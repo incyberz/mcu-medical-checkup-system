@@ -5,20 +5,7 @@
   }
 </style>
 <?php
-function ilustrasi($nama, $w = 180, $h = 'auto')
-{
-  $me = "assets/img/ilustrasi/$nama.jpg";
-  $na = "assets/img/img_na.jpg";
-  $width =  $w . 'px';
-  $height = $h == 'auto' ? '' : $h . 'px';
-  if (file_exists($me)) {
-    return "<img class='img-thumbnail' src='$me' width=$width height=$height />";
-  } else {
-    return "<img class='img-thumbnail' src='$na' width=$width height=$height />
-    <div class='tengah f12 miring'>ilustrasi $nama n/a</div>
-    ";
-  }
-}
+
 
 $img_tidur = ilustrasi('tidur');
 $img_merokok = ilustrasi('merokok');

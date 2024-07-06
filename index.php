@@ -40,8 +40,11 @@ $lokasi_xls = 'assets/xls';
 // $whatsapp_klinik_show = '0859-7509-6020';
 
 // set auto login
-$_SESSION['mmc_username'] = 'nakes1';
-$_SESSION['mmc_role'] = 'nakes';
+if (1) {
+  $_SESSION['mmc_username'] = 'nakes1';
+  $_SESSION['mmc_role'] = 'nakes';
+  echo "<div style='position:fixed; top:0; left:0; font-weight:bold; z-index:9999; background:red; padding:15px'>AUTOLOGIN MODE</div>";
+}
 
 // set logout
 // unset($_SESSION['mmc_username']);
@@ -106,8 +109,11 @@ foreach ($_GET as $key => $value) {
   break;
 }
 
-if (!$parameter and $username and $role != 'pasien') {
-  jsurl('?dashboard_nakes');
+// if (!$parameter and $username and $role == 'nakes') {
+//   jsurl('?dashboard_nakes');
+// }
+if ($parameter == 'fbclid') {
+  jsurl('?');
 }
 
 # ================================================

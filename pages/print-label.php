@@ -83,7 +83,7 @@ if (!$print) {
   ";
   $sub_judul = "
     $mode
-    <a href='?manage-sticker&id_paket=$id_paket&nama_paket=$nama_paket'>Back</a> 
+    <a href='?assign_sticker&id_paket=$id_paket&nama_paket=$nama_paket'>Back</a> 
     | 
     Print Label untuk 
     <b class='biru'>

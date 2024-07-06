@@ -339,6 +339,10 @@ header a{
     text-shadow: 0 0 3px black;
   }
 
+  .shadow_white {
+    text-shadow: 0 0 3px white;
+  }
+
   @keyframes contentOut {
     to {
       transform: translateY(-150px);
@@ -354,6 +358,29 @@ header a{
 
     .carousel .list .item .content .nama_paket {
       font-size: 30px;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .author {
+      font-size: 16px !important;
+    }
+
+    .nama_paket {
+      font-size: 20px !important;
+    }
+
+    .nama_program {
+      font-size: 18px !important;
+    }
+
+    .deskripsi {
+      font-size: 14px !important;
+    }
+
+    .nama_paket_thumb {
+      font-size: 14px !important;
+
     }
   }
 </style>
@@ -382,9 +409,9 @@ if (!mysqli_num_rows($q)) {
       <div class='item'>
         <img src='assets/img/carousel-img/$paket[carousel_image]'>
         <div class='content'>
-          <div class='author'>Medical Checkup</div>
+          <div class='author shadow_black'>Medical Checkup</div>
           <div class='nama_paket'>$paket[nama_paket]</div>
-          <div class='nama_program'>$paket[nama_program]</div>
+          <div class='nama_program shadow_white'>$paket[nama_program]</div>
           <div class='deskripsi'>$paket[deskripsi]</div>
           <div class='buttons'>
             <a class='btn btn-sm btn-success pt2' href='?program-detail&id_program=$paket[id_program]'>
@@ -398,7 +425,7 @@ if (!mysqli_num_rows($q)) {
       <div class='item'>
         <img src='assets/img/carousel-img/$paket[carousel_image]'>
         <div class='content'>
-          <div class='nama_paket f14 shadow_black'>
+          <div class='nama_paket f14 shadow_black nama_paket_thumb'>
             $paket[nama_paket]
           </div>
           <div class='description f12 miring shadow_black'>

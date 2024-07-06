@@ -1,4 +1,8 @@
 <?php
+// v.1.3.11 add data AOS to set_h2
+// v.1.3.10 add hari_tanggal
+// v.1.3.9 update eta function
+// v.1.3.8 autoset title when set_judul
 // v.1.3.7 set_h2 id, set_judul, set_sub_judul
 // v.1.3.6 function gender
 // v.1.3.5 eta2 updated
@@ -9,12 +13,28 @@
 // v.1.3.0 revision with echolog
 // v.1.2.0 revision with function baca_csv
 
-function set_h2($judul, $sub_judul = '')
+function hari_tanggal($datetime)
 {
+  $nama_hari = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  $nama_bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  $time = strtotime($datetime);
+  return $nama_hari[date('w', $time)]
+    . ', '
+    . date('d', $time)
+    . ' '
+    . $nama_bulan[intval(date('m', $time))]
+    . ' '
+    . date('Y, H:i', $time);
+}
+
+function set_h2($judul, $sub_judul = '', $href_back = '')
+{
+  set_title($judul);
+  $link = !$href_back ? '' : "<div class='mt2'><a href='$href_back'><img src='assets/img/icons/prev.png' class=img_icon></a></div>";
   echo "
-    <div class='section-title'>
+    <div class='section-title' data-aos='fade'>
       <h2 id=judul>$judul</h2>
-      <p id=sub_judul>$sub_judul</p>
+      <p id=sub_judul>$sub_judul$link</p>
     </div>
   ";
 }
@@ -89,12 +109,12 @@ function hm($nilai)
   }
 }
 
-function eta2($eta, $indo = 1)
+function eta2($datetime, $indo = 1)
 {
-  return eta(strtotime($eta) - strtotime('now'));
+  return eta(strtotime($datetime) - strtotime('now'));
 }
 
-function eta($eta, $indo = 1)
+function eta($detik, $indo = 1)
 {
   $menit = '';
   $jam = '';
@@ -102,54 +122,54 @@ function eta($eta, $indo = 1)
   $minggu = '';
   $bulan = '';
 
-  if ($eta >= 0) {
-    if ($eta < 60) {
-      return $indo ? "$eta detik lagi" : "$eta seconds left";
-    } elseif ($eta < 60 * 60) {
-      $menit = ceil($eta / 60);
+  if ($detik >= 0) {
+    if ($detik < 60) {
+      return $indo ? "$detik detik lagi" : "$detik seconds left";
+    } elseif ($detik < 60 * 60) {
+      $menit = ceil($detik / 60);
       return $indo ? "$menit menit lagi" : "$menit minutes left";
-    } elseif ($eta < 60 * 60 * 24) {
-      $jam = ceil($eta / (60 * 60));
+    } elseif ($detik < 60 * 60 * 24) {
+      $jam = ceil($detik / (60 * 60));
       return $indo ? "$jam jam lagi" : "$jam hours left";
-    } elseif ($eta < 60 * 60 * 24 * 7) {
-      $hari = ceil($eta / (60 * 60 * 24));
+    } elseif ($detik < 60 * 60 * 24 * 7) {
+      $hari = ceil($detik / (60 * 60 * 24));
       return $indo ? "$hari hari lagi" : "$hari days left";
-    } elseif ($eta < 60 * 60 * 24 * 7 * 4) {
-      $minggu = ceil($eta / (60 * 60 * 24 * 7));
+    } elseif ($detik < 60 * 60 * 24 * 7 * 4) {
+      $minggu = ceil($detik / (60 * 60 * 24 * 7));
       return $indo ? "$minggu minggu lagi" : "$minggu weeks left";
-    } elseif ($eta < 60 * 60 * 24 * 365) {
-      $bulan = ceil($eta / (60 * 60 * 24 * 7 * 4));
+    } elseif ($detik < 60 * 60 * 24 * 365) {
+      $bulan = ceil($detik / (60 * 60 * 24 * 7 * 4));
       return $indo ? "$bulan bulan lagi" : "$bulan monts left";
     } else {
-      $tahun = ceil($eta / (60 * 60 * 24 * 365));
+      $tahun = ceil($detik / (60 * 60 * 24 * 365));
       return $indo ? "$tahun tahun lagi" : "$tahun years left";
     }
   } else {
-    if ($eta > -60) {
-      $eta = -$eta;
-      return $indo ? "$eta detik yang lalu" : "$eta seconds ago";
-    } elseif ($eta > -60 * 60) {
-      $menit = ceil($eta / 60);
+    if ($detik > -60) {
+      $detik = -$detik;
+      return $indo ? "$detik detik yang lalu" : "$detik seconds ago";
+    } elseif ($detik > -60 * 60) {
+      $menit = ceil($detik / 60);
       $menit = -$menit;
       return $indo ? "$menit menit yang lalu" : "$menit minutes ago";
-    } elseif ($eta > -60 * 60 * 24) {
-      $jam = ceil($eta / (60 * 60));
+    } elseif ($detik > -60 * 60 * 24) {
+      $jam = ceil($detik / (60 * 60));
       $jam = -$jam;
       return $indo ? "$jam jam yang lalu" : "$jam hours ago";
-    } elseif ($eta > -60 * 60 * 24 * 7) {
-      $hari = ceil($eta / (60 * 60 * 24));
+    } elseif ($detik > -60 * 60 * 24 * 7) {
+      $hari = ceil($detik / (60 * 60 * 24));
       $hari = -$hari;
       return $indo ? "$hari hari yang lalu" : "$hari days ago";
-    } elseif ($eta > -60 * 60 * 24 * 7 * 4) {
-      $minggu = ceil($eta / (60 * 60 * 24 * 7));
+    } elseif ($detik > -60 * 60 * 24 * 7 * 4) {
+      $minggu = ceil($detik / (60 * 60 * 24 * 7));
       $minggu = -$minggu;
       return $indo ? "$minggu minggu yang lalu" : "$minggu weeks ago";
-    } elseif ($eta > -60 * 60 * 24 * 365) {
-      $bulan = ceil($eta / (60 * 60 * 24 * 7 * 4));
+    } elseif ($detik > -60 * 60 * 24 * 365) {
+      $bulan = ceil($detik / (60 * 60 * 24 * 7 * 4));
       $bulan = -$bulan;
       return $indo ? "$bulan bulan yang lalu" : "$bulan monts ago";
     } else {
-      $tahun = ceil($eta / (60 * 60 * 24 * 365));
+      $tahun = ceil($detik / (60 * 60 * 24 * 365));
       $tahun = -$tahun;
       return $indo ? "$tahun tahun yang lalu" : "$tahun years ago";
     }
@@ -251,17 +271,10 @@ function gender($lp)
   }
 }
 
-function tanggal($date, $format = 'd-M-Y', $indo = 1, $hari = false)
+function tanggal($date, $format = 'd-M-Y')
 {
   if (strtotime($date) > 0) {
-    if ($indo) {
-      $arr_nama_hari = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-      $arr_nama_bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      $nama_bulan = $arr_nama_bulan[intval(date('m', strtotime($date)) - 1)];
-      return date('d', strtotime($date)) . " $nama_bulan " . date('Y', strtotime($date));
-    } else {
-      return date($format, strtotime($date));
-    }
+    return date($format, strtotime($date));
   } else {
     if ($date == '') {
       return '<i>null</i>';
