@@ -39,7 +39,7 @@ echo "
       $divs = '';
       while ($program = mysqli_fetch_assoc($q)) {
         $id_program = $program['id_program'];
-        $href = $program['href'] ?? "?program-detail&id_program=$id_program";
+        $href = $program['href'] ?? "?program_detail&id_program=$id_program";
         $divs .= "
           <div class='col-lg-6 col-md-6 d-flex align-items-stretch'>
             <div class='icon-box'>

@@ -36,7 +36,7 @@ if (!mysqli_num_rows($q)) {
         <div class='card-body'>
           <h5 class='card-title'>$d[nama_paket]</h5>
           <p class='card-text'>Anda memilih Paket: <b>$d[nama_paket]</b> pada program: <i>$d[program]</i> pada tanggal $tgl dengan status: <i class=green>$status_show</i></p>
-          <a href='?order-paket-lanjutan&order_no=$order_no' class='btn btn-primary'>Lanjutkan Order</a>
+          <a href='?order_paket-lanjutan&order_no=$order_no' class='btn btn-primary'>Lanjutkan Order</a>
         </div>
       </div>    
     ";

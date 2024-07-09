@@ -1,6 +1,11 @@
 <?php
 $judul = 'Manage Order';
-$sub_judul = '';
+
+$id_paket = $_GET['id_paket'] ?? '';
+$nama_paket = $_GET['nama_paket'] ?? '';
+$order_no = $_GET['order_no'] ?? '';
+$sub_judul = $nama_paket ? "Untuk Paket <b class=darkblue>$nama_paket</b> | <a href='?manage_order' class='f12'>All Paket</a>" : '';
+
 set_title($judul);
 set_h2($judul, $sub_judul);
 only(['admin', 'marketing']);
@@ -67,6 +72,9 @@ if (isset($_POST['btn_add_paket'])) {
 
 
 $order_by = $_GET['order_by'] ?? 'tanggal_order DESC';
+$sql_id_paket = $id_paket ? "a.id_paket=$id_paket" : 1;
+$sql_order_no = $order_no ? "a.order_no='$order_no'" : 1;
+
 $s = "SELECT 
 a.order_no,
 a.tanggal_order,
@@ -98,6 +106,8 @@ FROM tb_order a
 JOIN tb_paket b ON a.id_paket=b.id 
 JOIN tb_program c ON b.id_program=c.id 
 WHERE c.id_klinik=$id_klinik 
+AND $sql_id_paket 
+AND $sql_order_no 
 ORDER BY $order_by
 ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

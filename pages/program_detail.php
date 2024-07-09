@@ -21,19 +21,16 @@ $s = "SELECT * FROM tb_program WHERE id='$id_program'";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) {
   echo div_alert('danger', "Maaf, data jenis program tidak ditemukan.");
+  exit;
 } else {
   $d = mysqli_fetch_assoc($q);
   $nama_program = $d['nama'];
+  $jenis = $d['jenis'];
   $deskripsi_program = $d['deskripsi'];
 }
 
-set_title("$nama_program - $nama_sistem");
-echo "
-  <div class='section-title'>
-    <h2>$nama_program</h2>
-    <p>$back | $deskripsi_program</p>
-  </div>
-";
+$link_back = "<div class='tengah mt2'><a href='?program&jenis=$jenis'>$img_prev</a></div>";
+set_h2("$nama_program - $nama_sistem", " $deskripsi_program$link_back");
 
 
 $s = "SELECT 
@@ -52,8 +49,8 @@ b.nama as nama_program,
 FROM tb_paket a 
 JOIN tb_program b ON a.id_program = b.id
 WHERE a.id_program=$id_program 
-AND status=1 -- status paket yang aktif 
-AND customizable is null 
+AND a.status=1 -- status paket yang aktif 
+AND a.customizable is null  
 ORDER BY no";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $count_valid_paket = 0;
@@ -67,11 +64,11 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
   if ($customizable) {
     $s2 = "SELECT 
-    a.id as id_paket_sub,
+    a.id as id_pemeriksaan,
     a.nama as nama_pemeriksaan,
     a.deskripsi 
 
-    FROM tb_paket_sub a 
+    FROM tb_pemeriksaan a 
     WHERE a.id_klinik=$id_klinik 
     AND status=1 
     AND for_opsional=1 
@@ -81,15 +78,15 @@ while ($paket = mysqli_fetch_assoc($q)) {
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     $pilihan = '';
     while ($detail = mysqli_fetch_assoc($q2)) {
-      $id_paket_sub = $detail['id_paket_sub'];
+      $id_pemeriksaan = $detail['id_pemeriksaan'];
       $deskripsi = $detail['deskripsi'];
       $pilihan .= "
         <tr>
           <td>
-            <input type=checkbox name=pemeriksaan__$id_paket_sub id=pemeriksaan__$id_paket_sub>
+            <input type=checkbox name=pemeriksaan__$id_pemeriksaan id=pemeriksaan__$id_pemeriksaan>
           </td>
           <td>
-            <label for=pemeriksaan__$id_paket_sub class=pointer>
+            <label for=pemeriksaan__$id_pemeriksaan class=pointer>
               $detail[nama_pemeriksaan] 
               <div class='f12 abu miring'>$deskripsi</div>
             </label>
@@ -108,19 +105,26 @@ while ($paket = mysqli_fetch_assoc($q)) {
     $btn_pilih = '';
   } else {
     $lihat_detail = 'Lihat Detail Pemeriksaan';
-    $btn_pilih = "<div class=mt2><a class='btn btn-success w-100' href='?order-paket&id_paket=$paket[id_paket]' >Pilih $paket[nama_paket]</a></div>";
+    $btn_pilih = "<div class=mt2><a class='btn btn-success w-100' href='?order_paket&id_paket=$paket[id_paket]' >Order Paket ini</a></div>";
 
     $s2 = "SELECT 
-    b.nama as nama_pemeriksaan
+    b.nama as nama_pemeriksaan,
+    b.deskripsi
 
     FROM tb_paket_detail a 
-    JOIN tb_paket_sub b ON a.id_paket_sub =b.id 
+    JOIN tb_pemeriksaan b ON a.id_pemeriksaan =b.id 
     WHERE a.id_paket=$paket[id_paket] 
+    AND b.show_to_paket = 1 
     ORDER BY no";
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     $details = '';
     while ($detail = mysqli_fetch_assoc($q2)) {
-      $details .= "<li>$detail[nama_pemeriksaan]</li>";
+      $details .= "
+        <li>
+          $detail[nama_pemeriksaan]
+          <div class='f12 abu mb3 mt1'>$detail[deskripsi]</div>
+        </li>
+      ";
     }
     if ($details) $details = "<ol class='f14 darkabu m0 pl3'>$details</ol>";
   }
@@ -159,25 +163,24 @@ while ($paket = mysqli_fetch_assoc($q)) {
           $paket[deskripsi]
           <hr>
           $details
-          <hr>
-          <div class='mt2 mb4 '>
-            <a href='$href_wa' target=_blank>
-              $img_wa
-              Info lebih lanjut...
-            </a>
-          </div>
         </div>
       </div>
       <div>
         $btn_pilih
       </div>
+      <div class='mt2 tengah '>
+        <a href='$href_wa' target=_blank>
+          Info lebih lanjut... $img_wa
+        </a>
+      </div>
+
     </div>
   </div>
   ";
 }
 
 $alert = '';
-if (!$count_valid_paket) $alert = div_alert('danger', "Maaf, belum ada Paket yang cocok untuk Program ini. Anda boleh menghubungi kami untuk informasi lebih lanjut dengan cara klik Nomor Whatsapp di paling atas.");
+if (!$count_valid_paket) $alert = div_alert('danger', "Maaf, belum ada Paket yang cocok untuk Program ini atau Paket belum ada item pemeriksaan. <hr>Anda boleh menghubungi kami untuk informasi lebih lanjut dengan cara klik Nomor Whatsapp di paling atas.");
 
 echo "
 <section id='produk' class='produk p0'>

@@ -17,7 +17,7 @@ set_h2('Pencarian Pasien', "<span class='abu f14 miring'>Pencarian Pasien untuk<
     </a>
   </div>
 ");
-only(['admin', 'nakes']);
+only(['admin', 'nakes', 'marketing']);
 
 
 

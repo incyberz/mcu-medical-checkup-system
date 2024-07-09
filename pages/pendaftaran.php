@@ -57,92 +57,39 @@ only(['admin', 'nakes', 'marketing']);
 <?php
 
 require_once 'include/mcu_functions.php';
-require_once 'include/radio_jenis_pasien.php';
+// require_once 'include/radio_jenis_pasien.php';
 // require_once 'tambah_pasien.php';
 
-$s = "SELECT
-a.nama ,
-a.jenis ,
-b.nama as jenis_pasien,
-a.date_created as tanggal_daftar,
-(SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien
 
-FROM tb_pasien a 
-JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
-WHERE a.date_created > '$tanggal_awal'";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$tr = '';
-if (mysqli_num_rows($q)) {
-  $i = 0;
-  $th = '<th>No</th>';
-  $jenis['bpj'] = 0;
-  $jenis['idv'] = 0;
-  $jenis['cor'] = 0;
-  while ($d = mysqli_fetch_assoc($q)) {
-    $i++;
-    $jenis[$d['jenis']]++;
-
-    $td = "<td>$i</td>";
-    foreach ($d as $key => $value) {
-      if (
-        $key == 'id'
-        || $key == 'jenis'
-      ) continue;
-      if ($i == 1) {
-        $kolom = key2kolom($key);
-        $th .= "<th>$kolom</th>";
-      }
-
-      if ($key == 'status_pasien') {
-        $value = $value ?? '<i class="f14 abu">baru didaftarkan</i>';
-      } elseif ($key == 'tanggal_daftar') {
-        $value = hari_tanggal($value);
-      }
-
-      $td .= "<td>$value</td>";
-    }
-    $tr .= "
-      <tr>
-        $td
-        <td>
-          $img_edit 
-          $img_delete 
-        </td>
-      </tr>
-    ";
-  }
-}
-
-$tb_pasien = $tr ? "
-  <table class=table>
-    <thead>$th<th>Aksi</th></thead>
-    $tr
-  </table>
-" : div_alert('danger', "Data pasien tidak ditemukan.");
 
 
 
 # ============================================================
 # DASHBOARD
 # ============================================================
+$jenis['BPJ'] = 0;
+$jenis['IDV'] = 0;
+$jenis['COR'] = 0;
+require_once 'data_pasien.php';
+
 $dashboard = "
 <div class='row tengah'>
   <div class='col-4'>
     <div class='wadah gradasi-toska'>
       <div class='f20 darkblue'>BPJS</div>
-      <div class='f40'>$jenis[bpj]</div>
+      <div class='f40'>$jenis[BPJ]</div>
     </div>
   </div>
   <div class='col-4'>
     <div class='wadah gradasi-toska'>
       <div class='f20 darkblue'>Individu</div>
-      <div class='f40'>$jenis[idv]</div>
+      <div class='f40'>$jenis[IDV]</div>
     </div>
   </div>
   <div class='col-4'>
     <div class='wadah gradasi-toska'>
       <div class='f20 darkblue'>Corporate</div>
-      <div class='f40'>$jenis[cor]</div>
+      <div class='f40'>$jenis[COR]</div>
     </div>
   </div>
 </div>
@@ -150,7 +97,7 @@ $dashboard = "
 
 echo "
   $dashboard
-  <div class='tengah'><a class='btn btn-success' href='?tambah_pasien'>$img_add Tambah Pasien</a></div>
+  <div class='tengah'><a class='btn btn-success' href='?tambah_pasien'> Tambah Pasien</a></div>
   <div class='tengah mt4 mb2'><span class=btn_aksi id=tb_pasien__toggle>$img_detail</span></div>
-  <div class=hideit id=tb_pasien>$tb_pasien</div>
+  <div class=hideita id=tb_pasien>$data_pasien</div>
 ";

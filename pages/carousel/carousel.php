@@ -414,7 +414,7 @@ if (!mysqli_num_rows($q)) {
           <div class='nama_program shadow_white'>$paket[nama_program]</div>
           <div class='deskripsi'>$paket[deskripsi]</div>
           <div class='buttons'>
-            <a class='btn btn-sm btn-success pt2' href='?program-detail&id_program=$paket[id_program]'>
+            <a class='btn btn-sm btn-success pt2' href='?program_detail&id_program=$paket[id_program]'>
               SEE MORE
             </a>
           </div>

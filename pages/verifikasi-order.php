@@ -46,7 +46,7 @@ function pesan_wa($event = 'after_order', $nama_pendaftar, $perusahaan_pendaftar
   }
 
   if ($event == 'after_order') {
-    $link_login = urlencode("https://mmc-clinic.com/?login&username=$username_pendaftar");
+    $link_login = urlencode("https://mmc-clinic.com/?login&as=pendaftar&username=$username_pendaftar");
 
     return
       "Selamat $waktu Saudara/i <b>$nama_pendaftar</b> dari <b>$perusahaan_pendaftar</b><br><br>Berdasarkan Request Order dari Anda dengan Order No. <i>$order_no</i> tanggal $tanggal_show, kami mengucapkan banyak terimakasih, dan kami telah memverifikasi request Anda, serta membuat username dan password untuk Anda:<br><br>~ <b>Username: $username_pendaftar</b><br>~ <b>Password: $password_pendaftar</b><br><br>Silahkan login ke Website MMC dengan username dan password tersebut untuk melengkapi data dan melanjutkan penawaran Anda.<br><br>$link_login<br><br><br>Untuk biaya Medical Checkup dan biaya lain dapat kita negosiasi bersama tergantung jumlah peserta, jarak lokasi, dan jenis paket (pemeriksaan) yang Anda inginkan. Terimakasih atas perhatian dan kerjasamanya.<br><br>Admin Medical Checkup<br><br>[Message from: MMC Information System, $long_date_show, Bekasi, Indonesia]";

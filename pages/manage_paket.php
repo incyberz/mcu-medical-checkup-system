@@ -71,16 +71,20 @@ a.nama as nama_paket,
 a.status,
 a.image,
 a.carousel_image as carousel,
-b.nama as nama_program,
+b.singkatan as program,
 (
   SELECT COUNT(1) FROM tb_paket_detail
-  WHERE id_paket=a.id) count_paket_detail,
+  WHERE id_paket=a.id) count_pemeriksaan,
+(
+  SELECT COUNT(1) FROM tb_paket_detail p 
+  JOIN tb_pemeriksaan q ON p.id_pemeriksaan=q.id 
+  WHERE p.id_paket=a.id 
+  AND q.cetak_sticker = 1 
+  ) count_sticker,
 (
   SELECT COUNT(1) FROM tb_order
-  WHERE id_paket=a.id) count_order,
-(
-  SELECT COUNT(1) FROM tb_paket_sticker
-  WHERE kode LIKE CONCAT(a.id,'-%')) count_sticker
+  WHERE id_paket=a.id) count_order
+
 FROM tb_paket a 
 JOIN tb_program b ON a.id_program=b.id
 JOIN tb_jenis_program c ON b.jenis=c.jenis
@@ -99,7 +103,7 @@ if (!mysqli_num_rows($q)) {
     $i++;
     $id_paket = $d['id_paket'];
     $nama_paket = $d['nama_paket'];
-    $count_paket_detail = $d['count_paket_detail'];
+    $count_pemeriksaan = $d['count_pemeriksaan'];
     $count_order = $d['count_order'];
     $status = $d['status'];
 
@@ -176,10 +180,14 @@ if (!mysqli_num_rows($q)) {
           </div>
 
         ";
+      } elseif ($key == 'count_pemeriksaan') {
+        $value .= " <a href='?assign_pemeriksaan&id_paket=$id_paket&nama_paket=$nama_paket'>$img_next</a>";
       } elseif ($key == 'count_sticker') {
         $label = $d['count_sticker'] ? 'label_green' : 'label_gray';
         $img_sticker = "<img src='$lokasi_icon/$label.png' height=20px class='zoom pointer' style='display:inline-block;margin-left: 10px' />";
-        $value .= " <a href='?assign_sticker&id_paket=$id_paket&nama_paket=$nama_paket'>$img_sticker</a>";
+        $value .= " <a href='?manage_pemeriksaan&for=sticker&id_paket=$id_paket&nama_paket=$nama_paket'>$img_sticker</a>";
+      } elseif ($key == 'count_order') {
+        $value .= " <a href='?manage_order&id_paket=$id_paket&nama_paket=$nama_paket'>$img_next</a>";
       }
 
       $style_non_aktif = $status ? '' : 'f12 abu miring';
@@ -193,7 +201,7 @@ if (!mysqli_num_rows($q)) {
       ";
     }
 
-    if ($count_paket_detail || $count_order) {
+    if ($count_pemeriksaan || $count_order) {
       $aksi_delete = "
         <span onclick='alert(\"Tidak bisa hapus paket ini karena terdapat Paket Detail atau sudah pernah di-order. Hapus dahulu semua Paket Detail-nya dan seluruh Transaksi Order-nya.\")'>
           $img_delete_disabled

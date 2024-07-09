@@ -5,7 +5,7 @@
 </style>
 <?php
 // admin_only();
-
+$img_offering_price = "<img src='assets/img/ilustrasi/offering_price.png' class='img-fluid img-thumbnail'>";
 
 $pesan_insert = '';
 if (isset($_POST['btn_verifikasi'])) {
@@ -130,26 +130,26 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
   if ($customizable) {
     $s2 = "SELECT 
-    a.id as id_paket_sub,
+    a.id as id_pemeriksaan,
     a.nama as nama_pemeriksaan,
     a.deskripsi 
 
-    FROM tb_paket_sub a 
+    FROM tb_pemeriksaan a 
     WHERE a.id_klinik=$id_klinik ";
     $lihat_detail = 'Lihat Pilihan Pemeriksaan';
 
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     $pilihan = '';
     while ($detail = mysqli_fetch_assoc($q2)) {
-      $id_paket_sub = $detail['id_paket_sub'];
+      $id_pemeriksaan = $detail['id_pemeriksaan'];
       $deskripsi = $detail['deskripsi'];
       $pilihan .= "
         <tr>
           <td>
-            <input type=checkbox name=pemeriksaan__$id_paket_sub id=pemeriksaan__$id_paket_sub>
+            <input type=checkbox name=pemeriksaan__$id_pemeriksaan id=pemeriksaan__$id_pemeriksaan>
           </td>
           <td>
-            <label for=pemeriksaan__$id_paket_sub class=pointer>
+            <label for=pemeriksaan__$id_pemeriksaan class=pointer>
               $detail[nama_pemeriksaan] 
               <div class='f12 abu miring'>$deskripsi</div>
             </label>
@@ -170,7 +170,7 @@ while ($paket = mysqli_fetch_assoc($q)) {
 
     // non custom
     $lihat_detail = 'Lihat Detail Pemeriksaan';
-    $order_no = date('y') . "0$id_klinik-0$id_program-" . strtotime('now');
+    $new_order_no = date('y') . "0$id_klinik-0$id_program-" . strtotime('now');
     $form_order = "
       <form method=post class='mt4 wadah gradasi-hijau'>
         <div class='flexy flex-between'>
@@ -178,8 +178,8 @@ while ($paket = mysqli_fetch_assoc($q)) {
           <div class='consolas darkblue flexy'>
             <div>Order No:</div> 
             <div>
-              <input type=hidden name=order_no value=$order_no >
-              <input name=order_no2 value=$order_no class='form-control form-control-sm' disabled>
+              <input type=hidden name=order_no value='$new_order_no' >
+              <input name=order_no2 value='$new_order_no' class='form-control form-control-sm' disabled>
             </div> 
             
           </div>
@@ -208,27 +208,14 @@ while ($paket = mysqli_fetch_assoc($q)) {
         
         <div class='mb4 biru mt2 tengah'>
           <div class=bold>Order Anda akan diteruskan ke Tim Marketing kami.</div>
-          <hr>
-          Kami akan segera melakukan follow-up dengan memberikan Surat Penawaran untuk pelaksanaan Medical Checkup.
+          <div class='mb2 mt4'>$img_offering_price</div>
+          Kami akan segera melakukan follow-up dengan memberikan Surat Penawaran untuk kesepakatan harga kepada Anda.
 
         </div>
 
 
       </form>
     ";
-
-    $s2 = "SELECT 
-    b.nama as nama_pemeriksaan
-
-    FROM tb_paket_detail a 
-    JOIN tb_paket_sub b ON a.id_paket_sub =b.id 
-    WHERE a.id_paket=$paket[id_paket] ORDER BY no";
-    $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
-    $details = '';
-    while ($detail = mysqli_fetch_assoc($q2)) {
-      $details .= "<li>$detail[nama_pemeriksaan]</li>";
-    }
-    if ($details) $details = "<ol class='f14 darkabu m0 pl3'>$details</ol>";
   }
 
 
@@ -255,8 +242,11 @@ while ($paket = mysqli_fetch_assoc($q)) {
           <div class='bordered f12 abu p1 mb4'>$pesan_by_system</div>
           <input type=hidden name=pesan_by_system value='$pesan_by_system' />
 
-          <div class='f14 darkabu mb1'>Pesan tambahan dari Anda (opsional)</div>
+          <div class='f14 darkblue tengah mb1'>Pesan tambahan dari Anda (opsional)</div>
           <textarea class='form-control mb2' rows=5 name=pesan_tambahan id=pesan_tambahan></textarea>
+
+          <div class=mb2>$img_offering_price</div>
+          <div class='tebal biru tengah mb2'>Silahkan lanjutkan Order Anda ke Whatsapp Tim Marketing kami agar Order Anda segera kami follow-up.</div>
 
           <button class='btn btn-primary w-100' name=btn_verifikasi>Lanjutkan Verifikasi by Whatsapp</button>
           <div class='f12 mt1 darkabu'>Pesan Order Anda akan kami teruskan ke Bagian Marketing PT. MMC via Whatsapp agar segera di follow-up dan segera membuat Surat Penawaran untuk Anda.</div>
@@ -274,8 +264,10 @@ while ($paket = mysqli_fetch_assoc($q)) {
       $paket =  "<a href='$src' target=_blank><img src='$src' class='img-fluid br5'></a>";
     } else {
       $paket = "        
-      <h3 >$paket[nama_paket]</h3>
-      <div class='f14  mt1 mb2'>$paket[deskripsi]</div>
+      <h3 class='mt3 mb2 tengah f20 darkblue'>Ordering $paket[nama_paket]</h3>
+      <div class=tengah>
+        <a href='?program_detail&id_program=$id_program'>$img_prev</a>
+      </div>
     ";
     }
 
@@ -283,8 +275,6 @@ while ($paket = mysqli_fetch_assoc($q)) {
       <div class='wadah p2 item-corporate' style='max-width:600px; margin:auto'>
         $paket
         <div class='f18 consolas darkblue mt1 mb1'>$shout</div>
-        <span class='btn_aksi pointer f12' id=$id_toggle> $img_detail $lihat_detail</span>
-        <div id=detail$id_paket class='hideit wadah gradasi-kuning mt1 '>$details</div>
         $form_order
       </div>
     ";
@@ -295,11 +285,6 @@ $alert = '';
 if (!$count_valid_paket) $alert = div_alert('danger', "Maaf, belum ada Paket yang cocok untuk Program ini. Anda boleh menghubungi kami untuk informasi lebih lanjut dengan cara klik Nomor Whatsapp di paling atas.");
 
 echo "
-<div class='section-title'>
-  <h2>$judul</h2>
-  <p>$back | Silahkan Anda melanjutkan proses order MCU $Corporate!</p>
-</div>
-
 <section id='produk' class='produk p0'>
   $divs
   $alert

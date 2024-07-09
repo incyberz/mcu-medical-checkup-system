@@ -1,4 +1,5 @@
 <style>
+  .menu_admin,
   .menu_nakes {
     display: inline-block;
     padding: 10px !important;
@@ -7,9 +8,18 @@
 </style>
 <?php
 // hide other info menu when parameter terisi
+$li_admin = '';
 $li_public = '';
 $li_nakes = '';
 // if (!$parameter) {
+if ($username and ($role == 'admin' || $role == 'marketing')) {
+  $li_admin = "
+      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_paket'>Manage Paket</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_order'>Manage Order</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_pemeriksaan'>Manage Pemeriksaan</a></li>
+    ";
+}
+
 if ($username and $role != 'pasien') {
   $li_nakes = "
       <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran</a></li>
@@ -45,6 +55,7 @@ if (isset($_SESSION['mmc_username_master'])) {
         <li><a class="nav-link scrollto active" href="?">Home</a></li>
         <?= $li_public ?>
         <?= $li_nakes ?>
+        <?= $li_admin ?>
         <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
           <ul>
             <li><a href="#">Drop Down 1</a></li>
