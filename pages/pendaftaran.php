@@ -1,9 +1,9 @@
 <?php
 $tanggal_awal = '2024-7-1';
 $bln = $arr_nama_bulan[intval(date('m', strtotime($tanggal_awal))) - 1];
-$thn = date('Y', strtotime($tanggal_awal));
+$tahun = date('Y', strtotime($tanggal_awal));
 $img_filter = img_icon('filter');
-set_h2('Pendaftaran', "Data Pendaftaran Pasien <b class=darkblue>$bln $thn</b> $img_filter");
+set_h2('Pendaftaran', "Data Pendaftaran Pasien <b class=darkblue>$bln $tahun</b> $img_filter");
 only(['admin', 'nakes', 'marketing']);
 
 

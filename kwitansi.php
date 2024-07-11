@@ -165,6 +165,7 @@ if (!$id_paket_custom) {
 # ============================================================
 $s = "SELECT 
 a.nominal_bayar,
+b.id as id_pasien,
 b.nama as nama_pasien,
 c.nama as nama_kasir,
 a.tanggal_bayar,
@@ -189,6 +190,7 @@ $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (mysqli_num_rows($q) == 0) die(div_alert('danger', 'Data tidak ditemukan'));
 $d = mysqli_fetch_assoc($q);
 $kasir = $d['nama_kasir'];
+$id_pasien = $d['id_pasien'];
 $nama_pasien = ucwords(strtolower($d['nama_pasien']));
 $nama_kasir = ucwords(strtolower($d['nama_kasir']));
 $nominal_show = number_format($d['nominal_bayar']);
@@ -196,7 +198,8 @@ $terbilang = terbilang($d['nominal_bayar']) . ' rupiah';
 $tanggal_show = hari_tanggal($d['tanggal_bayar'], 1, 0, 0);
 $mcu_dan = $d['is_mcu'] ? 'Medical Checkup dan' : '';
 
-
+$nomor = $d['is_mcu'] ? 'MCU' : 'LAB';
+$nomor .= "-$id_pasien";
 
 ?>
 
@@ -242,15 +245,12 @@ $mcu_dan = $d['is_mcu'] ? 'Medical Checkup dan' : '';
           <div>:</div>
           <div>
             Biaya <?= $mcu_dan ?> Pemeriksaan Laboratorium
-            <!-- <ul class="list_pemeriksaan">
-              <li>Pemeriksaan 1 Nama Pemeriksaan Nama Pemeriksaan Nama Pemeriksaan Nama Pemeriksaan Nama Pemeriksaan </li>
-              <li>Pemeriksaan 1 Nama Pemeriksaan</li>
-              <li>Pemeriksaan 1 Nama Pemeriksaan Nama Pemeriksaan</li>
-              <li>Pemeriksaan 1 Nama Pemeriksaan</li>
-              <li>Pemeriksaan 1 Nama Pemeriksaan</li>
-            </ul> -->
-
           </div>
+        </div>
+        <div class="row">
+          <div class="telah_terima">Nomor</div>
+          <div>:</div>
+          <div><?= $nomor ?></div>
         </div>
         <div class="row">
           <div class="telah_terima">Tanggal Pemeriksaan</div>

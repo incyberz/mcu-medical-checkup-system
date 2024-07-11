@@ -1,5 +1,6 @@
 <?php
 $jenis = $_GET['jenis'] ?? die(div_alert('danger', "Page ini membutuhkan index [jenis]"));
+$JENIS = strtoupper($jenis);
 $MCU = $jenis == 'mcu' ? 'MCU' : 'Lab';
 set_title("Pemeriksaan $MCU");
 only('users');
@@ -225,20 +226,57 @@ WHERE a.id_paket=$id_paket
 AND c.jenis='$jenis'
 ORDER BY b.nomor
 ";
+
+if ($JENIS == 'COR') {
+  $s = "SELECT 
+  1,
+  e.id as id_pemeriksaan,
+  e.nama as nama_pemeriksaan,
+  e.jenis as jenis_pemeriksaan,
+  -- e.kode as pemeriksaan
+  (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
+  FROM tb_pasien a 
+  JOIN tb_order b ON a.order_no=b.order_no 
+  JOIN tb_paket c ON b.id_paket=c.id 
+  JOIN tb_paket_detail d ON d.id_paket=c.id 
+  JOIN tb_pemeriksaan e ON d.id_pemeriksaan=e.id 
+  WHERE a.id=$id_pasien
+  ";
+} else {
+  die(div_alert('danger', "Invalid Jenis Pasien: $JENIS"));
+}
+
+
 $q2 = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $jumlah_pemeriksaan = mysqli_num_rows($q2);
 $tr_progress = '';
 $jenis_pemeriksaan = '';
 $no = 0;
 $jumlah_pemeriksaan_selesai = 0;
+if (!mysqli_num_rows($q2)) {
+  $tr_progress = div_alert('danger', "
+    Paket ini belum punya List Pemeriksaan | 
+    <a href='?assign_pemeriksaan&id_paket=$id_paket&nama_paket=$nama_paket'>
+      Assign Pemeriksaan
+    </a>
+  ");
+} else {
+}
 while ($d2 = mysqli_fetch_assoc($q2)) {
   $no++;
+  $id_pemeriksaan = $d2['id_pemeriksaan'];
   $jenis_pemeriksaan = $d2['jenis_pemeriksaan'];
+  $count_pemeriksaan_detail = $d2['count_pemeriksaan_detail'];
+
+
+  if (!$count_pemeriksaan_detail) {
+    $link = "<a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan'>Manage</a>";
+    echo (div_alert('danger', "Pemeriksaan <b class=darkblue>$d2[nama_pemeriksaan]</b> belum punya detail pemeriksaan | $link"));
+  }
+
   $s3 = "SELECT 
-  a.tanggal_simpan_$d2[pemeriksaan] as tanggal_periksa, 
-  (
-    SELECT nama FROM tb_user 
-    WHERE id=a.pemeriksa_$d2[pemeriksaan] ) as pemeriksa 
+  '' as tanggal_periksa, 
+  '' as pemeriksa 
   FROM tb_mcu a 
   WHERE a.id_pasien=$id_pasien";
   // echo $s3;
@@ -270,18 +308,18 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
 
   // die($s3);
 
-  $buttons .= "<div><a class='btn btn-$btn ' href='?pemeriksaan&pemeriksaan=$d2[pemeriksaan]&id_pasien=$id_pasien'>$d2[nama_pemeriksaan]</a></div> ";
+  $buttons .= "<div><a class='btn btn-$btn ' href='?pemeriksaan&pemeriksaan=ZZZ'>$d2[nama_pemeriksaan]</a></div> ";
 }
 
 $info_pemeriksaan = '';
-if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan) {
+if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_pemeriksaan) {
   if ($status == 9) {
     //update status pasien menjadi 10 (pasien selesai)
     $s2 = "UPDATE tb_pasien SET status=10 WHERE id='$id_pasien'";
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     jsurl();
   }
-  $info_pemeriksaan = "<div class='alert alert-success mt2'>Pasien telah menjalani semua pemeriksaan $img_check</div>";
+  $info_pemeriksaan =  "<div class='alert alert-success mt2'>Pasien telah menjalani semua pemeriksaan $img_check</div>";
 }
 
 $tb_progress = '';

@@ -5,10 +5,14 @@ $id_paket = $_GET['id_paket'] ?? die(div_alert('danger', 'Index [id_paket] belum
 $nama_paket = $_GET['nama_paket'] ?? die(div_alert('danger', 'Index [nama_paket] belum terdefinisi.'));
 $href =  '?manage_paket';
 $arr_id_pemeriksaan = [];
+$sudah_bayar = 0;
 if ($custom) {
   $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', 'Index [id_pasien] belum terdefinisi.'));
   $href =  "?manage_paket_custom&id_pasien=$id_pasien";
-  $s = "SELECT id_pemeriksaan FROM tb_paket_custom_detail a 
+  $s = "SELECT 
+  id_pemeriksaan,
+  b.status_bayar  
+  FROM tb_paket_custom_detail a 
   JOIN tb_paket_custom b ON a.id_paket_custom=b.id 
   JOIN tb_pasien c ON b.id=c.id_paket_custom 
   WHERE c.id=$id_pasien 
@@ -16,6 +20,7 @@ if ($custom) {
   ";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   while ($d = mysqli_fetch_assoc($q)) {
+    if ($d['status_bayar'] === '0' || $d['status_bayar'] === '1') $sudah_bayar = 1;
     array_push($arr_id_pemeriksaan, $d['id_pemeriksaan']);
   }
 }
@@ -30,7 +35,7 @@ only(['admin', 'marketing']);
 $img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
 
 
-
+if ($sudah_bayar) die(div_alert('danger tengah', 'Tidak bisa re-assign pemeriksaan karena pada Paket ini pasien sudah melakukan pembayaran.'));
 
 
 

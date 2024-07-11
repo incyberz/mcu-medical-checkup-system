@@ -1,7 +1,8 @@
 <?php
 $judul = 'Manage Pemeriksaan';
 $arr_for = [
-  'deskripsi' => ['singkatan', 'nama', 'deskripsi',],
+  'detail' => ['nama', 'count_pemeriksaan_detail',],
+  'deskripsi' => ['nama', 'singkatan', 'deskripsi',],
   'jenis' => ['nama', 'jenis',],
   'sticker' => ['nama', 'cetak_sticker'],
   'visibility' => ['nama', 'status', 'show_to_paket'],
@@ -12,7 +13,7 @@ $arr_for = [
 ];
 
 $navs = '';
-$for = $_GET['for'] ?? 'deskripsi';
+$for = $_GET['for'] ?? 'detail';
 foreach ($arr_for as $key => $arr) {
   $nav_active = $key == $for ? 'nav_active' : '';
   $navs .= "<div class='proper darkblue pointer $nav_active p2 pt1 pb1 br5 navigasi' id=navigasi__$key>$key</div>";
@@ -85,17 +86,23 @@ if (isset($_POST['btn_add_pemeriksaan'])) {
 
 
 
-
+# ============================================================
+# MAIN SELECT PEMERIKSAAN
+# ============================================================
 $s = "SELECT 
 a.id as id_pemeriksaan,
-a.nama,
-a.jenis,
-a.*,
+a.nama, -- kolom pertama
+a.singkatan, -- kolom kedua
+a.*, -- kolom berikutnya
+(SELECT count(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=a.id) count_pemeriksaan_detail,
 (SELECT count(1) FROM tb_paket_detail WHERE id_paket=a.id) count_paket_detail
 
 
 FROM tb_pemeriksaan a 
-WHERE a.id_klinik=$id_klinik";
+JOIN tb_jenis_pemeriksaan b ON a.jenis=b.jenis 
+WHERE a.id_klinik=$id_klinik 
+ORDER BY b.nomor, a.nomor  
+";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $count_pemeriksaan = mysqli_num_rows($q);
 
@@ -112,7 +119,7 @@ if (!mysqli_num_rows($q)) {
     $nama_pemeriksaan = $d['nama'];
     $status = $d['status'];
 
-    // detail info
+    // count_pemeriksaan_detail info
     $detail_info = "$img_detail";
 
     # ============================================================
@@ -179,6 +186,14 @@ if (!mysqli_num_rows($q)) {
 
       if ($key == 'nama') {
         // $value =  "<a href='?manage-single-paket&id_pemeriksaan=$id_pemeriksaan'>$value</a>";
+      } elseif ($key == 'count_pemeriksaan_detail') {
+        # ============================================================
+        # LIST PEMERIKSAAN DETAIL
+        # ============================================================
+        $count_pemeriksaan_detail = $d['count_pemeriksaan_detail'];
+        if ($count_pemeriksaan_detail) {
+        }
+        $value .= " | <a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan&nama_pemeriksaan=$nama_pemeriksaan'>Manage Detail</a>";
       } elseif ($key == 'image') {
         $value = $link_upload_image;
       } elseif ($key == 'status') {
@@ -450,11 +465,11 @@ echo "
           $('#editing__value__' + field + '__' + id_pemeriksaan).slideUp();
           return;
         }
-        link_ajax = `ajax/ajax_update_pemeriksaan.php?aksi=update&field=${field}&id_pemeriksaan=${id_pemeriksaan}&value=${new_value}`;
+        link_ajax = `ajax/ajax_update.php?tb=pemeriksaan&aksi=update&field=${field}&id=${id_pemeriksaan}&value=${new_value}`;
 
       } else if (aksi == 'btn_delete') {
         console.log('deleting');
-        link_ajax = `ajax/ajax_update_pemeriksaan.php?aksi=delete&id_pemeriksaan=${id_pemeriksaan}`;
+        link_ajax = `ajax/ajax_update.php?tb=pemeriksaan&aksi=delete&id=${id_pemeriksaan}`;
       } else {
         alert(`undefined aksi [${aksi}]`);
         return;

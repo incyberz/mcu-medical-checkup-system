@@ -19,6 +19,7 @@ $detik = date('ymdHis');
 $tanggal_show = date('d-F-Y');
 $tgl_show = date('d-M-y');
 $edit_section = '';
+$thn = date('y');
 
 $id_klinik = 1; //klinik MMC
 $lokasi_pages = 'pages';

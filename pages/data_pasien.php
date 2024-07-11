@@ -84,6 +84,7 @@ if (mysqli_num_rows($q)) {
         $value = "<i class='f14 abu'>$value</i>";
       } elseif ($key == 'status_pasien') {
         $value = $value ? "<span class=f14>$value</span>" : "<span class='f12 abu miring'>pasien baru</span>";
+        $value .= "<div class='mt1 f10 abu'>MCU$thn-$id_pasien</div>";
       } elseif ($key == 'tanggal_daftar') {
         $value = '<span class=f14>' . hari_tanggal($value, 0, 1, 1, 0, '-') . '</span>';
       } elseif ($key == 'nama_paket') {

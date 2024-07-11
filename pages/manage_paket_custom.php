@@ -186,6 +186,7 @@ if (mysqli_num_rows($q)) {
   $i = 0;
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
+    $id_paket = $id_paket_custom;
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
@@ -252,10 +253,20 @@ if (mysqli_num_rows($q)) {
             $form_undo
           </div>
           ";
+
+          $id_paket_show = $id_paket < 100 ? "00$id_paket" : $id_paket;
+          $nama_paket = "Paket-$id_paket_show";
+
           $form_cetak_sticker = "
-          <form method=post target=_blank action='sticker.php'>
-            <button class='btn btn-primary' name=btn_cetak_kwitansi>CETAK STICKER</button>
-          </form>
+            <div class='wadah gradasi-kuning'>
+              <h4 class='darkabu mb2'>Cetak Sticker Medis</h4>
+              <form method=post target=_blank action='?cetak_sticker'>
+                <input type=hidden name=id_paket_custom class='form-control mb2' value='$id_paket_custom' readonly>
+                <input type=hidden name=id_pasien class='form-control mb2' value='$id_pasien' readonly>
+                <input type=hidden name=nama_paket class='form-control mb2' value='$nama_paket' readonly>
+                <button class='btn btn-primary' name=btn_cetak_kwitansi>CETAK STICKER</button>
+              </form>
+            </div>
           ";
         } else {
           // belum bayar
