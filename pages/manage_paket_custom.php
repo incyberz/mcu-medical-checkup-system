@@ -105,6 +105,7 @@ if (isset($_POST['btn_bayar'])) {
 $items = div_alert('danger', 'Belum ada item pemeriksaan');
 $sum_biaya = 0;
 $sum_biaya_show = 'Rp 0,-';
+$jumlah_pemeriksaan = 0;
 if (!$pasien['id_paket_custom']) {
   // auto-create id_paket_custom
   $s = "SELECT MAX(id)+1 as new_id FROM tb_paket_custom";
@@ -131,6 +132,7 @@ if (!$pasien['id_paket_custom']) {
   WHERE a.id_paket_custom=$pasien[id_paket_custom]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $i = 0;
+  $jumlah_pemeriksaan = mysqli_num_rows($q);
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $biaya_show = number_format($d['biaya']) . '.-';
@@ -270,16 +272,20 @@ if (mysqli_num_rows($q)) {
           ";
         } else {
           // belum bayar
-          if ($JENIS == 'BPJ') {
-            $cara_bayar = "
-              <button class='btn btn-warning w-100' onclick='return confirm(`Set Dengan BPJS?`)' name=btn_bayar value=0>Bayar Dengan BPJS</button>
-            ";
-          } elseif ($JENIS == 'IDV') {
-            $cara_bayar = "
-              <span class='btn btn-primary w-100 btn_aksi' id=blok_bayar_cash__toggle>Pembayaran Cash</span>
-            ";
+          if ($jumlah_pemeriksaan) {
+            if ($JENIS == 'BPJ') {
+              $cara_bayar = "
+                <button class='btn btn-warning w-100' onclick='return confirm(`Set Dengan BPJS?`)' name=btn_bayar value=0>Bayar Dengan BPJS</button>
+              ";
+            } elseif ($JENIS == 'IDV') {
+              $cara_bayar = "
+                <span class='btn btn-primary w-100 btn_aksi' id=blok_bayar_cash__toggle>Pembayaran Cash</span>
+              ";
+            } else {
+              die(div_alert('danger', 'Jenis pasien invalid.'));
+            }
           } else {
-            die(div_alert('danger', 'Jenis pasien invalid.'));
+            $cara_bayar = '<span class="f12 abu miring">belum ada item pemeriksaan</span>';
           }
 
           $form_komponen = "

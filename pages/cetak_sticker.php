@@ -103,8 +103,6 @@ if (!$print) {
 
   $sub_judul = "
     $mode
-    <a href='?assign_sticker&id_paket=$id_paket&nama_paket=$nama_paket'>Back</a> 
-    | 
     Cetak Sticker untuk 
     <b class='darkblue'>
       $nama_pasien | 
@@ -246,23 +244,33 @@ if (!mysqli_num_rows($q)) {
   $i = 0;
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
-    if (!array_key_exists($d['sampel'], $arr_sampel_paket)) {
-      $arr_sampel_paket[$d['sampel']] = $arr_sampel[$d['sampel']];
+    if ($d['sampel']) {
+      if (!array_key_exists($d['sampel'], $arr_sampel_paket)) {
+        $arr_sampel_paket[$d['sampel']] = $arr_sampel[$d['sampel']];
+      }
+      $zat = $arr_sampel[$d['sampel']]['zat'];
+      $volume = $arr_sampel[$d['sampel']]['volume'];
+      $satuan = $arr_sampel[$d['sampel']]['satuan'];
+      $list_pemeriksaan .=  "
+        <tr>
+          <td>$i</td>
+          <td>$d[nama_pemeriksaan]</td>
+          <td>$d[sampel]</td>
+          <td>$zat</td>
+          <td>$volume $satuan</td>
+        </tr>
+      ";
+    } else {
+      $list_pemeriksaan .=  "
+        <tr>
+          <td>$i</td>
+          <td>$d[nama_pemeriksaan]</td>
+          <td class='abu f12 miring'>tanpa sampel</td>
+          <td class='abu f12 miring'>-</td>
+          <td class='abu f12 miring'>-</td>
+        </tr>
+      ";
     }
-
-    $zat = $arr_sampel[$d['sampel']]['zat'];
-    $volume = $arr_sampel[$d['sampel']]['volume'];
-    $satuan = $arr_sampel[$d['sampel']]['satuan'];
-
-    $list_pemeriksaan .=  "
-      <tr>
-        <td>$i</td>
-        <td>$d[nama_pemeriksaan]</td>
-        <td>$d[sampel]</td>
-        <td>$zat</td>
-        <td>$volume $satuan</td>
-      </tr>
-    ";
   }
 
   echo "

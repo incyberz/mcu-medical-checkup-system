@@ -1,11 +1,11 @@
 <?php
 $id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die(erid('id_pemeriksaan'));
 $nama_pemeriksaan = $_GET['nama_pemeriksaan'] ?? die(erid('nama_pemeriksaan'));
-set_h2('Detail Pemeriksaan', "Manage Detail Pemeriksaan <b class='proper darkblue'>$nama_pemeriksaan</b>");
+set_h2('Detail Pemeriksaan', "
+  Manage Detail Pemeriksaan <b class='proper darkblue'>$nama_pemeriksaan</b>
+  <div class=mt2><a href='?manage_pemeriksaan'>$img_prev</a></div>
+");
 only(['admin', 'marketing']);
-
-
-
 
 
 
@@ -39,7 +39,7 @@ if (isset($_POST['btn_tambah_detail'])) {
   // echo $s;
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   echo div_alert('success', "Add detail sukses. Silahkan pilih detail tersebut untuk editing selanjutnya.");
-  jsurl('', 1000);
+  jsurl('');
 }
 
 
@@ -72,13 +72,14 @@ $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 $th = '';
 if (!mysqli_num_rows($q)) {
-  echo div_alert('danger', 'Pemeriksaan ini belum mempunyai detail pemeriksaan');
+  echo div_alert('danger', 'Pemeriksaan ini belum mempunyai detail pemeriksaan. <hr><span class=blue>Silahkan Tambah Detail kemudian Anda sesuaikan (perbarui)!</span>');
 } else {
   $i = 0;
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $id_detail = $d['id_detail'];
     $td = '';
+    $th = '';
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
@@ -86,10 +87,43 @@ if (!mysqli_num_rows($q)) {
         || $key == 'id_pemeriksaan'
         || $key == 'nama_pemeriksaan'
       ) continue;
-      if ($i == 1) {
-        $kolom = key2kolom($key);
-        $th .= "<th>$kolom</th>";
+
+      # ============================================================
+      # EXCEPTION HIDEIT
+      # ============================================================
+      $hideit = 'hideit';
+      $needed = [];
+      if ($d['blok'] == 'radio' || $d['blok'] == 'radio-toolbar' || $d['blok'] == 'multi-radio' || $d['blok'] == 'select') {
+        // fields yang dibutuhkan
+        $needed = ['class', 'option_labels', 'option_values', 'option_class', 'option_default'];
+      } elseif ($d['blok'] == 'input-range') {
+        $needed = ['class', 'min', 'max', 'minrange', 'maxrange'];
       }
+      if (in_array($key, $needed)) $hideit = '';
+
+      # ============================================================
+      # HIDEIT TD CLASS
+      # ============================================================
+      $td_class = "$hideit td" . "__$id_detail " . 'td' . "__$id_detail" . "__$key";
+      // hanya label dan blok yang selalu muncul
+      if ($key == 'label' || $key == 'blok') $td_class = '';
+
+      # ============================================================
+      # HEADER TABEL
+      # ============================================================
+      $kolom = key2kolom($key);
+      $widths = [
+        'label' => '20%',
+        'blok' => '10%',
+        'name' => '15%',
+        'class' => '10%',
+        'option_labels' => '15%',
+        'option_values' => '10%',
+        'option_default' => '10%',
+      ];
+      $width = '';
+      if (array_key_exists($key, $widths)) $width = $widths[$key];
+      $th .= "<th class='$td_class' width=$width>$kolom</th>";
 
       $null_class = $value ? '' : 'f12 abu miring';
       $value = $value ? $value : 'NULL';
@@ -107,6 +141,7 @@ if (!mysqli_num_rows($q)) {
         || $key == 'value'
         || $key == 'class'
         || $key == 'satuan'
+        || $key == 'name'
       ) {
         $input_editing = "<input class='form-control input_editing' id=$id value='$value'>";
       } elseif (
@@ -148,6 +183,12 @@ if (!mysqli_num_rows($q)) {
         $input_editing = "
           <select class='form-control input_editing' id=$id>$opt</select>
         ";
+      } elseif ($key == 'option_labels' || $key == 'option_values') {
+        $pesan = $key == 'option_labels' ? 'pisahkan dengan koma, misal: Setuju, Netral, Tidak Setuju' : 'tanpa spasi, pisahkan dg koma, misal: 1,0,-1';
+        $input_editing = "
+          <textarea class='form-control input_editing' id=$id>$value</textarea>
+          <div class='f12 tengah mt1 biru'>$pesan</div>
+        ";
       }
 
 
@@ -157,7 +198,7 @@ if (!mysqli_num_rows($q)) {
       $toggle_id = $dual_id . '__toggle';
       $btn = $input_editing == $belum_punya ? '' : "<button class='btn btn-primary btn-sm w-100 mt2 btn_save' id=btn_save__$dual_id>Save</button>";
       $td .= "
-        <td>
+        <td id=td__$dual_id class='$td_class'>
           <div class='btn_aksi $null_class' id=$toggle_id>$value</div>
           <div class='wadah gradasi-kuning editing hideit' id=$dual_id style='min-width:200px'>
             $input_editing
@@ -167,24 +208,35 @@ if (!mysqli_num_rows($q)) {
       ";
     }
     $tr .= "
-      <tr>
-        <td><button class='btn-transparan btn_delete' id=btn_delete__$dual_id>$img_delete</button></td>
-        $td
+      <tr id=tr__$id_detail>
+        <td><button class='btn-transparan btn_save' id=btn_delete__$dual_id  >$img_delete</button></td>
+        <td>
+          <table class='table table-bordered' id=sub_table>
+            <thead>
+              $th
+            </thead>
+            <tr>
+              $td
+            </tr>
+          </table>
+        </td>
       </tr>
     ";
   }
 }
 
 echo "
-<style>.btn_aksi:hover{color:blue; letter-spacing: .3px; font-weight:bold}</style>
+<style>
+  .btn_aksi:hover{color:blue; letter-spacing: .3px; font-weight:bold}
+  #sub_table th{font-size: 10px}
+</style>
 <div class='gradasi-toska' style='overflow-x: scroll'>
   <table class=table>
-    <thead><th>&nbsp;</th>$th</thead>
     $tr
     <tr>
       <td colspan=100%>
         <form method=post>
-          <button class='btn-transparan green' name=btn_tambah_detail>$img_add Tambah Detail</button>
+          <button class='btn-transparan green' name=btn_tambah_detail onclick='return confirm(`Tambah detail?`)'>$img_add Tambah Detail</button>
         </form>
       </td>
     </tr>
@@ -227,43 +279,57 @@ echo "
   $(function() {
     $('.btn_save').click(function() {
       let tid = $(this).prop('id');
-      let rid = tid.split('-');
+      let rid = tid.split('__');
       let aksi = rid[0];
-      let field = rid[1];
-      let id_detail = rid[2];
+      let rid2 = rid[1].split('-');
+      let field = rid2[0];
+      let id_detail = rid2[1];
+      let dual_id = '#' + field + '-' + id_detail;
+      let toggle_id = dual_id + '__toggle';
+      let value = $(toggle_id).text().trim();
 
-      let link_ajax = "ajax/ajax_update_pemeriksaan_detail.php";
-      console.log(aksi, field, id_detail);
+      let link_ajax;
+
+      console.log(aksi, field, id_detail, value);
 
       if (aksi == 'btn_save') {
         new_value = $('#input_editing__' + field + '__' + id_detail).val().trim();
         if (value == new_value) {
-          $('#editing__value__' + field + '__' + id_detail).slideUp();
+          console.log('SAMA', value, new_value);
+          $(dual_id).slideUp();
           return;
         }
-        link_ajax = `ajax/ajax_update.php?tb=pemeriksaan&aksi=update&field=${field}&id=${id_detail}&value=${new_value}`;
+        link_ajax = `ajax/ajax_update.php?tb=pemeriksaan_detail&aksi=update&field=${field}&id=${id_detail}&value=${new_value}`;
 
       } else if (aksi == 'btn_delete') {
+        let y = confirm('Yakin DELETE detail pemeriksaan ini?');
+        if (!y) return;
         console.log('deleting');
-        link_ajax = `ajax/ajax_update.php?tb=pemeriksaan&aksi=delete&id=${id_detail}`;
+        link_ajax = `ajax/ajax_update.php?tb=pemeriksaan_detail&aksi=delete&id=${id_detail}`;
       } else {
         alert(`undefined aksi [${aksi}]`);
         return;
       }
+
+      console.log(link_ajax);
+
       $.ajax({
         url: link_ajax,
         success: function(a) {
           if (a.trim() == 'sukses') {
+            console.log('sukses');
             if (aksi == 'btn_save') {
               // update value
-              $('#value__' + field + '__' + id_pemeriksaan).text(new_value);
+              $(toggle_id).text(new_value);
 
               // slide up
-              $('#editing__value__' + field + '__' + id_pemeriksaan).slideUp();
+              $(dual_id).slideUp();
+
+              // if change blok then refresh
+              if (field == 'blok') location.reload();
 
             } else if (aksi == 'btn_delete') {
-              console.log('slide up tr');
-              $('#tr__value__' + field + '__' + id_pemeriksaan).slideUp();
+              $('#tr__' + id_detail).slideUp();
 
             }
 

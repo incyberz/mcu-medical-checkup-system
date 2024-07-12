@@ -25,6 +25,7 @@ if (isset($_POST['btn_tambah_pasien'])) {
   $s = "INSERT INTO tb_pasien ($koloms,id_klinik) VALUES ($isis,$id_klinik) ";
   // echo $s;
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  jsurl('?pendaftaran');
   exit;
 }
 

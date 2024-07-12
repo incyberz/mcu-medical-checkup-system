@@ -1,16 +1,19 @@
 <?php
 if (isset($_POST['btn_mulai_pemeriksaan'])) {
-  $s = "INSERT INTO tb_mcu (
+  $s = "INSERT INTO tb_hasil_pemeriksaan (
     id_pasien,
-    awal_pemeriksaan,
-    awal_pemeriksaan_by
+    awal_periksa,
+    awal_periksa_by,
+    status
   ) VALUES (
     $id_pasien,
     CURRENT_TIMESTAMP,
-    $id_user
+    $id_user,
+    1 -- status 1 artinya sudah mulai periksa
   ) ON DUPLICATE KEY UPDATE 
-    awal_pemeriksaan = CURRENT_TIMESTAMP,
-    awal_pemeriksaan_by = $id_user
+    awal_periksa = CURRENT_TIMESTAMP,
+    awal_periksa_by = $id_user,
+    status = 1
   ";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   // echo $s;
@@ -20,9 +23,6 @@ if (isset($_POST['btn_mulai_pemeriksaan'])) {
 }
 
 set_title('Awal Pemeriksaan');
-set_judul('Awal Pemeriksaan');
-
-$section = 'awal-pemeriksaan';
 
 $tanggal_show = date('d-F-Y H:i');
 $tanggal = date('d-F-Y');
@@ -37,7 +37,7 @@ $form_pemeriksaan = "
       <input type=checkbox required id=cek>
       <label for=cek>Pasien mulai masuk pemeriksaan pada tanggal <b class=darkblue>$tanggal</b> pukul <b class=darkblue>$pukul</b>.</label>
     </div>
-    <button class='btn btn-primary w-100' name=btn_mulai_pemeriksaan value='$section'>Mulai Pemeriksaan</button>
+    <button class='btn btn-primary w-100' name=btn_mulai_pemeriksaan value='$id_pasien'>Mulai Pemeriksaan</button>
     <div class='tengah f12 mt1 abu'>Disubmit oleh <span class='darkblue'>$nama_user</span> pada tanggal <span class=consolas>$tanggal_show</span></div>
   </form>
 

@@ -46,24 +46,3 @@ $arr = [
     'satuan' => 'cm'
   ],
 ];
-
-
-$s = "CREATE TABLE tb_pemeriksaan_detail (
-    id INT(11) NOT NULL AUTO_INCREMENT,
-    id_pemeriksaan INT(11) NOT NULL,
-
-    blok  varchar(11) NOT NULL,
-    label  varchar(11) NOT NULL,
-    type  varchar(11)  NULL,
-    placeholder  varchar(11) NOT NULL,
-    value  INT(11) NOT NULL,
-    required  INT(11) NOT NULL,
-    class  varchar(11) NOT NULL,
-    min  INT(11) NOT NULL,
-    max  INT(11) NOT NULL,
-    minlength  INT(11) NOT NULL,
-    maxlength  INT(11) NOT NULL,
-    minrange  INT(11) NOT NULL,
-    maxrange  INT(11) NOT NULL,
-    satuan  INT(11) NOT NULL)
-";

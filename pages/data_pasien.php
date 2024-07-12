@@ -1,12 +1,12 @@
 <?php
 $s = "SELECT
+a.date_created as tanggal_daftar,
 a.id as id_pasien,
 a.nama,
 a.jenis ,
 a.order_no,
 a.id_paket_custom,
 b.nama as jenis_pasien,
-a.date_created as tanggal_daftar,
 ( 
   SELECT p.nama FROM tb_status_pasien p WHERE p.status=a.status
   ) status_pasien,
@@ -28,11 +28,21 @@ a.date_created as tanggal_daftar,
   SELECT COUNT(1) FROM tb_paket_custom_detail p 
   JOIN tb_paket_custom q ON p.id_paket_custom=q.id 
   WHERE q.id=a.id_paket_custom 
-  ) count_detail_paket_custom
+  ) count_detail_paket_custom,
+( 
+  SELECT last_pemeriksaan FROM tb_hasil_pemeriksaan p 
+  WHERE p.id_pasien=a.id 
+  ) last_pemeriksaan,
+( 
+  SELECT status FROM tb_hasil_pemeriksaan p 
+  WHERE p.id_pasien=a.id 
+  ) status_pemeriksaan
 
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
-WHERE a.date_created > '$tanggal_awal'";
+WHERE a.date_created > '$tanggal_awal' 
+ORDER BY date_created DESC
+";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (mysqli_num_rows($q)) {
@@ -56,6 +66,7 @@ if (mysqli_num_rows($q)) {
         || $key == 'jenis'
         || $key == 'count_detail_paket_custom'
         || $key == 'tanggal_bayar'
+        || $key == 'last_pemeriksaan'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
@@ -105,6 +116,28 @@ if (mysqli_num_rows($q)) {
           $count = $d['count_detail_paket_custom'] ? "<span class='green'>$d[count_detail_paket_custom] pemeriksaan</span>" : '<span class=red>belum ada item pemeriksaan</span>';
           $value = "<a href='?manage_paket_custom&id_pasien=$id_pasien' >$value<div class='f12 mt1'>$count</div></a>";
         }
+      } elseif ($key == 'status_pemeriksaan') {
+        $loading = "<img src='assets/img/gifs/loading.gif' height=25px>";
+        if (!$value) {
+          $value = '<span class="f12 miring darkred">belum pemeriksaan</span>';
+        } elseif ($value == 1) {
+          $value = "<span class='f12 miring green'>awal pemeriksaan $loading</span>";
+        } elseif ($value == 2) {
+          $value = "
+            <span class='f12 miring green'>
+              sedang pemeriksaan 
+              <span class=btn_aksi id=last_pemeriksaan__toggle>$loading</span>
+            </span>
+            <div class='hideit wadah gradasi-kuning mt2 mb2' id=last_pemeriksaan>
+              <div class='abu miring'>Last Pemeriksaan:</div>
+                $d[last_pemeriksaan]
+              </div>
+            </div>
+          ";
+        } else {
+          $value = div_alert('danger', 'UNKNOWN STATUS');
+        }
+        $value .= "<div class=><a href='?tampil_pasien&id_pasien=1454&jenis=bpj'>$img_next</a></div>";
       }
 
       $td .= "<td>$value</td>";

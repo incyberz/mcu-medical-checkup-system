@@ -61,6 +61,7 @@ while ($d = mysqli_fetch_assoc($q)) {
 }
 
 require_once 'include/mcu_functions.php';
+require_once 'include/radio_toolbar_functions.php';
 require_once 'include/radio_jenis_pasien.php';
 $ilustrasi = ilustrasi($aksi);
 

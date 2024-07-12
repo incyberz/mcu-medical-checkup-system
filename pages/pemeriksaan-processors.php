@@ -1,35 +1,68 @@
 <?php
 if (isset($_POST['btn_submit_data_pasien'])) {
-  $section = $_POST['btn_submit_data_pasien'];
+  $id_pasien = $_POST['btn_submit_data_pasien'] ?? die('index [id_pasien] undefined');
+  // $id_paket = $_POST['id_paket'] ?? die('index [id_paket] undefined');
+  // $id_pemeriksaan = $_POST['id_pemeriksaan'] ?? die('index [id_pemeriksaan] undefined');
+  $last_pemeriksaan = $_POST['last_pemeriksaan'] ?? die('index [last_pemeriksaan] undefined');
+  $id_pemeriksaan = $_POST['id_pemeriksaan'] ?? die('index [id_pemeriksaan] undefined');
   unset($_POST['btn_submit_data_pasien']);
+  unset($_POST['last_pemeriksaan']);
+  unset($_POST['id_pemeriksaan']);
 
-  if ($section == 'gigi') {
-    echolog('EXCEPTION FOR GIGI');
-    // echo '<pre>';
-    // var_dump($_POST);
-    // echo '</pre>';
-    $array_gigi = '';
-    foreach ($_POST as $status_gigi) {
-      $array_gigi .= "$status_gigi,";
-    }
-    $sets = "array_gigi = '$array_gigi'";
-  } else {
-    $sets = '__';
-    foreach ($_POST as $key => $value) {
-      // echo "<br>$section | $key | $value";
-      $sets .= ", $key = '$value'";
-    }
+  // echolog('data POST');
+  // echo '<pre>';
+  // var_dump($_POST);
+  // echo '</pre>';
+
+
+
+
+  # ============================================================
+  # UPDATE ARRAY ID DETAIL WITH DATA POSTS
+  # ============================================================
+  echolog('updating array');
+  foreach ($_POST as $key => $value) {
+    $arr_id_detail[$key] = $value;
   }
+  // echo '<pre>';
+  // var_dump($arr_id_detail);
+  // echo '</pre>';
 
-  $sets .= ", tanggal_simpan_$section = CURRENT_TIMESTAMP";
-  $sets .= ", pemeriksa_$section = $id_user";
-  $sets = str_replace('__,', '', $sets);
+  # ============================================================
+  # ARRAY SORT BY KEY
+  # ============================================================
+  ksort($arr_id_detail);
 
-  $s = "UPDATE tb_mcu SET $sets WHERE id_pasien=$id_pasien";
-  // echo $s;
+  # ============================================================
+  # CONVERT TO STRING
+  # ============================================================
+  $pairs = [];
+  echolog('converting to string');
+  $str = '';
+  foreach ($arr_id_detail as $key => $value) {
+    if ($value) $str .= "$key=$value||";
+  }
+  $pairs['arr_hasil'] = "arr_hasil='$str'";
+
+  // echo '<pre>';
+  // var_dump($str);
+  // echo '</pre>';
+
+  echolog('timestamp and by-role ZZZ');
+
+  $str_pairs = join(',', $pairs);
+
+  $s = "UPDATE tb_hasil_pemeriksaan SET 
+    $str_pairs,
+    last_pemeriksaan = '$last_pemeriksaan',
+    last_update = CURRENT_TIMESTAMP,
+    status = 2 
+  WHERE id_pasien=$id_pasien";
+  echolog($s);
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echolog('sukses');
+  jsurl("?tampil_pasien&id_pasien=$id_pasien", 3000);
 
-  echo div_alert('success', "Update Data Pasien sukses. ");
-  jsurl('', 1000);
+
   exit;
 }
