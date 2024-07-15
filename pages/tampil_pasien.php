@@ -54,7 +54,7 @@ include 'include/arr_status_pasien.php';
 # MAIN SELECT PASIEN
 # ============================================================
 include 'tampil_pasien-data_pasien.php';
-$id_paket = $pasien['id_paket'];
+$id_paket = $pasien['id_paket'] ?? die(div_alert('danger', "Pasien ini belum mempunyai Paket Pemeriksaan. | <a href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>"));
 $nama_paket = $pasien['nama_paket'];
 
 
@@ -101,6 +101,7 @@ if ($JENIS == 'COR') {
   e.nama as nama_pemeriksaan,
   f.nama as jenis_pemeriksaan,
   e.singkatan,
+  2 as status_bayar, -- status bayar 2 = corporate
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
   FROM tb_pasien a 
   JOIN tb_order b ON a.order_no=b.order_no 
@@ -116,6 +117,7 @@ if ($JENIS == 'COR') {
   d.nama as nama_pemeriksaan,
   e.nama as jenis_pemeriksaan,
   d.singkatan,
+  b.status_bayar,
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=d.id) count_pemeriksaan_detail
   FROM tb_pasien a 
   JOIN tb_paket_custom b ON a.id_paket_custom=b.id  
@@ -147,6 +149,7 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   $nama_pemeriksaan = $pemeriksaan['nama_pemeriksaan'];
   $jenis_pemeriksaan = $pemeriksaan['jenis_pemeriksaan'];
   $count_pemeriksaan_detail = $pemeriksaan['count_pemeriksaan_detail'];
+  $status_bayar = $pemeriksaan['status_bayar'];
 
 
 
@@ -219,6 +222,10 @@ if ($data_pemeriksaan) {
 
 $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class="f12 red">Belum pernah login</span>';
 $src = "$lokasi_pasien/$foto_profil";
+
+if ($jenis == 'idv' and $status_bayar == '') {
+  $buttons = div_alert('danger', "Pasien Individu ini belum melakukan Pembayaran. <hr><a class='btn btn-primary' href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>");
+}
 
 # ============================================================
 # FINAL ECHO PEM MCU

@@ -1,14 +1,14 @@
 <?php
 $judul = 'Manage Pemeriksaan';
 $arr_for = [
-  'detail' => ['nama', 'count_pemeriksaan_detail',],
+  'detail' => ['nama', 'biaya', 'count_pemeriksaan_detail',],
   'deskripsi' => ['nama', 'singkatan', 'deskripsi',],
   'jenis' => ['nama', 'jenis',],
-  'sticker' => ['nama', 'cetak_sticker'],
+  // 'sticker' => ['nama', 'cetak_sticker'],
   'visibility' => ['nama', 'status', 'show_to_paket'],
-  'sample' => ['nama', 'sample'],
-  'biaya' => ['nama', 'biaya'],
-  'durasi' => ['nama', 'durasi'],
+  'sampel' => ['nama', 'sampel'],
+  // 'biaya' => ['nama', 'biaya'],
+  // 'durasi' => ['nama', 'durasi'],
   'image' => ['nama', 'image'],
 ];
 
@@ -34,6 +34,12 @@ if (!array_key_exists($for, $arr_for)) die("index [$for] invalid");
 $fields = '';
 $arr_field = $arr_for[$for];
 
+# ============================================================
+# INCLUDES
+# ============================================================
+$arr_jenis_pemeriksaan = [];
+include 'include/arr_jenis_pemeriksaan.php';
+include 'include/arr_sampel.php';
 
 
 
@@ -90,12 +96,13 @@ if (isset($_POST['btn_add_pemeriksaan'])) {
 # MAIN SELECT PEMERIKSAAN
 # ============================================================
 $s = "SELECT 
+b.nama as jenis_pemeriksaan, 
 a.id as id_pemeriksaan,
 a.nama, -- kolom pertama
 a.singkatan, -- kolom kedua
 a.*, -- kolom berikutnya
 (SELECT count(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=a.id) count_pemeriksaan_detail,
-(SELECT count(1) FROM tb_paket_detail WHERE id_paket=a.id) count_paket_detail
+(SELECT count(1) FROM tb_paket_detail WHERE id_pemeriksaan=a.id) count_paket_detail
 
 
 FROM tb_pemeriksaan a 
@@ -116,6 +123,8 @@ if (!mysqli_num_rows($q)) {
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $id_pemeriksaan = $d['id_pemeriksaan'];
+    $jenis = $d['jenis'];
+    $jenis_pemeriksaan = $d['jenis_pemeriksaan'];
     $nama_pemeriksaan = $d['nama'];
     $status = $d['status'];
 
@@ -141,7 +150,7 @@ if (!mysqli_num_rows($q)) {
 
 
 
-    $td = "<td>$i</td>";
+    $td = "<td>$i<div class='f10 abu miring'>id.$id_pemeriksaan</div></td>";
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
@@ -218,20 +227,20 @@ if (!mysqli_num_rows($q)) {
         # ============================================================
         # IS CETAK STICKER
         # ============================================================
-        $label = $value ? 'ON' : 'off';
-        $id_check = "cetak_sticker__$id_pemeriksaan";
-        $checked = $value ? 'checked' : '';
-        $tebal_biru = $value ? 'tebal_biru' : '';
+        // $label = $value ? 'ON' : 'off';
+        // $id_check = "cetak_sticker__$id_pemeriksaan";
+        // $checked = $value ? 'checked' : '';
+        // $tebal_biru = $value ? 'tebal_biru' : '';
 
-        $value = "
-          <div class='form-check form-switch'>
-            <input class='form-check-input check_sticker' type='checkbox' id='$id_check' $checked>
-            <label class='form-check-label proper pointer $tebal_biru f12' for='$id_check' id='label-$id_check'>
-              $label
-            </label>
-          </div>
+        // $value = "
+        //   <div class='form-check form-switch'>
+        //     <input class='form-check-input check_sticker' type='checkbox' id='$id_check' $checked>
+        //     <label class='form-check-label proper pointer $tebal_biru f12' for='$id_check' id='label-$id_check'>
+        //       $label
+        //     </label>
+        //   </div>
 
-        ";
+        // ";
       } elseif ($key == 'show_to_paket') {
         # ============================================================
         # IS SHOW TO PAKET
@@ -243,7 +252,7 @@ if (!mysqli_num_rows($q)) {
 
         $value = "
           <div class='form-check form-switch'>
-            <input class='form-check-input check_sticker' type='checkbox' id='$id_check' $checked>
+            <input class='form-check-input check_show_to_paket' type='checkbox' id='$id_check' $checked>
             <label class='form-check-label proper pointer $tebal_biru f12' for='$id_check' id='label-$id_check'>
               $label
             </label>
@@ -256,12 +265,19 @@ if (!mysqli_num_rows($q)) {
       $value_id = "value__$key" . "__$id_pemeriksaan";
 
       $input_for_editing = '';
-      if ($key == 'nama' || $key == 'sample' || $key == 'singkatan') {
+      if ($key == 'nama'  || $key == 'singkatan') {
         $input_for_editing = "<input class='form-control' value='$value' id=input__$value_id>";
       } elseif ($key == 'deskripsi') {
         $input_for_editing = "<textarea rows=10 class='form-control' id=input__$value_id>$value</textarea>";
-      } elseif ($key == 'jenis') {
-        $input_for_editing = "<select class='form-control' id=input__$value_id><option>ZZZ</option></select>";
+      } elseif ($key == 'jenis' || $key == 'sampel') {
+        $opt = '';
+        $arr = $key == 'jenis' ? $arr_jenis_pemeriksaan : $arr_sampel;
+        foreach ($arr as $k => $v) {
+          if (!$v) continue;
+          $selected = $value == $k ? 'selected' : '';
+          $opt .= "<option value='$k' $selected>$v</option>";
+        }
+        $input_for_editing = "<select class='form-control' id=input__$value_id><option>$opt</option></select>";
       }
 
       $value = $value ? $value : 'NULL';
@@ -288,6 +304,7 @@ if (!mysqli_num_rows($q)) {
 
     $tr .= "
       <tr class=tr id=tr__$value_id>
+        <td><span class='f10 miring abu'>$jenis</span></td>
         $td
         <td>
           $aksi_delete
@@ -302,6 +319,7 @@ include 'include/select_jenis_pemeriksaan.php';
 $count_next = $count_pemeriksaan + 1;
 $tr_tambah = "
   <tr>
+    <td>&nbsp;</td>
     <td>$count_next</td>
     <td colspan=100%>
       <div class=flexy>
@@ -326,6 +344,7 @@ $tr_tambah = "
 echo "
   <table class=table>
     <thead>
+      <th width=100px>Jenis</th>
       <th width=50px>No</th>
       $th
       <th width=30px class=tengah onclick='alert(`Anda boleh menghapus Paket jika belum ada Detail Paket dan belum ada yang melakukan Order pada paket tersebut.`)'>$img_delete_disabled</th>

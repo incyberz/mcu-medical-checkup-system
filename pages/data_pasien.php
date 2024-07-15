@@ -1,4 +1,21 @@
 <?php
+# ============================================================
+# INCLUDES 
+# ============================================================
+include 'include/arr_status_pasien.php';
+$arr_status_pasien[0] = 'Belum Pembayaran';
+$count_status = [];
+foreach ($arr_status_pasien as $key => $value) {
+  // inisialisasi jumlah status pasien
+  $count_status[$key] = 0;
+}
+
+
+
+
+# ============================================================
+# MAIN SELECT DATA PASIEN
+# ============================================================
 $s = "SELECT
 a.date_created as tanggal_daftar,
 a.id as id_pasien,
@@ -6,6 +23,7 @@ a.nama,
 a.jenis ,
 a.order_no,
 a.id_paket_custom,
+a.status,
 b.nama as jenis_pasien,
 ( 
   SELECT p.nama FROM tb_status_pasien p WHERE p.status=a.status
@@ -54,6 +72,7 @@ if (mysqli_num_rows($q)) {
     $id_pasien = $d['id_pasien'];
     $JENIS = strtoupper($d['jenis']);
     $jenis[$JENIS]++;
+    $count_status[$d['status'] ?? 0]++;
 
     $td = "<td>$i</td>";
     foreach ($d as $key => $value) {
@@ -67,6 +86,7 @@ if (mysqli_num_rows($q)) {
         || $key == 'count_detail_paket_custom'
         || $key == 'tanggal_bayar'
         || $key == 'last_pemeriksaan'
+        || $key == 'status'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
@@ -74,7 +94,14 @@ if (mysqli_num_rows($q)) {
       }
 
       if ($key == 'nama') {
-        $value = "$value<div class='mt1 f14 miring abu'>$d[jenis_pasien]</div>";
+        $value = "
+          $value
+          <div class='mt1 f14 miring abu'>
+            $d[jenis_pasien]
+            <a style='display:inline-block;margin-left:10px' href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]&mode=edit_pasien' onclick='return confirm(`Edit pasien ini?`)'>$img_edit</a>
+            <a href='?hapus_pasien&id_pasien=$d[id_pasien] onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
+          </div>
+        ";
       } elseif ($key == 'status_bayar') {
         $value = $JENIS == 'COR' ? "Corporate $img_check" : 'baru didaftarkan';
         if ($d['id_paket_custom']) {
@@ -83,18 +110,18 @@ if (mysqli_num_rows($q)) {
             $value = 'sudah memilih detail paket';
             if ($d['tanggal_bayar']) {
               if ($JENIS == 'BPJ') {
-                $value = 'BPJS';
+                $value = '<span class="coklat bold">BPJS</span>';
               } else {
-                $value = 'LUNAS';
+                $value = '<span class="green bold">LUNAS</span>';
               }
               $tgl = hari_tanggal($d['tanggal_bayar'], 0, 0, 1, 1, '-');
               $value = "<div class=f12>$tgl</div>$value $img_check";
             }
           }
         }
-        $value = "<i class='f14 abu'>$value</i>";
+        $value = "<i class='f12 abu'>$value</i>";
       } elseif ($key == 'status_pasien') {
-        $value = $value ? "<span class=f14>$value</span>" : "<span class='f12 abu miring'>pasien baru</span>";
+        $value = $value ? "<span class=f12>$d[status] ~ $value</span>" : "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
         $value .= "<div class='mt1 f10 abu'>MCU$thn-$id_pasien</div>";
       } elseif ($key == 'tanggal_daftar') {
         $value = '<span class=f14>' . hari_tanggal($value, 0, 1, 1, 0, '-') . '</span>';
@@ -119,16 +146,17 @@ if (mysqli_num_rows($q)) {
       } elseif ($key == 'status_pemeriksaan') {
         $loading = "<img src='assets/img/gifs/loading.gif' height=25px>";
         if (!$value) {
-          $value = '<span class="f12 miring darkred">belum pemeriksaan</span>';
+          $value = '<span class="f12 miring red bold">belum-pem.</span>';
         } elseif ($value == 1) {
           $value = "<span class='f12 miring green'>awal pemeriksaan $loading</span>";
         } elseif ($value == 2) {
+          $toggle_id = "last_pemeriksaan_$id_pasien" . "__toggle";
           $value = "
             <span class='f12 miring green'>
-              sedang pemeriksaan 
-              <span class=btn_aksi id=last_pemeriksaan__toggle>$loading</span>
+              sedang-pem. 
+              <span class=btn_aksi id=$toggle_id>$loading</span>
             </span>
-            <div class='hideit wadah gradasi-kuning mt2 mb2' id=last_pemeriksaan>
+            <div class='hideit wadah gradasi-kuning mt2 mb2' id=last_pemeriksaan_$id_pasien>
               <div class='abu miring'>Last Pemeriksaan:</div>
                 $d[last_pemeriksaan]
               </div>
@@ -137,7 +165,20 @@ if (mysqli_num_rows($q)) {
         } else {
           $value = div_alert('danger', 'UNKNOWN STATUS');
         }
-        $value .= "<div class=><a href='?tampil_pasien&id_pasien=1454&jenis=bpj'>$img_next</a></div>";
+
+        # ============================================================
+        # FINAL UI STATUS PEMERIKSAAN
+        # ============================================================
+        if ($d['status']) {
+          $value .= "
+            <div class=>
+              <a href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]'>$img_next</a>
+            </div>
+          ";
+        } else {
+          // ABAIKAN JIKA PASIEN BELUM BAYAR
+          $value = '-';
+        }
       }
 
       $td .= "<td>$value</td>";
@@ -145,18 +186,51 @@ if (mysqli_num_rows($q)) {
     $tr .= "
       <tr>
         $td
-        <td>
-          $img_edit 
-          $img_delete 
-        </td>
       </tr>
     ";
   }
 }
 
+
+$selisih = strtotime('now') - strtotime($last_update_header);
+// echo "selisih update header : $selisih seconds ZZZ";
+
+# ============================================================
+# ASUMSI BAHWA PENDAFTARAN PASIEN BARU MELEBIHI 30 DETIK
+# ============================================================
+if ($selisih > 30) {
+  $count_pasien_null = $count_status[0];
+  $count_pasien_ready = $count_status[7] + $count_status[8]; // yang ready dan sdh cetak sticker
+  $count_pasien_sedang =  $count_status[9];
+
+  $s = "INSERT INTO tb_header (
+    id_klinik,
+    count_pasien_null,
+    count_pasien_ready,
+    count_pasien_sedang,
+    last_update
+  ) VALUES (
+    $id_klinik,
+    $count_pasien_null,
+    $count_pasien_ready,
+    $count_pasien_sedang,
+    CURRENT_TIMESTAMP 
+  ) ON DUPLICATE KEY UPDATE 
+    id_klinik = $id_klinik,
+    count_pasien_null = $count_pasien_null,
+    count_pasien_ready = $count_pasien_ready,
+    count_pasien_sedang = $count_pasien_sedang,
+    last_update = CURRENT_TIMESTAMP
+  ";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echo div_alert('success', 'Auto UPDATE Header Count sukses.');
+  jsurl();
+}
+
+
 $data_pasien = $tr ? "
   <table class=table>
-    <thead>$th<th>Aksi</th></thead>
+    <thead>$th</thead>
     $tr
   </table>
 " : div_alert('danger', "Data pasien tidak ditemukan.");

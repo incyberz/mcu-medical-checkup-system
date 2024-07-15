@@ -1,11 +1,45 @@
 <?php
-$id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die(erid('id_pemeriksaan'));
-$nama_pemeriksaan = $_GET['nama_pemeriksaan'] ?? die(erid('nama_pemeriksaan'));
+$id_detail = $_GET['id_detail'] ?? '';
+if ($id_detail) {
+  if (!$id_detail) die(kosong('id_detail'));
+  $s = "SELECT b.nama,b.id 
+  FROM tb_pemeriksaan_detail a 
+  JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id
+  WHERE a.id=$id_detail";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $d = mysqli_fetch_assoc($q);
+  $id_pemeriksaan = $d['id'];
+  $nama_pemeriksaan = $d['nama'];
+
+  $img_up = img_icon('up');
+  $link_up = "<a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan' >$img_up</a>";
+} else {
+  $link_up = '';
+  $id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die(erid('id_pemeriksaan'));
+  $nama_pemeriksaan = $_GET['nama_pemeriksaan'] ?? '';
+  if (!$id_pemeriksaan) die(kosong('id_pemeriksaan'));
+  if (!$nama_pemeriksaan) {
+    $s = "SELECT nama FROM tb_pemeriksaan WHERE id=$id_pemeriksaan";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    $d = mysqli_fetch_assoc($q);
+    $nama_pemeriksaan = $d['nama'];
+  }
+}
+
 set_h2('Detail Pemeriksaan', "
   Manage Detail Pemeriksaan <b class='proper darkblue'>$nama_pemeriksaan</b>
-  <div class=mt2><a href='?manage_pemeriksaan'>$img_prev</a></div>
+  <div class=mt2><a href='?manage_pemeriksaan'>$img_prev</a> $link_up</div>
 ");
-only(['admin', 'marketing']);
+only(
+  ['admin', 'marketing'],
+  'Yang berhak update pertanyaan adalah Role Admin atau Role Marketing
+  <hr>
+  <span class=biru>Silahkan Logout kemudian re-Login sebagai role diatas untuk editing Detail Pemeriksaan</span>
+  <hr>
+  <a href=# onclick=window.close()>Close Tab</a> | <a href=?logout>Logout</a>
+  ',
+  0
+);
 
 
 
@@ -33,7 +67,7 @@ if (isset($_POST['btn_tambah_detail'])) {
   ) VALUES (
     '$id_pemeriksaan',
     'input',
-    'NEW DETAIL PEMERIKSAAN',
+    '$_POST[label]',
     'satuan'
   )";
   // echo $s;
@@ -58,14 +92,32 @@ if (isset($_POST['btn_tambah_detail'])) {
 # ============================================================
 # MAIN SELECT PEMERIKSAAN
 # ============================================================
+$sql_id_detail = $id_detail ? "a.id = $id_detail" : 1;
 $s = "SELECT 
 a.id as id_detail,
-a.label,
+a.label, -- ordering UI
+a.blok, -- ordering UI
+a.option_values, -- ordering UI
+a.option_default, -- ordering UI
+
+a.min, -- ordering UI
+a.max, -- ordering UI
+a.minrange, -- ordering UI
+a.maxrange, -- ordering UI
+
+a.normal_value,
+a.normal_lo_l,
+a.normal_hi_l,
+a.normal_lo_p,
+a.normal_hi_p,
+a.step,
+
 a.*,
 b.nama as nama_pemeriksaan 
 FROM tb_pemeriksaan_detail a 
 JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
-WHERE b.id=$id_pemeriksaan
+WHERE b.id=$id_pemeriksaan 
+AND $sql_id_detail 
 ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
@@ -95,9 +147,33 @@ if (!mysqli_num_rows($q)) {
       $needed = [];
       if ($d['blok'] == 'radio' || $d['blok'] == 'radio-toolbar' || $d['blok'] == 'multi-radio' || $d['blok'] == 'select') {
         // fields yang dibutuhkan
-        $needed = ['class', 'option_labels', 'option_values', 'option_class', 'option_default'];
+        $needed = [
+          'option_values',
+          'option_default',
+          'option_labels',
+          'class',
+
+          'option_class'
+        ];
       } elseif ($d['blok'] == 'input-range') {
-        $needed = ['class', 'min', 'max', 'minrange', 'maxrange'];
+        $needed = [
+          'class',
+          'min',
+          'max',
+          'minrange',
+          'maxrange',
+
+          // 'normal_value',
+          // 'normal_lo_l',
+          // 'normal_hi_l',
+          // 'normal_lo_p',
+          // 'normal_hi_p',
+          'step',
+          'satuan',
+
+        ];
+      } elseif ($d['blok'] == 'array-gigi') {
+        $needed = ['class', 'label'];
       }
       if (in_array($key, $needed)) $hideit = '';
 
@@ -115,11 +191,11 @@ if (!mysqli_num_rows($q)) {
       $widths = [
         'label' => '20%',
         'blok' => '10%',
-        'name' => '15%',
-        'class' => '10%',
-        'option_labels' => '15%',
-        'option_values' => '10%',
-        'option_default' => '10%',
+        // 'name' => '15%',
+        // 'class' => '10%',
+        // 'option_labels' => '15%',
+        // 'option_values' => '10%',
+        // 'option_default' => '10%',
       ];
       $width = '';
       if (array_key_exists($key, $widths)) $width = $widths[$key];
@@ -142,6 +218,8 @@ if (!mysqli_num_rows($q)) {
         || $key == 'class'
         || $key == 'satuan'
         || $key == 'name'
+        || $key == 'option_default'
+        || $key == 'option_class'
       ) {
         $input_editing = "<input class='form-control input_editing' id=$id value='$value'>";
       } elseif (
@@ -152,9 +230,10 @@ if (!mysqli_num_rows($q)) {
         || $key == 'minrange'
         || $key == 'maxrange'
       ) {
+        $value = floatval($value);
         $input_editing = "<input type=number class='form-control input_editing' id=$id value='$value'>";
       } elseif ($key == 'blok') {
-        $arr = ['input', 'input-range',  'select', 'radio-toolbar'];
+        $arr = ['input', 'input-range',  'select', 'radio-toolbar', 'array-gigi'];
         $opt = '';
         foreach ($arr as $v) {
           $selected = $v == $value ? 'selected' : '';
@@ -163,8 +242,10 @@ if (!mysqli_num_rows($q)) {
         $input_editing = "
           <select class='form-control input_editing' id=$id>$opt</select>
         ";
-      } elseif ($key == 'type') {
-        $arr = ['text', 'number', 'date', 'time', 'checkbox', 'radio'];
+      } elseif ($key == 'type' || $key == 'step') {
+        $arr = $key == 'type'
+          ? ['text', 'number', 'date', 'time', 'checkbox', 'radio']
+          : [1, 0.1, 0.01];
         $opt = '';
         foreach ($arr as $v) {
           $selected = $v == $value ? 'selected' : '';
@@ -228,7 +309,7 @@ if (!mysqli_num_rows($q)) {
 echo "
 <style>
   .btn_aksi:hover{color:blue; letter-spacing: .3px; font-weight:bold}
-  #sub_table th{font-size: 10px}
+  #sub_table th{font-size: 10px; background: #005; color: white}
 </style>
 <div class='gradasi-toska' style='overflow-x: scroll'>
   <table class=table>
@@ -236,7 +317,12 @@ echo "
     <tr>
       <td colspan=100%>
         <form method=post>
-          <button class='btn-transparan green' name=btn_tambah_detail onclick='return confirm(`Tambah detail?`)'>$img_add Tambah Detail</button>
+          <div class=flexy>
+            <div><input class='form-control' required minlength=3 maxlength=50 name=label placeholder='Detail baru...'></div>
+            <div>
+              <button class='btn-transparan green' name=btn_tambah_detail >$img_add Tambah Detail</button>
+            </div>
+          </div>
         </form>
       </td>
     </tr>

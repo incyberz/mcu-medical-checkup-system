@@ -61,8 +61,15 @@ if (isset($_POST['btn_submit_data_pasien'])) {
   echolog($s);
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   echolog('sukses');
-  jsurl("?tampil_pasien&id_pasien=$id_pasien", 3000);
+  // jsurl("?tampil_pasien&id_pasien=$id_pasien", 3000);
 
+  # ============================================================
+  # UPDATE status pasien 
+  # ============================================================
+  $s = "UPDATE tb_pasien SET status=9 WHERE id=$id_pasien";
+  echolog('updating status pasien');
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
+  jsurl();
   exit;
 }

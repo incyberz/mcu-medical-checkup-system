@@ -102,6 +102,7 @@ $ilustrasi = ilustrasi($aksi);
         return;
       }
       let link_ajax = 'ajax/ajax_cari_pasien.php?keyword=' + keyword + '&order_no=' + order_no + '&jenis=' + jenis;
+      console.log(link_ajax);
 
       $.ajax({
         url: link_ajax,
@@ -113,7 +114,7 @@ $ilustrasi = ilustrasi($aksi);
     });
 
     $('.jenis_pasien').click(function() {
-      let tid = $(this).prop('id');
+      let tid = $(this).prop('for');
       let rid = tid.split('__');
       jenis = rid[1];
       $('#jenis').text(jenis);

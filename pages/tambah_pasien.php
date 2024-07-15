@@ -47,23 +47,20 @@ if (isset($_POST['btn_tambah_pasien'])) {
 
 
 require_once 'include/mcu_functions.php';
+require_once 'include/radio_toolbar_functions.php';
 // require_once 'include/radio_jenis_pasien.php';
 
 $arr_gender = [
   'l' => [
-    'name' => 'gender',
-    'id' => 'gender__l',
-    'classes' => 'gender',
-    'value' => 'l',
-    'checked' => '',
+    'id_detail' => 'gender',
+    'option_class' => 'gender',
+    'option_value' => 'l',
     'caption' => 'Laki-laki',
   ],
   'p' => [
-    'name' => 'gender',
-    'id' => 'gender__p',
-    'classes' => 'gender',
-    'value' => 'p',
-    'checked' => '',
+    'id_detail' => 'gender',
+    'option_class' => 'gender',
+    'option_value' => 'p',
     'caption' => 'Perempuan',
   ],
 ];
@@ -71,27 +68,21 @@ $radio_gender = radio_toolbar($arr_gender, false);
 
 $arr_jenis = [
   'bpjs' => [
-    'name' => 'jenis',
-    'id' => 'jenis_pasien__bpjs',
-    'classes' => 'jenis_pasien',
-    'value' => 'bpj',
-    'checked' => 'checked',
+    'id_detail' => 'jenis',
+    'option_class' => 'jenis_pasien',
+    'option_value' => 'bpj',
     'caption' => 'BPJS',
   ],
   'individu' => [
-    'name' => 'jenis',
-    'id' => 'jenis_pasien__individu',
-    'classes' => 'jenis_pasien',
-    'value' => 'idv',
-    'checked' => '',
+    'id_detail' => 'jenis',
+    'option_class' => 'jenis_pasien',
+    'option_value' => 'idv',
     'caption' => 'Individu',
   ],
   // 'corporate' => [
-  //   'name' => 'jenis_pasien',
-  //   'id' => 'jenis_pasien__corporate',
-  //   'classes' => 'jenis_pasien',
+  //   'id_detail' => 'jenis_pasien',
+  //   'option_class' => 'jenis_pasien',
   //   'value' => 1,
-  //   'checked' => 'checked',
   //   'caption' => 'Corporate',
   // ],
 ];
@@ -325,19 +316,22 @@ echo "
       }
     });
 
-    $('.jenis_pasien').change(function() {
+    $('.opsi_radio').change(function() {
       let tid = $(this).prop('id');
       let rid = tid.split('__');
       let aksi = rid[0];
-      let jenis = rid[1];
-      console.log(aksi, jenis);
-      if (jenis == 'bpjs') {
-        $('#tr__no_bpjs').show();
-        $('#no_bpjs').prop('required', true);
-      } else {
-        $('#tr__no_bpjs').hide();
-        $('#no_bpjs').prop('required', false);
-        $('#no_bpjs').val('');
+      if (aksi == 'jenis') {
+        let jenis = rid[1];
+        // console.log(aksi, jenis, 'ZZZ');
+        if (jenis == 'bpj') {
+          $('#tr__no_bpjs').show();
+          $('#no_bpjs').prop('required', true);
+        } else {
+          $('#tr__no_bpjs').hide();
+          $('#no_bpjs').prop('required', false);
+          $('#no_bpjs').val('');
+        }
+
       }
     });
   })

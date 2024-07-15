@@ -39,7 +39,11 @@ date_default_timezone_set("Asia/Jakarta");
 
 function erid($a)
 {
-  return "Error, index $a belum terdefinisi.";
+  return "<span style=color:red>Error, index [$a] belum terdefinisi.</span>";
+}
+function kosong($a)
+{
+  return "<span style=color:red>Error, index [$a] tidak boleh kosong.</span>";
 }
 
 function clean_sql($a)

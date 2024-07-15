@@ -1,5 +1,6 @@
 <?php
 // v. 2.0.1 updated with array or non-array input users
+// v. 2.0.1 only() role function - redirect updated 
 
 function login_only($pesan = 'Maaf, Anda harus login untuk melihat page ini.<hr>Redirecting to homepage...', $timeout = 3000)
 {
@@ -56,13 +57,14 @@ function only($roles = ['admin'], $pesan = "Maaf, Anda harus login dengan role y
   }
 
   if (!isset($_SESSION['mmc_username']) || !$allowed) {
+    $redirect = $timeout ? "<script>setTimeout(()=>{location.replace('?')},$timeout);</script>" : '';
     die("
     <div style='display:flex;justify-content:center; color:red'>
       <div style='border:solid 1px red; background: #fcc; padding:100px 30px; border-radius:10px; text-align:center'>
         $pesan
       </div>
     </div>
-    <script>setTimeout(()=>{location.replace('?')},$timeout);</script>
+    $redirect
     ");
   }
 }

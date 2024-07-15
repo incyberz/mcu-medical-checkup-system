@@ -33,7 +33,9 @@ include 'include/radio_toolbar_functions.php';
 include 'pemeriksaan-functions.php';
 
 $p = $arr_pemeriksaan[$id_pemeriksaan] ?? die(div_alert('danger', "Belum ada pemeriksaan $nama_pemeriksaan pada database."));
-$sub_judul = "<span class='f20 darkblue'>Pemeriksaan $p</span>";
+$p = strtoupper("Pemeriksaan $p");
+$p = str_replace('PEMERIKSAAN PEMERIKSAAN', 'PEMERIKSAAN', $p);
+$sub_judul = "<span class='f20 darkblue'>$p</span>";
 set_title($judul, $sub_judul);
 only('users');
 
@@ -50,6 +52,7 @@ only('users');
 # ===========================================================
 $arr_id_detail = [];
 include 'pemeriksaan-hasil_at_db.php';
+//var_dump($arr_id_detail[94]);
 
 # ===========================================================
 # PROCESSORS
@@ -61,25 +64,17 @@ include 'pemeriksaan-processors.php';
 # ============================================================
 include 'pemeriksaan-data_pasien.php';
 
+
+
+
+
+
+
+
+
 # ============================================================
-# GET DATA MCU 
+# ROLE MANAGEMENTS ZZZ
 # ============================================================
-// if ($pasien['punya_hasil']) {
-//   $s = "SELECT * FROM tb_hasil_pemeriksaan WHERE id_pasien=$id_pasien";
-//   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-//   $hasil = mysqli_fetch_assoc($q);
-// } else {
-//   $hasil = [];
-// }
-
-
-
-
-
-
-
-
-
 // include 'include/arr_fitur_dokter.php';
 // include 'include/arr_fitur_nakes.php';
 
@@ -93,15 +88,6 @@ $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class=
 if (!$punya_hasil) {
   include 'pemeriksaan-awal_periksa.php';
 } else { // punya data MCU
-
-  // $s = "SELECT 1 FROM tb_mcu WHERE id_pasien=$id_pasien";
-  // $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  // if (!mysqli_num_rows($q)) {
-  // }
-
-
-  // $form_pemeriksaan = div_alert('danger', "Belum ada form untuk pemeriksaan <span class=darkblue>$nama_pemeriksaan</span><hr>Mohon segera lapor developer.");
-  // $file_form = "$lokasi_pages/form-pemeriksaan/pemeriksaan-$id_pemeriksaan.php";
 
   # ============================================================
   # FORM PEMERIKSAAN
@@ -138,11 +124,11 @@ if (!$punya_hasil) {
     $btn_notif = "Diperiksa oleh <span class='darkblue'>$nama_user</span> pada tanggal <span class=consolas>$tanggal_show</span>";
     $tanggal_pemeriksaan = $mcu['tanggal_simpan_' . $id_pemeriksaan] ?? '';
 
+    # ============================================================
+    # MODE SUDAH MENGISI
+    # ============================================================
+    include 'include/arr_user.php';
     if ($tanggal_pemeriksaan) {
-      # ============================================================
-      # MODE SUDAH MENGISI
-      # ============================================================
-      include 'include/arr_user.php';
 
 
       $hide_form = 'hideit';
@@ -188,137 +174,26 @@ if (!$punya_hasil) {
     $blok_inputs = '';
 
 
-    foreach ($arr_input as $key => $v) {
-
-
-      # ============================================================
-      # FILL DATA FROM DB
-      # ============================================================
-      $id_detail = $v['id'];
-      if (array_key_exists($id_detail, $arr_id_detail)) {
-        $v['value'] = $arr_id_detail[$id_detail];
-      }
-
-      $v['required'] = 'required'; // ZZZ forced to required
-      $required = $v['required'] ?? 'required';
-
-      if ($v == 'separator') {
-        $blok_sub_input = '';
-      } elseif ($v['blok'] == 'input-range') {
-
-        # ============================================================
-        # CREATE RANGE
-        # ============================================================
-        $arr_range = [];
-        $jumlah_titik = 8;
-        $div_range = '';
-        for ($i = 0; $i <= $jumlah_titik; $i++) {
-          $range_value = round($v['minrange'] + ($i * (($v['maxrange'] - $v['minrange']) / $jumlah_titik)), 0);
-          $div_range .= "<div>$range_value</div>";
-        }
-        $min_range = $v['minrange'];
-        $max_range = $v['maxrange'];
-
-        $value = $v['value'] ?? '';
-        $val_range = $value ? $value : intval(($max_range - $min_range) / 2) + $min_range;
-        $step = $v['step'] ?? 1;
-        $placeholder = $v['placeholder'] ?? '...';
-        $type = $v['type'] ?? 'text';
-        $min = $v['min'] ?? '';
-        $max = $v['max'] ?? '';
-        $minlength = $v['minlength'] ?? '';
-        $maxlength = $v['maxlength'] ?? '';
-        $class = $v['class'] ?? '';
-        $satuan = $v['satuan'] ?? '';
-
-        $blok_sub_input = "
-          <div class='flexy flex-center'>
-            <div class='f14 darkblue miring pt1'>$v[label]</div>
-            <div>
-              <input 
-                id='$key' 
-                name='$key' 
-                value='$value' 
-                step='$step' 
-                placeholder='$placeholder' 
-                type='$type' 
-                $required
-                class='form-control mb2 $class' 
-                min='$min' 
-                max='$max' 
-                minlength='$minlength' 
-                maxlength='$maxlength' 
-                style='max-width:100px'
-              >          
-            </div>
-            <div class='f14 abu miring pt1'>$satuan</div>
-          </div>
-          <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range' step='$step'>
-          <div class='flexy flex-between f12 consolas abu'>
-            $div_range
-          </div>
-        ";
-      } elseif ($v['blok'] == 'radio') {
-        // $pakai_kacamata = radio_tf('Apakah Anda memakai kacamata?', 'kacamata', '', 'Pakai', 0);
-
-        $Ya = $v['label_ya'] ?? 'Ya';
-        $Tidak = $v['label_tidak'] ?? 'Tidak';
-        $value_tidak = $v['value_tidak'] ?? 0;
-        $value_ya = $v['value_ya'] ?? 1;
-
-        $blok_sub_input = create_radio_yt(
-          $v['label'], // label radio 
-          $key, // name radio
-          '', // nilai default
-          '', // caption
-          $Ya, // Ya
-          $Tidak, // Tidak
-          '', // class label
-          $value_tidak,
-          $value_ya
-        );
-      } elseif ($v['blok'] == 'radio-toolbar') {
-        # ============================================================
-        # RADIO TOOLBAR FUNCTION
-        # ============================================================
-        $blok_sub_input = radio_toolbar2(
-          $v['label'],
-          $id_detail,
-          $v['option_values'],
-          $v['option_labels'],
-          $v['class'],
-          $v['option_class']
-        );
-      } elseif ($v['blok'] == 'array_gigi') {
-        $blok_sub_input = array_gigi(
-          $v['question'], // $question,
-          $v['array_gigi'], // $value_default = '',
-        );
-      } elseif ($v['blok'] == 'input') {
-        $blok_sub_input = 'INPUT BIASA';
-      } else {
-        die(div_alert('danger', "Belum ada UI untuk v-blok: <b class=darkblue>$v[blok]</b>. Harap segera lapor developer!"));
-      }
-      $blok_inputs .= !$blok_sub_input ? '<hr style="border: solid 5px #ccc; margin:50px 0">' : "
-        <div class='wadah gradasi-toska' >
-          $blok_sub_input
-        </div>  
-      ";
-    }
+    # ============================================================
+    # PENENTUAN BLOK INPUT
+    # ============================================================
+    # $arr_input['blok'] : - radio-toolbar
+    #                      - input-range
+    #                      - select
+    # ============================================================
+    include 'pemeriksaan-blok_input_handler.php';
 
     $tanggal_show = date('d-F-Y H:i');
-
-    // $ZZZ = "
-    //     <input type=hiddena name=id_paket value=$id_paket>
-    //     <input type=hiddena name=JENIS value=$JENIS>
-    // ";
-
-    $ZZZ = '';
 
     $form_pemeriksaan = "
       $hasil_form
       <form method='post' class='$hide_form form-pemeriksaan wadah bg-white' id=blok_form>
+
+        <!-- =========================================================== -->
+        <!-- BLOK INPUTS -->
+        <!-- =========================================================== -->
         $blok_inputs
+
         <div class='flexy mb2 flex-center'>
           <input type=checkbox required id=cek>
           <label for=cek>Saya menyatakan bahwa data diatas sudah benar.</label>
@@ -329,7 +204,6 @@ if (!$punya_hasil) {
         </div>
         <input type=hiddena name=last_pemeriksaan value='$nama_pemeriksaan by $nama_user'>
         <input type=hiddena name=id_pemeriksaan value='$id_pemeriksaan'>
-        $ZZZ
       </form>
     ";
   } else { // end ada detail
@@ -367,10 +241,36 @@ echo "
 ";
 
 
-
 ?>
 <script>
   $(function() {
+    $('.opsi_radio').click(function() {
+      let tid = $(this).prop('id');
+      let rid = tid.split('__');
+      let id_detail = rid[0];
+      let value = rid[1];
+      let value_default = $('#value_default__' + id_detail).text();
+
+      // restore UI
+      $('.label__' + id_detail).prop('style', '');
+
+      console.log(id_detail, value, value_default);
+      if (value_default) {
+        if (value_default.trim().toLowerCase() == value.trim().toLowerCase()) {
+          console.log('DEFAULT');
+        } else {
+          // ============================================================
+          // NILAI ABNORMAL != NILAI DEFAULT
+          // ============================================================
+          $('#label__' + id_detail + '__' + value).prop('style', 'background:red');
+        }
+      }
+    });
+
+
+    // ============================================================
+    // ALL RANGE CLICK
+    // ============================================================
     $('.range').click(function() {
       $('.range').change();
     })
@@ -383,5 +283,5 @@ echo "
       // console.log(aksi, id, val);
       $('#' + id).val(val)
     })
-  })
+  });
 </script>

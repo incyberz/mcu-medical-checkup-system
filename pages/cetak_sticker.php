@@ -6,7 +6,7 @@ if ($print) {
   include '../conn.php';
   $lokasi_img = "../assets/img";
 }
-include 'include/arr_sampel.php';
+include 'include/arr_sampel_detail.php';
 
 $nama_paket = $_POST['nama_paket'] ?? die(div_alert('danger', 'Index nama_paket belum terdefinisi.'));
 $id_paket = $_POST['id_paket'] ?? null;
@@ -127,13 +127,6 @@ if (!$print) {
 
 
 
-# ===========================================================
-# PROCESSORS
-# ===========================================================
-if (isset($_POST['btn_add_paket'])) {
-  echo div_alert('success', "Delete Paket sukses.");
-  jsurl('', 3000);
-}
 
 
 
@@ -288,6 +281,16 @@ if (!mysqli_num_rows($q)) {
     </div>
   ";
 }
+
+
+
+# ============================================================
+# UPDATE status pasien 
+# ============================================================
+$s = "UPDATE tb_pasien SET status=8 WHERE id=$id_pasien";
+echo div_alert('info tengah', 'Updating status pasien sukses. | Status pasien: Sudah Cetak Sticker (8)');
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+
 
 
 # ============================================================

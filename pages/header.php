@@ -5,26 +5,71 @@
     padding: 10px !important;
     color: blue
   }
+
+  .badge {
+    /* border: solid 1px #ccc; */
+    display: inline-block;
+    margin: 0 5px;
+  }
+
+  .badge-red {
+    background: red;
+  }
+
+  .badge-blue {
+    background: blue;
+  }
 </style>
 <?php
 // hide other info menu when parameter terisi
 $li_admin = '';
 $li_public = '';
 $li_nakes = '';
-// if (!$parameter) {
-if ($username and ($role == 'admin' || $role == 'marketing')) {
-  $li_admin = "
-      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_paket'>Manage Paket</a></li>
-      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_order'>Manage Order</a></li>
-      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_pemeriksaan'>Manage Pemeriksaan</a></li>
-    ";
-}
 
-if ($username and $role != 'pasien') {
+# ============================================================
+# MENU INTERNAL USERS
+# ============================================================
+if ($username and ($role != 'pasien' || $role != 'pendaftar')) {
+
+  $count_pasien_null = 0;
+  $count_pasien_ready = 0;
+  $count_pasien_sedang = 0;
+
+  $s = "SELECT * FROM tb_header WHERE id_klinik=$id_klinik";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  if (!mysqli_num_rows($q)) {
+    // auto create first
+    $s = "INSERT INTO tb_header (
+      id_klinik,
+      count_pasien_null,
+      count_pasien_ready,
+      count_pasien_sedang,
+      last_update
+    ) VALUES (
+      $id_klinik,
+      $count_pasien_null,
+      $count_pasien_ready,
+      $count_pasien_sedang,
+      '2020-1-1' -- initialisasi last_update pertama
+    )";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    echo div_alert('success', 'Auto Create Header Count sukses.');
+    jsurl();
+  } else {
+    $d = mysqli_fetch_assoc($q);
+    $count_pasien_null = $d['count_pasien_null'];
+    $count_pasien_ready = $d['count_pasien_ready'];
+    $count_pasien_sedang = $d['count_pasien_sedang'];
+    $last_update_header = $d['last_update'];
+  }
+
+  $count_pasien_null_show = !$count_pasien_null ? '' : "<span class='badge badge-red'>$count_pasien_null</span>";
+  $count_pasien_ready_show = !$count_pasien_ready ? '' : "<span class='badge badge-red'>$count_pasien_ready</span>";
+  $count_pasien_sedang_show = !$count_pasien_sedang ? '' : "<span class='badge badge-blue'>$count_pasien_sedang</span>";
+
   $li_nakes = "
-      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran</a></li>
-      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=mcu'>MCU</a></li>
-      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=lab'>Laboratorium</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran $count_pasien_null_show</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=mcu'>Pemeriksaan $count_pasien_ready_show $count_pasien_sedang_show</a></li>
     ";
 } elseif (!$username) {
   $li_public = "
@@ -36,7 +81,15 @@ if ($username and $role != 'pasien') {
           <li><a class='nav-link scrollto' href='blog/'>Blog</a></li>
           ";
 }
-// } else
+
+if ($username and ($role == 'admin' || $role == 'marketing')) {
+  $li_admin = "
+    <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_paket'>Manage Paket</a></li>
+    <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_order'>Manage Order</a></li>
+    <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_pemeriksaan'>Manage Pemeriksaan</a></li>
+  ";
+}
+
 
 if (isset($_SESSION['mmc_username_master'])) {
   $li_public = "<li><a style='display:inline-block; padding: 10px; color:blue' class='nav-link scrollto gradasi-hijau bold' href='?login_as&unlog'>UNLOG</a></li>";

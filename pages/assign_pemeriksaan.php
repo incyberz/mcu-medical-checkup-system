@@ -24,10 +24,11 @@ if ($custom) {
     array_push($arr_id_pemeriksaan, $d['id_pemeriksaan']);
   }
 }
+$link_back = "<div class=mt2><a href='$href'>$img_prev</a></div>";
 $sub_judul = "
   Assign Pemeriksaan untuk <b class='biru'>$nama_paket</b>
   <span class='hideit bg-red' id=custom>$custom</span>
-  <div class=mt2><a href='$href'>$img_prev</a></div> 
+  $link_back 
 ";
 set_title($judul);
 set_h2($judul, $sub_judul);
@@ -153,7 +154,7 @@ if (!mysqli_num_rows($q)) {
     <table class='table table-hover table-striped'>
       $tr
     </table>
-    <a class='btn btn-primary' href='?print-label&id_pasien=random&id_paket=$id_paket&nama_paket=$nama_paket'><i class='bx bx-printer'></i> Test Print</a>
+    $link_back
   ";
 }
 ?>
