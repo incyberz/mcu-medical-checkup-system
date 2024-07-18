@@ -1,40 +1,14 @@
 <?php
 # ============================================================
+# LOBBY PASIEN 
+# ============================================================
+include 'lobby_pasien.php';
+echo "<div id=lobby_pasien>$lobby_pasien</div>";
+
+# ============================================================
 # CARI PASIEN
 # ============================================================
-$aksi = $_GET['aksi'] ?? 'mcu';
-$MCU = strtoupper($aksi);
-$Medical_Checkup = $aksi == 'mcu' ? 'Medical Checkup' : 'Laboratorium';
-$not_aksi = $aksi == 'mcu' ? 'lab' : 'mcu';
-$Not_Medical = $aksi == 'mcu' ? 'Laboratorium' : 'Medical Checkup';
-
-set_h2('Pencarian Pasien', "<span class='abu f14 miring'>Pencarian Pasien untuk</span> 
-  <div>
-    <span class='hideit bg-red' id=aksi>$aksi</span>
-    <b class=darkblue>Pemeriksaan $Medical_Checkup</b> | 
-    <a href='?cari_pasien&aksi=$not_aksi' class='miring f12'>
-    $Not_Medical
-    </a>
-  </div>
-");
 only(['admin', 'nakes', 'marketing']);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # ===========================================================
 # PROCESSORS
@@ -60,28 +34,93 @@ while ($d = mysqli_fetch_assoc($q)) {
   $list_order_no .= "<option value='$d[order_no]'>$d[order_no] - $d[perusahaan]</option>";
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# INCLUDES
+# ============================================================
 require_once 'include/mcu_functions.php';
 require_once 'include/radio_toolbar_functions.php';
 require_once 'include/radio_jenis_pasien.php';
-$ilustrasi = ilustrasi($aksi);
+$ilustrasi = ilustrasi('mcu');
 
+
+
+
+
+
+
+
+
+
+# ============================================================
+# FINAL ECHO | FORM PENCARIAN
+# ============================================================
+echo "
+  <div class='tengah hideit' id=form_pencarian>
+    <span class='abu f18 '>Pencarian Pasien untuk</span> 
+    <div class='bold darkblue f18'>Pemeriksaan Medical Checkup dan Laboratorium</div>
+
+    <div class='tengah mb4 mt2' id=img_ilustrasi>$ilustrasi</div>
+
+    <div class='wadah gradasi-hijau tengah' style='max-width: 500px; margin:auto;'>
+      <div>$radio_jenis_pasien</div>
+      <span id='jenis' class='hideit bg-red'>cor</span>
+      <input class='form-control mb2 tengah f24' name='keyword' id='keyword' placeholder='keyword...' autocomplete='off'>
+
+      <div id='list_pasien' class='biru'></div>
+      <div id='list_pasien_text_awal' class='hideit '>Silahkan masukan No. MCU atau nama pasien pada input keyword diatas minimal 3 huruf.</div>
+    </div>
+  </div>
+";
+
+
+
+# ============================================================
+# NAVIGASI
+# ============================================================
 
 ?>
-<div class="tengah mb4" id=img_ilustrasi><?= $ilustrasi ?></div>
-<div class="wadah gradasi-hijau tengah" style="max-width: 500px; margin:auto;">
-  <div><?= $radio_jenis_pasien ?></div>
-  <span id="jenis" class="hideit bg-red">cor</span>
-  <div class="hideit">
-    <!-- khusus untuk pasien perusahaan -->
-    <div class="mb1 f12 abu">Active Order saat ini:</div>
-    <select name="order_no" id="order_no" class="form-control mb4 tengah"><?= $list_order_no ?></select>
-  </div>
-  <input class="form-control mb2 tengah f24" name="keyword" id="keyword" placeholder="keyword..." autocomplete="off">
-
-  <div id="list_pasien" class="biru"></div>
-  <div id="list_pasien_text_awal" class='hideit '>Silahkan masukan No. MCU atau nama pasien pada input keyword diatas minimal 3 huruf.</div>
-
+<div class="tengah mt2">
+  <button class="btn btn-sm btn-secondary" id=btn_nav>Pencarian Pasien</button>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
   $(function() {
     let order_no = $('#order_no').val();
@@ -119,6 +158,17 @@ $ilustrasi = ilustrasi($aksi);
       jenis = rid[1];
       $('#jenis').text(jenis);
       $('#keyword').keyup();
+    });
+
+    $('#btn_nav').click(function() {
+      let cap = $(this).text();
+      if (cap == 'Pencarian Pasien') {
+        $(this).text('Lobby Pasien');
+      } else {
+        $(this).text('Pencarian Pasien');
+      }
+      $('#form_pencarian').slideToggle();
+      $('#lobby_pasien').slideToggle();
     });
   })
 </script>

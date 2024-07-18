@@ -1,7 +1,7 @@
 <?php
 include "../conn.php";
 $keyword = $_GET['keyword'] ?? die("Error @ajax :: [keyword] belum terdefinisi.");;
-$order_no = $_GET['order_no'] ?? die("Error @ajax :: [order_no] belum terdefinisi.");;
+// $order_no = $_GET['order_no'] ?? die("Error @ajax :: [order_no] belum terdefinisi.");;
 $jenis = $_GET['jenis'] ?? die("Error @ajax :: [jenis] belum terdefinisi.");
 
 if (!$jenis) die("Error @ajax :: [jenis] is empty.");
@@ -12,7 +12,7 @@ $join_tb_paket = '';
 $c_id = "''";
 $c_singkatan = "''";
 if ($jenis == 'cor') {
-  $sql_order_no = "a.order_no = '$order_no'";
+  // $sql_order_no = "a.order_no = '$order_no'";
   $join_tb_order = "JOIN tb_order b ON a.order_no=b.order_no";
   $join_tb_paket = "JOIN tb_paket c ON b.id_paket=c.id";
   $c_id = 'c.id';

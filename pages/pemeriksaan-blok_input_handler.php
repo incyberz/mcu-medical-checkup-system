@@ -29,7 +29,6 @@ foreach ($arr_input as $key => $v) {
     $arr_range = [];
     $jumlah_titik = 8;
     $div_range = '';
-    $last_range_value = '';
     $min_range = $v['minrange'];
     $max_range = $v['maxrange'];
     $durasi_range = $max_range - $min_range;
@@ -52,9 +51,7 @@ foreach ($arr_input as $key => $v) {
 
     for ($i = 0; $i <= $jumlah_titik; $i++) {
       $range_value = round($min_range + ($i * ($durasi_range / $jumlah_titik)), $precission);
-      $range_value_or_hide = $range_value == $last_range_value ? '&nbsp;' : $range_value;
-      $div_range .= "<div>$range_value_or_hide</div>";
-      $last_range_value = $range_value;
+      $div_range .= "<div>$range_value</div>";
     }
 
     $value = $v['value'] ?? '';

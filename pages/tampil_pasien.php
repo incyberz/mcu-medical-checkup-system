@@ -37,18 +37,25 @@ if (!mysqli_num_rows($q)) {
 
 
 
-if (!$order_no) {
-  echo div_alert('info tengah', 'Pasien ini mendaftar pada jalur mandiri (BPJS/Individu)');
-  // echo "<div class=tengah><a class='btn btn-primary' href='?pemeriksaan'>Langsung ke Pemeriksaan</a></div>";
-  // exit;
-}
-
 
 
 # ============================================================
-# KHUSUS PASIEN PERUSAHAAN
+# INCLUDES
 # ============================================================
 include 'include/arr_status_pasien.php';
+include 'include/arr_user.php';
+
+
+# ===========================================================
+# HASIL (IF EXISTS)
+# ===========================================================
+$arr_id_detail = [];
+$arr_pemeriksaan_tanggal = [];
+$arr_pemeriksaan_by = [];
+$arr_sampel_tanggal = [];
+$arr_sampel_by = [];
+
+include 'pemeriksaan-hasil_at_db.php';
 
 # ============================================================
 # MAIN SELECT PASIEN
@@ -91,7 +98,6 @@ $nama_paket = $pasien['nama_paket'];
 
 
 
-$buttons = '';
 # ============================================================
 # LIST PEMERIKSAAN
 # ============================================================
@@ -101,6 +107,7 @@ if ($JENIS == 'COR') {
   e.nama as nama_pemeriksaan,
   f.nama as jenis_pemeriksaan,
   e.singkatan,
+  e.sampel,
   2 as status_bayar, -- status bayar 2 = corporate
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
   FROM tb_pasien a 
@@ -118,6 +125,7 @@ if ($JENIS == 'COR') {
   e.nama as jenis_pemeriksaan,
   d.singkatan,
   b.status_bayar,
+  d.sampel,
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=d.id) count_pemeriksaan_detail
   FROM tb_pasien a 
   JOIN tb_paket_custom b ON a.id_paket_custom=b.id  
@@ -134,6 +142,7 @@ $tr_progress = '';
 $jenis_pemeriksaan = '';
 $no = 0;
 $jumlah_pemeriksaan_selesai = 0;
+$jumlah_sampel_selesai = 0;
 if (!mysqli_num_rows($q_pemeriksaan)) {
   $tr_progress = div_alert('danger', "
     Paket ini belum punya List Pemeriksaan | 
@@ -141,8 +150,8 @@ if (!mysqli_num_rows($q_pemeriksaan)) {
       Assign Pemeriksaan
     </a>
   ");
-} else {
 }
+$arr_csampel = [];
 while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   $no++;
   $id_pemeriksaan = $pemeriksaan['id_pemeriksaan'];
@@ -150,82 +159,99 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   $jenis_pemeriksaan = $pemeriksaan['jenis_pemeriksaan'];
   $count_pemeriksaan_detail = $pemeriksaan['count_pemeriksaan_detail'];
   $status_bayar = $pemeriksaan['status_bayar'];
-
-
-
-  # ============================================================
-  # ZZZ 
-  # ============================================================
-  $s3 = "SELECT 
-  '' as tanggal_periksa, 
-  '' as pemeriksa 
-  FROM tb_mcu a 
-  WHERE a.id_pasien=$id_pasien";
-  // echo $s3;
-  $q3 = mysqli_query($cn, $s3) or die(mysqli_error($cn));
-  $d3 = mysqli_fetch_assoc($q3);
-  // $tanggal_periksa_show = '<span class="consolas darkblue">' . date('d-F-Y H:i:s', strtotime($d3['tanggal_periksa'])) . '</span> ~ <span class="f12 abu miring">  ' . eta2($d3['tanggal_periksa']) . '</span>';
-  $tanggal_periksa_show = 'TANGGAL_PERIKSA_SHOW';
-  if (mysqli_num_rows($q3) and $d3['tanggal_periksa']) {
-    $btn = 'secondary';
-    $jumlah_pemeriksaan_selesai++;
-    $info_pemeriksaan = "<span class=darkabu>Telah diperiksa oleh <b class=darkblue>$d3[pemeriksa]</b>, $tanggal_periksa_show</span> $img_check";
-  } else {
-    $btn = 'primary';
-    $info_pemeriksaan = '<span class="f12 miring abu">belum menjalani pemeriksaan di bagian ini.</span>';
+  if ($jenis == 'idv' and $status_bayar == '') {
+    $buttons = div_alert('danger', "Pasien Individu ini belum melakukan Pembayaran. <hr><a class='btn btn-primary' href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>");
+    exit;
   }
 
+  $sampel = $pemeriksaan['sampel'];
+  if (!in_array($sampel, $arr_csampel) and $sampel) array_push($arr_csampel, $sampel);
+
+  // info progres pemeriksaan
+  $tanggal_periksa = $arr_pemeriksaan_tanggal[$id_pemeriksaan] ?? '';
+  $id_pemeriksa = $arr_pemeriksaan_by[$id_pemeriksaan] ?? '';
+  $info_pemeriksaan = '<span class="f12 miring abu">belum menjalani pemeriksaan di bagian ini.</span>';
+  if ($tanggal_periksa) {
+    $jumlah_pemeriksaan_selesai++;
+    $hari = hari_tanggal($tanggal_periksa);
+    $info_pemeriksaan = "by <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>";
+  }
+
+  # ============================================================
+  # TR PROGRESS PEMERIKSAAN
+  # ============================================================
   $tr_progress .= "
     <tr>
+      <td>$no</td>
+      <td class=kiri>$pemeriksaan[nama_pemeriksaan]</td>
+      <td class=kiri>$info_pemeriksaan</td>
       <td>
-        $no
-      </td>
-      <td class=kiri>
-        $pemeriksaan[nama_pemeriksaan]
-      </td>
-      <td class=kiri>
-        $info_pemeriksaan
+        <a href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$id_pasien'>$img_next</a>
       </td>
     </tr>
   ";
-
-  // die($s3);
-
-  $button = "<div><a class='btn btn-$btn ' href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$id_pasien&nama_pemeriksaan=$nama_pemeriksaan&JENIS=$JENIS&id_paket=$id_paket'>$pemeriksaan[singkatan]</a></div> ";
-  if (!$count_pemeriksaan_detail) {
-    $link = "<a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan&nama_pemeriksaan=$pemeriksaan[nama_pemeriksaan]'>Manage</a>";
-    $pesan = "Pemeriksaan <b class=darkblue>$pemeriksaan[nama_pemeriksaan]</b> belum punya detail pemeriksaan";
-    echo (div_alert('danger',   "$pesan | $link"));
-    $button = "<div><span class='btn btn-secondary' onclick='alert(`" . strip_tags($pesan) . "`)'>$pemeriksaan[singkatan]</span></div> ";
-  }
-
-  $buttons .= $button;
 }
 
-$info_pemeriksaan = '';
-if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_pemeriksaan) {
+
+$tr_sampel = '';
+$info_sampel = '<span class="f12 miring abu">belum ambil sampel</span>';
+$no = 0;
+$jumlah_sampel = count($arr_csampel);
+if ($arr_csampel) {
+  include 'include/arr_sampel.php';
+  foreach ($arr_csampel as $sampel) {
+    $no++;
+
+    // info progres sampel
+    $tanggal_periksa = $arr_sampel_tanggal[$sampel] ?? '';
+    $id_pemeriksa = $arr_sampel_by[$sampel] ?? '';
+    $info_sampel = '<span class="f12 miring abu">belum menjalani pemeriksaan di bagian ini.</span>';
+    if ($tanggal_periksa) {
+      $jumlah_sampel_selesai++;
+      $hari = hari_tanggal($tanggal_periksa);
+      $info_sampel = "by <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>";
+    }
+
+
+    $tr_sampel .= "
+      <tr>
+        <td>$no</td>
+        <td class=kiri>$arr_sampel[$sampel]</td>
+        <td class=kiri>$info_sampel</td>
+        <td>
+          <a href='?ambil_sampel&sampel=$sampel&id_pasien=$id_pasien'>$img_next</a>
+        </td>
+      </tr>
+    ";
+  }
+}
+
+# ============================================================
+# INFO SELESAI PEMERIKSAAN
+# ============================================================
+$info_selesai = '';
+if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_sampel_selesai == $jumlah_sampel and $jumlah_pemeriksaan) {
   if ($status == 9) {
     //update status pasien menjadi 10 (pasien selesai)
     $s2 = "UPDATE tb_pasien SET status=10 WHERE id='$id_pasien'";
     $q_pemeriksaan = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     jsurl();
   }
-  $info_pemeriksaan =  "<div class='alert alert-success mt2'>Pasien telah menjalani semua pemeriksaan $img_check</div>";
+  $info_selesai =  "
+    <div class='alert alert-success mt2'>
+      Pasien telah menjalani semua pemeriksaan $img_check
+
+      <div class=mt2>
+        <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien'>Hasil Pemeriksaan</a>
+      </div>
+    </div>
+  ";
 }
 
-$tb_progress = '';
-if ($data_pemeriksaan) {
-  $tb_progress = "<table class='table table-striped table-hover mt4'>$tr_progress</table>";
-} else {
-  $tb_progress = div_alert('info mt2', 'Pasien ini belum menjalani pemeriksaan');
-}
 
 $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class="f12 red">Belum pernah login</span>';
 $src = "$lokasi_pasien/$foto_profil";
 
-if ($jenis == 'idv' and $status_bayar == '') {
-  $buttons = div_alert('danger', "Pasien Individu ini belum melakukan Pembayaran. <hr><a class='btn btn-primary' href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>");
-}
 
 # ============================================================
 # FINAL ECHO PEM MCU
@@ -236,16 +262,18 @@ echo "
     <div><img src='$src' class='foto_profil'></div>
     <div class='mb1'>$gender_icon $pasien[nama_pasien]</div>
     <div class='border-bottom mb2 pb2 biru f12'>MCU-$id_pasien | $status_show</div>
-    <div class=''>
-      <h4 class=mb4>MCU $pasien[nama_paket] $pasien[jenis_pasien]</h4>
-      <div class='flexy mt2 flex-center'>
-        $buttons
+    <h4 class=mb4>MCU $pasien[nama_paket] $pasien[jenis_pasien]</h4>
+    <div class='flexy flex-center'>
+      <div class=wadah>
+        Sampel Pemeriksaan
+        <table class='table table-striped table-hover mt4'>$tr_sampel</table>
       </div>
     </div>
     <div class='flexy flex-center'>
-      <div>
-        $tb_progress
-        $info_pemeriksaan
+      <div class=wadah>
+        Progress Pemeriksaan
+        <table class='table table-striped table-hover mt4'>$tr_progress</table>
+        $info_selesai
       </div>
     </div>
   </div>

@@ -121,7 +121,13 @@ if (mysqli_num_rows($q)) {
         }
         $value = "<i class='f12 abu'>$value</i>";
       } elseif ($key == 'status_pasien') {
-        $value = $value ? "<span class=f12>$d[status] ~ $value</span>" : "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
+        if (!$value) {
+          $value = "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
+        } elseif ($d['status'] == 10) {
+          $value =  "<span class='f12 green'>$d[status] ~ $value $img_check</span>";
+        } else {
+          $value = "<span class=f12>$d[status] ~ $value</span>";
+        }
         $value .= "<div class='mt1 f10 abu'>MCU$thn-$id_pasien</div>";
       } elseif ($key == 'tanggal_daftar') {
         $value = '<span class=f14>' . hari_tanggal($value, 0, 1, 1, 0, '-') . '</span>';
@@ -145,7 +151,9 @@ if (mysqli_num_rows($q)) {
         }
       } elseif ($key == 'status_pemeriksaan') {
         $loading = "<img src='assets/img/gifs/loading.gif' height=25px>";
-        if (!$value) {
+        if ($d['status'] == 10) {
+          $value = "<span class='f12 green'> selesai $img_check</span>";
+        } elseif (!$value) {
           $value = '<span class="f12 miring red bold">belum-pem.</span>';
         } elseif ($value == 1) {
           $value = "<span class='f12 miring green'>awal pemeriksaan $loading</span>";
