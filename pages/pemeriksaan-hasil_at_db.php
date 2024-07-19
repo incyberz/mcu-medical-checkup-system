@@ -14,10 +14,10 @@ $arr_sampel_by = [];
 $s = "SELECT * FROM tb_hasil_pemeriksaan WHERE id_pasien=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (mysqli_num_rows($q)) {
-  $d = mysqli_fetch_assoc($q);
-  $arr_hasil = explode('||', $d['arr_hasil']);
-  $arr_tanggal_by = explode('||', $d['arr_tanggal_by']);
-  $arr_sampel_tanggal_by = explode('||', $d['arr_sampel']);
+  $hasil = mysqli_fetch_assoc($q);
+  $arr_hasil = explode('||', $hasil['arr_hasil']);
+  $arr_tanggal_by = explode('||', $hasil['arr_tanggal_by']);
+  $arr_sampel_tanggal_by = explode('||', $hasil['arr_sampel']);
 
   foreach ($arr_hasil as $pair) {
     if (!$pair) continue;
@@ -39,10 +39,11 @@ if (mysqli_num_rows($q)) {
   foreach ($arr_sampel_tanggal_by as $pair) {
     if (!$pair) continue;
     $arr_pair = explode('=', $pair, 2);
-    $arr_sampel_tanggal_by[$arr_pair[0]] = $arr_pair[1];
 
     $arr_tmp = explode(',', $arr_pair[1]);
-    $arr_sampel_tanggal[$arr_pair[0]] = $arr_tmp[0];
-    $arr_sampel_by[$arr_pair[0]] = $arr_tmp[1];
+    if ($arr_tmp[0]) {
+      $arr_sampel_tanggal[$arr_pair[0]] = $arr_tmp[0];
+      $arr_sampel_by[$arr_pair[0]] = $arr_tmp[1];
+    }
   }
 }

@@ -7,14 +7,14 @@
 <?php
 
 
-$img_tidur = ilustrasi('tidur');
-$img_merokok = ilustrasi('merokok');
-$img_stress = ilustrasi('stress');
-$img_olahraga = ilustrasi('olahraga');
-$img_tato = ilustrasi('tato');
-$img_tindik = ilustrasi('tindik');
-$img_obat = ilustrasi('obat');
-$img_minum = ilustrasi('minum');
+$img_tidur = ilustrasi('tidur', 180, 'auto', 'jpg');
+$img_merokok = ilustrasi('merokok', 180, 'auto', 'jpg');
+$img_stress = ilustrasi('stress', 180, 'auto', 'jpg');
+$img_olahraga = ilustrasi('olahraga', 180, 'auto', 'jpg');
+$img_tato = ilustrasi('tato', 180, 'auto', 'jpg');
+$img_tindik = ilustrasi('tindik', 180, 'auto', 'jpg');
+$img_obat = ilustrasi('obat', 180, 'auto', 'jpg');
+$img_minum = ilustrasi('minum', 180, 'auto', 'jpg');
 
 
 

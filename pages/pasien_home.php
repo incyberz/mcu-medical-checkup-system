@@ -148,18 +148,20 @@ if (!mysqli_num_rows($q)) {
   }
 }
 
-$s2 = "SELECT 
-a.nama as nama_pemeriksaan 
-FROM tb_paket_sub a 
-JOIN tb_paket_detail b ON a.id=b.id_paket_sub
-WHERE b.id_paket='$id_paket'";
-$q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+if (!$id_paket) die(div_alert('danger', "id_paket pasien ini belum ditentukan."));
+
+// $s2 = "SELECT 
+// a.nama as nama_pemeriksaan 
+// FROM tb_paket_sub a 
+// JOIN tb_paket_detail b ON a.id=b.id_paket_sub
+// WHERE b.id_paket='$id_paket'";
+// $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
 $li = '';
-if (mysqli_num_rows($q2)) {
-  while ($d2 = mysqli_fetch_assoc($q2)) {
-    $li .= "<li>$d2[nama_pemeriksaan]</li>";
-  }
-}
+// if (mysqli_num_rows($q2)) {
+//   while ($d2 = mysqli_fetch_assoc($q2)) {
+//     $li .= "<li>$d2[nama_pemeriksaan]</li>";
+//   }
+// }
 $detail_pemeriksaan = "<ol>$li</ol>";
 
 $tanggal_order_show = date('d-m-Y', strtotime($d['tanggal_order']));

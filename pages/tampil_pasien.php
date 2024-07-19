@@ -219,7 +219,7 @@ if ($arr_csampel) {
         <td class=kiri>$arr_sampel[$sampel]</td>
         <td class=kiri>$info_sampel</td>
         <td>
-          <a href='?ambil_sampel&sampel=$sampel&id_pasien=$id_pasien'>$img_next</a>
+          <a href='?pemeriksaan&ambil_sampel=1&sampel=$sampel&id_pasien=$id_pasien'>$img_next</a>
         </td>
       </tr>
     ";

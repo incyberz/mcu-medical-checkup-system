@@ -64,6 +64,7 @@ $fields = "
   e.nama as nama_pemeriksaan,
   e.singkatan,
   e.sampel,
+  e.jenis,
   f.nama as jenis_pemeriksaan,
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
 ";
@@ -96,12 +97,25 @@ if ($JENIS == 'COR') {
 }
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) die('Belum ada data pemeriksaan untuk pasien ini');
+$is_mcu = 0;
 while ($d = mysqli_fetch_assoc($q)) {
   $id_pemeriksaan = $d['id_pemeriksaan'];
   $jenis_pemeriksaan = $d['jenis_pemeriksaan'];
-  if (strtolower($jenis_pemeriksaan) == 'hematologi') {
-    include 'hasil_pemeriksaan-hematologi.php';
+  $jenis = strtolower($d['jenis']);
+  $file = "$lokasi_pages/hasil_pemeriksaan-$jenis.php";
+  if (file_exists($file)) {
+    if ($jenis != 'mcu') {
+      // ZZZ
+      // include $file;
+    } else {
+      $is_mcu = 1;
+    }
   } else {
+
     echo div_alert('danger', "Belum ada Format Hasil Pemeriksaan untuk jenis: $jenis_pemeriksaan");
   }
+}
+
+if ($is_mcu) {
+  include 'hasil_pemeriksaan-mcu.php';
 }

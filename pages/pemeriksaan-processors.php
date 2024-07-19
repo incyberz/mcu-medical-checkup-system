@@ -6,12 +6,18 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     # ============================================================
     # SAMPEL PROCESSOR
     # ============================================================
-    $arr_sampel_tanggal_by[$sampel] = date('Y-m-d H:i:s') . ",$id_user";
+    // $arr_sampel_tanggal_by[$sampel] = "$sampel=" . date('Y-m-d H:i:s') . ",$id_user";
+    array_push($arr_sampel_tanggal_by, "$sampel=" . date('Y-m-d H:i:s') . ",$id_user");
 
     # ============================================================
     # ARRAY SORT BY KEY
     # ============================================================
-    ksort($arr_sampel_tanggal_by);
+    // ksort($arr_sampel_tanggal_by);
+
+    // echo '<pre> at processors arr_sampel_tanggal_by ';
+
+    // var_dump($arr_sampel_tanggal_by);
+    // echo '</pre>';
 
     # ============================================================
     # CONVERT TO STRING
@@ -20,7 +26,7 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     echolog('converting to string');
     $str_sampel = '';
     foreach ($arr_sampel_tanggal_by as $key => $value) {
-      if ($value) $str_sampel .= "$key=$value||";
+      if ($value) $str_sampel .= "$value||";
     }
     $pairs['arr_sampel'] = "arr_sampel='$str_sampel'";
 
@@ -32,6 +38,9 @@ if (isset($_POST['btn_submit_data_pasien'])) {
       status = 2 -- status hasil sedang diinput
     WHERE id_pasien=$id_pasien";
     // echolog($s);
+    // echo '<pre>';
+    // var_dump($s);
+    // echo '</pre>';
     // exit;
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     echolog('sukses');
@@ -72,9 +81,9 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     ksort($arr_id_detail);
     ksort($arr_id_pemeriksaan_tanggal);
 
-    echo '<pre>';
-    var_dump($arr_id_pemeriksaan_tanggal);
-    echo '</pre>';
+    // echo '<pre>';
+    // var_dump($arr_id_pemeriksaan_tanggal);
+    // echo '</pre>';
 
     # ============================================================
     # CONVERT TO STRING

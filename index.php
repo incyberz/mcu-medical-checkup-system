@@ -42,8 +42,8 @@ $lokasi_xls = 'assets/xls';
 
 // set auto login
 if (1) {
-  $_SESSION['mmc_username'] = 'meyda';
-  $_SESSION['mmc_role'] = 'marketing';
+  $_SESSION['mmc_username'] = 'ahmadnk';
+  $_SESSION['mmc_role'] = 'dokter';
   echo "<div style='position:fixed; top:0; left:0; font-weight:bold; z-index:9999; background:red; padding:15px'>AUTOLOGIN MODE</div>";
 }
 
@@ -95,6 +95,7 @@ include 'user_data.php';
 # INCLUDES
 # ================================================
 include 'include/insho_functions.php';
+include 'include/mcu_functions.php';
 include 'include/crud_icons.php';
 include 'include/img_icon.php';
 include 'include/date_managements.php';
