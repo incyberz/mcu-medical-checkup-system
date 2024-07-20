@@ -8,6 +8,9 @@
 # ============================================================
 foreach ($arr_input as $key => $v) {
 
+  // khusus MCU by Dokter
+  if ($v['bagian']) $v['label'] = "$v[bagian] > $v[label]";
+
   # ============================================================
   # FILL DATA FROM DB
   # ============================================================
@@ -116,16 +119,7 @@ foreach ($arr_input as $key => $v) {
       $v['value'] // value from DB
     );
   } elseif ($v['blok'] == 'array-gigi') {
-    include 'include/array_gigi_function.php';
-
-    $value_from_db = $v['value'];
-
-    $blok_sub_input = array_gigi(
-      $id_detail,
-      $v['label'],
-      $value_from_db
-    );
-    // die($v['label']);
+    include 'include/array_gigi_function2.php';
   } elseif ($v['blok'] == 'input') {
     $blok_sub_input = 'BLOK INPUT BELUM DITENTUKAN';
     echo div_alert('danger', "Blok [input] belum ditentukan. | <a href='?manage_pemeriksaan_detail&id_detail=$id_detail'>Manage</a>");

@@ -4,7 +4,7 @@ $bln = $arr_nama_bulan[intval(date('m', strtotime($tanggal_awal))) - 1];
 $tahun = date('Y', strtotime($tanggal_awal));
 $img_filter = img_icon('filter');
 set_h2('Pendaftaran', "Data Pendaftaran Pasien <b class=darkblue>$bln $tahun</b> $img_filter");
-only(['admin', 'nakes', 'marketing']);
+only(['admin', 'nakes', 'marketing', 'dokter']);
 
 
 ?>

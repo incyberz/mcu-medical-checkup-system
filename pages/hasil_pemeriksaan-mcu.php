@@ -3,6 +3,7 @@ set_title('Hasil MCU');
 $tidak_ada = '<i class=hasil>--tidak ada--</i>';
 include 'hasil_pemeriksaan-styles.php';
 include 'include/arr_pemeriksaan.php';
+include 'include/arr_pemeriksaan_detail.php';
 
 
 # ============================================================
@@ -41,7 +42,7 @@ echo "
   <div class='wadah gradasi-hijau tengah'>
     Preview Hasil Laboratorium
     <div class='flexy flex-center f12'>
-      <div class='bg-white p4 mt2' style='box-shadow: 0 0 8px black; padding: 1cm; width: 21cm; height-ZZZ: 297mm' id=kertas>
+      <div class='kertas bg-white p4 mt2' id=kertas__mcu>
         <div>$img_header_logo</div>
         <div class='border-bottom mb2 pb2 f12 mt1'>Tambun Business Park Blok C12 Tambun - Bekasi<br>Telp.(021) 29487893</div>
         
@@ -52,90 +53,38 @@ echo "
 
 
 
-# ============================================================
-# HASIL RIWAYAT PENYAKIT
-# ============================================================
-$dt = explode(',', $pasien['riwayat_penyakit']);
-$arr = [
-  'RIWAYAT PENYAKIT' => 'riwayat',
-  'RIWAYAT PENGOBATAN' => 'pengobatan',
-  'RIWAYAT PENYAKIT AYAH' => 'ayah',
-  'RIWAYAT PENYAKIT IBU' => 'ibu'
-];
-$riw = [];
-foreach ($arr as $k1 => $v1) if ($v1) $riw[$v1] = '';
-
-foreach ($dt as $k2 => $v2) {
-  $t = explode('--', $v2);
-  if ($v2) $riw[$t[0]] .= "<li>$v2</li>";
-}
-
-foreach ($arr as $k1 => $v1) {
-
-  // if (!$riw[$v1]) continue;
-  $riw[$v1] = $riw[$v1] ? "<ul class='hasil m0'>$riw[$v1]</ul>" : $tidak_ada;
-  blok_hasil($k1, $riw[$v1]);
-}
 
 
 # ============================================================
-# HASIL GEJALA PENYAKIT
+# HASIL FROM PASIEN
 # ============================================================
-$dt = explode(',', $pasien['gejala_penyakit']);
-$str_hasil = '';
-foreach ($dt as $k => $v)  if ($v) $str_hasil .= "<li>$v</li>";
-
-$str_hasil = $str_hasil ? "<ul class='hasil m0'>$str_hasil</ul>" : $tidak_ada;
-blok_hasil('GEJALA PENYAKIT', $str_hasil);
-
-
+include 'hasil_pemeriksaan-mcu-from_pasien.php';
 
 # ============================================================
-# HASIL GAYA HIDUP
+# AWAL PERIKSA, SAMPLING, DAN LIST PEMERIKSAAN
 # ============================================================
-$dt = explode(',', $pasien['gaya_hidup']);
-$str_hasil = '';
-foreach ($dt as $k => $v)  if ($v) $str_hasil .= "<li>$v</li>";
-
-$str_hasil = $str_hasil ? "<ul class='hasil m0'>$str_hasil</ul>" : $tidak_ada;
-blok_hasil('GAYA HIDUP', $str_hasil);
-
-
+include 'hasil_pemeriksaan-mcu-awal_pemeriksaan.php';
 
 # ============================================================
-# HASIL KELUHAN
+# PEMFIS AWAL
 # ============================================================
-$str_hasil = strlen($pasien['keluhan']) > 3 ? "<span class='hasil m0'>$pasien[keluhan]</span>" : $tidak_ada;
-blok_hasil('KELUHAN', $str_hasil);
+include 'hasil_pemeriksaan-mcu-pemfis.php';
 
 # ============================================================
-# AWAL PEMERIKSAAN
+# MATA 
 # ============================================================
-blok_hasil('AWAL PEMERIKSAAN', $hasil['awal_periksa'], 1);
+include 'hasil_pemeriksaan-mcu-mata.php';
 
 # ============================================================
-# SAMPLING
+# GIGI 
 # ============================================================
-$li = '';
-foreach ($arr_sampel_by as $key => $value) {
-  $by = $arr_user[$value];
-  $at = $arr_sampel_tanggal[$key];
-  $li .= "<li>$key by $by at $at </li>";
-}
-$str_hasil = $li ? "<ul class='hasil m0'>$li</ul>" : $tidak_ada;
-blok_hasil('SAMPLING', $str_hasil);
+include 'hasil_pemeriksaan-mcu-gigi.php';
 
 # ============================================================
-# PEMERIKSAAN
+# PEMFIS DOKTER
 # ============================================================
-$li = '';
-foreach ($arr_pemeriksaan_by as $key => $value) {
-  $by = $arr_user[$value];
-  $at = $arr_pemeriksaan_tanggal[$key];
-  $li .= "<li>$arr_pemeriksaan[$key] by $by at $at </li>";
-}
-$str_hasil = $li ? "<ul class='hasil m0'>$li</ul>" : $tidak_ada;
-blok_hasil('PEMERIKSAAN', $str_hasil);
+include 'hasil_pemeriksaan-mcu-pemfis_dokter.php';
+
 
 
 # ============================================================

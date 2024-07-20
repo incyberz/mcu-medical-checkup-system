@@ -242,7 +242,7 @@ if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_sampel_selesa
       Pasien telah menjalani semua pemeriksaan $img_check
 
       <div class=mt2>
-        <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien'>Hasil Pemeriksaan</a>
+        <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Hasil Pemeriksaan MCU</a>
       </div>
     </div>
   ";

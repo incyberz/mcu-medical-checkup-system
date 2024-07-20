@@ -44,6 +44,8 @@ $lokasi_xls = 'assets/xls';
 if (1) {
   $_SESSION['mmc_username'] = 'ahmadnk';
   $_SESSION['mmc_role'] = 'dokter';
+  // $_SESSION['mmc_username'] = 'meyda';
+  // $_SESSION['mmc_role'] = 'marketing';
   echo "<div style='position:fixed; top:0; left:0; font-weight:bold; z-index:9999; background:red; padding:15px'>AUTOLOGIN MODE</div>";
 }
 

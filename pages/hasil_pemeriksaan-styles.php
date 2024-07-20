@@ -1,4 +1,11 @@
 <style>
+  .kertas {
+    box-shadow: 0 0 8px black;
+    padding: 1cm;
+    width: 21cm;
+    /* height-ZZZ: 297mm */
+  }
+
   .blok_hasil {
     border: solid 1px #aaa;
     font-size: 10px;
@@ -31,12 +38,14 @@
       visibility: hidden;
     }
 
-    #kertas {
+    .kertas {
       visibility: visible;
       position: absolute;
       left: 0;
       top: 0;
       margin: 0;
+      padding: 0 1cm;
+      box-shadow: none;
     }
   }
 </style>

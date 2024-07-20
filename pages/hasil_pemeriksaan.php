@@ -2,6 +2,7 @@
 set_title("Hasil Pemeriksaan");
 only('users');
 $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', "Page ini membutuhkan index [id_pasien]"));
+$get_jenis = $_GET['jenis'] ?? die(div_alert('danger', "Page ini membutuhkan index [jenis]"));
 
 # ============================================================
 # INCLUDES
@@ -73,6 +74,7 @@ $joins = "
   JOIN tb_pemeriksaan e ON d.id_pemeriksaan=e.id 
   JOIN tb_jenis_pemeriksaan f ON e.jenis=f.jenis 
   WHERE a.id=$id_pasien 
+  AND e.jenis='$get_jenis'
 ";
 
 if ($JENIS == 'COR') {
@@ -98,21 +100,24 @@ if ($JENIS == 'COR') {
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) die('Belum ada data pemeriksaan untuk pasien ini');
 $is_mcu = 0;
+$jumlah_row = mysqli_num_rows($q);
+
 while ($d = mysqli_fetch_assoc($q)) {
   $id_pemeriksaan = $d['id_pemeriksaan'];
   $jenis_pemeriksaan = $d['jenis_pemeriksaan'];
   $jenis = strtolower($d['jenis']);
+  echo "<br>$jenis ROW: $jumlah_row";
+  // exit;
   $file = "$lokasi_pages/hasil_pemeriksaan-$jenis.php";
-  if (file_exists($file)) {
-    if ($jenis != 'mcu') {
-      // ZZZ
-      // include $file;
+  if ($jenis != 'mcu') {
+    if (file_exists($file)) {
+      include $file;
     } else {
-      $is_mcu = 1;
+
+      echo div_alert('danger', "Belum ada Format Hasil Pemeriksaan untuk jenis: $jenis_pemeriksaan");
     }
   } else {
-
-    echo div_alert('danger', "Belum ada Format Hasil Pemeriksaan untuk jenis: $jenis_pemeriksaan");
+    $is_mcu = 1;
   }
 }
 

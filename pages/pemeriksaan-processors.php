@@ -79,7 +79,7 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     # ARRAY SORT BY KEY
     # ============================================================
     ksort($arr_id_detail);
-    ksort($arr_id_pemeriksaan_tanggal);
+    // ksort($arr_id_pemeriksaan_tanggal);
 
     // echo '<pre>';
     // var_dump($arr_id_pemeriksaan_tanggal);

@@ -290,7 +290,10 @@ if (!mysqli_num_rows($q)) {
     }
     $tr .= "
       <tr id=tr__$id_detail>
-        <td><button class='btn-transparan btn_save' id=btn_delete__$dual_id  >$img_delete</button></td>
+        <td>
+          <button class='btn-transparan btn_save' id=btn_delete__$dual_id  >$img_delete</button>
+          <div class='f10 abu mt1'>id.$id_detail</div>
+        </td>
         <td>
           <table class='table table-bordered' id=sub_table>
             <thead>
