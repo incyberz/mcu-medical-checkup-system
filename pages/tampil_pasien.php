@@ -108,6 +108,7 @@ if ($JENIS == 'COR') {
   f.nama as jenis_pemeriksaan,
   e.singkatan,
   e.sampel,
+  e.jenis,
   2 as status_bayar, -- status bayar 2 = corporate
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
   FROM tb_pasien a 
@@ -126,6 +127,7 @@ if ($JENIS == 'COR') {
   d.singkatan,
   b.status_bayar,
   d.sampel,
+  d.jenis,
   (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=d.id) count_pemeriksaan_detail
   FROM tb_pasien a 
   JOIN tb_paket_custom b ON a.id_paket_custom=b.id  
@@ -152,6 +154,7 @@ if (!mysqli_num_rows($q_pemeriksaan)) {
   ");
 }
 $arr_csampel = [];
+$link_hasil_penunjang = '';
 while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   $no++;
   $id_pemeriksaan = $pemeriksaan['id_pemeriksaan'];
@@ -163,6 +166,12 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
     $buttons = div_alert('danger', "Pasien Individu ini belum melakukan Pembayaran. <hr><a class='btn btn-primary' href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>");
     exit;
   }
+
+  if (strtolower($pemeriksaan['jenis']) != 'mcu') $link_hasil_penunjang .= " 
+    <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$pemeriksaan[jenis]&id_pemeriksaan=$id_pemeriksaan'>
+      $nama_pemeriksaan
+    </a>
+  ";
 
   $sampel = $pemeriksaan['sampel'];
   if (!in_array($sampel, $arr_csampel) and $sampel) array_push($arr_csampel, $sampel);
@@ -243,6 +252,10 @@ if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_sampel_selesa
 
       <div class=mt2>
         <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Hasil Pemeriksaan MCU</a>
+      </div>
+      <div class='wadah mt2'>
+        <div class='mb2 mt1 abu'>Pemeriksaan Penunjang</div>
+        $link_hasil_penunjang 
       </div>
     </div>
   ";

@@ -38,6 +38,10 @@
       visibility: hidden;
     }
 
+    .back-to-top {
+      visibility: hidden !important;
+    }
+
     .kertas {
       visibility: visible;
       position: absolute;

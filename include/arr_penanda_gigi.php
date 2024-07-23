@@ -31,3 +31,25 @@ function simbol_gigi($kode)
   if (!array_key_exists($kode, $arr)) die("<span class=red>Kode gigi: $kode tidak ada dalam arr_penanda_gigi</span>");
   return $arr[$kode];
 }
+
+function arti_simbol_gigi($simbol)
+{
+  $arr = [
+    'O' => 'Caries',
+    '@' => 'Tambalan',
+    'X' => 'Gigi Sudah tidak ada',
+    'H' => 'Gigi belum tumbuh',
+    'E' => 'Gigi goyang',
+    '^' => 'Calculus',
+    'V' => 'Radix',
+    '2' => 'Caries',
+    '3' => 'Tambalan',
+    '4' => 'Gigi Sudah tidak ada',
+    '5' => 'Gigi belum tumbuh',
+    '6' => 'Gigi goyang',
+    '7' => 'Calculus',
+    '8' => 'Radix',
+  ];
+  if (!array_key_exists($simbol, $arr)) die("<span class=red>Simbol gigi: $simbol tidak ada dalam arr_penanda_gigi</span>");
+  return $arr[$simbol];
+}

@@ -1,7 +1,9 @@
 <?php
 // get id_pemeriksaan by id_pasien and jenis ZZZ
 
-$id_pemeriksaan = 3;
+// $id_pemeriksaan = 3;
+// $s = "SELECT a.id as id_pemeriksaan a"
+set_title('Hasil Lab - ' . $nama_pemeriksaan);
 
 # ============================================================
 # DETAIL PEMERIKSAAN

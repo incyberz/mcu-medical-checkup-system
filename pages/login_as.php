@@ -25,6 +25,8 @@ if ($_SESSION['mmc_role'] == 'pasien') {
 # ============================================================
 if ($role == 'pasien') {
   $s = "SELECT 1 FROM tb_pasien WHERE username='$username'";
+} elseif ($role == 'pendaftar') {
+  $s = "SELECT 1 FROM tb_pendaftar WHERE username='$username'";
 } else {
   $s = "SELECT 1 FROM tb_user WHERE username='$username' AND role='$role'";
 }

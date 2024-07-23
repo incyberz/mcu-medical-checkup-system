@@ -22,7 +22,24 @@ while ($d = mysqli_fetch_assoc($q)) {
         // $kelainan = '';
       } else {
         $kelainan = $img_check_pink; // "$nama_pemeriksaan: $arr_id_detail[$id_detail]";
-        // $c_hasil = '';
+
+        // li kesimpulan
+        $li_kesimpulan = "
+          <li>
+            <span class=column>$d[bagian]:</span>
+            <span class=hasil>$nama_pemeriksaan: $arr_id_detail[$id_detail]</span>
+          </li>
+        ";
+
+        // add to kesimpulan
+        if (!isset($kesimpulan['Kelainan Fisik'])) {
+          $kesimpulan['Kelainan Fisik'] = [$li_kesimpulan];
+        } else {
+          array_push($kesimpulan['Kelainan Fisik'], $li_kesimpulan);
+        }
+
+        // add abnormal color
+        $c_hasil = "<span class=red>$c_hasil</span>";
       }
     }
 
@@ -35,7 +52,7 @@ while ($d = mysqli_fetch_assoc($q)) {
 
   $tr .= "
     <tr>
-      <td>$d[bagian]</td>
+      <td><span class=column>$d[bagian]</span></td>
       <td>$img</td>
       <td>$hasil</td>
       <td>$kelainan</td>

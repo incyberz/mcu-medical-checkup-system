@@ -26,13 +26,18 @@ if ($id_detail) {
   }
 }
 
+$mode = $_GET['mode'] ?? '';
+$DPem = !$mode ? 'Manage Detail Pemeriksaan' : '<div class="f30 blue">Batasan Hasil Pemeriksaan</div>';
+
 set_h2('Detail Pemeriksaan', "
-  Manage Detail Pemeriksaan <b class='proper darkblue'>$nama_pemeriksaan</b>
+  $DPem <b class='proper darkblue'>$nama_pemeriksaan</b>
   <div class=mt2><a href='?manage_pemeriksaan'>$img_prev</a> $link_up</div>
 ");
+$roles = ['admin', 'marketing', 'nakes', 'dokter'];
+$str_roles = join(', ', $roles);
 only(
-  ['admin', 'marketing'],
-  'Yang berhak update pertanyaan adalah Role Admin atau Role Marketing
+  $roles,
+  'Yang berhak update pertanyaan adalah: [$str_roles]
   <hr>
   <span class=biru>Silahkan Logout kemudian re-Login sebagai role diatas untuk editing Detail Pemeriksaan</span>
   <hr>
@@ -62,13 +67,11 @@ if (isset($_POST['btn_tambah_detail'])) {
   $s = "INSERT INTO tb_pemeriksaan_detail (
     id_pemeriksaan,
     blok,
-    label,
-    satuan
+    label
   ) VALUES (
     '$id_pemeriksaan',
     'input',
-    '$_POST[label]',
-    'satuan'
+    '$_POST[label]'
   )";
   // echo $s;
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -145,15 +148,23 @@ if (!mysqli_num_rows($q)) {
       # ============================================================
       $hideit = 'hideit';
       $needed = [];
-      if ($d['blok'] == 'radio' || $d['blok'] == 'radio-toolbar' || $d['blok'] == 'multi-radio' || $d['blok'] == 'select') {
+      if ($mode == 'batasan') {
+        $needed = [
+          'normal_value',
+          'normal_lo_l',
+          'normal_hi_l',
+          'normal_lo_p',
+          'normal_hi_p',
+        ];
+      } elseif ($d['blok'] == 'radio' || $d['blok'] == 'radio-toolbar' || $d['blok'] == 'multi-radio' || $d['blok'] == 'select') {
         // fields yang dibutuhkan
         $needed = [
           'option_values',
           'option_default',
           'option_labels',
           'class',
-
-          'option_class'
+          'option_class',
+          'satuan',
         ];
       } elseif ($d['blok'] == 'input-range') {
         $needed = [
@@ -175,6 +186,8 @@ if (!mysqli_num_rows($q)) {
       } elseif ($d['blok'] == 'array-gigi') {
         $needed = ['class', 'label'];
       }
+
+
       if (in_array($key, $needed)) $hideit = '';
 
       # ============================================================
@@ -211,18 +224,8 @@ if (!mysqli_num_rows($q)) {
       $belum_punya = div_alert('danger', "Input Editing untuk kolom [$key] belum ditentukan");
       $input_editing = $belum_punya;
 
+      $input_editing = "<input class='form-control input_editing' id=$id value='$value'>";
       if (
-        $key == 'label'
-        || $key == 'placeholder'
-        || $key == 'value'
-        || $key == 'class'
-        || $key == 'satuan'
-        || $key == 'name'
-        || $key == 'option_default'
-        || $key == 'option_class'
-      ) {
-        $input_editing = "<input class='form-control input_editing' id=$id value='$value'>";
-      } elseif (
         $key == 'min'
         || $key == 'max'
         || $key == 'minlength'

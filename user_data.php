@@ -15,12 +15,14 @@ if ($username == '') {
 
   if ($role == 'pasien' || $role == 'pendaftar') {
     $tb = $role;
+    $sql_jabatan = "'$role'";
   } else {
     $tb = 'user';
+    $sql_jabatan = "SELECT jabatan FROM tb_role WHERE role=a.role";
   }
   $s = "SELECT a.*, 
   a.nama as nama_user,
-  (SELECT jabatan FROM tb_role WHERE role=a.role) jabatan 
+  ($sql_jabatan) jabatan 
   FROM tb_$tb a 
   WHERE a.username='$username'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

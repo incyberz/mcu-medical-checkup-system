@@ -59,9 +59,9 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
     }
   } else {
     $nilai_normal = '<span class="red bold">invalid</span> ';
-    if (!$lo) $nilai_normal .= "<hr>Nilai minimum batas normal masih kosong";
-    if (!$hi) $nilai_normal .= "<hr>Nilai maximum batas normal masih kosong";
-    if ($lo < $hi) $nilai_normal .= "<hr>Nilai minimum > nilai maksimum";
+    if (!$lo) $nilai_normal .= "<br><span class=red>Nilai minimum batas normal masih kosong</span>";
+    if (!$hi) $nilai_normal .= "<br><span class=red>Nilai maximum batas normal masih kosong</span>";
+    if ($lo < $hi) $nilai_normal .= "<br><span class=red>Nilai minimum > nilai maksimum</span>";
   }
 
   $hasil = $arr_id_detail[$id_detail];

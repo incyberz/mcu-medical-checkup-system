@@ -41,11 +41,11 @@ $lokasi_xls = 'assets/xls';
 // $whatsapp_klinik_show = '0859-7509-6020';
 
 // set auto login
-if (1) {
+if (0) {
   $_SESSION['mmc_username'] = 'ahmadnk';
   $_SESSION['mmc_role'] = 'dokter';
-  // $_SESSION['mmc_username'] = 'meyda';
-  // $_SESSION['mmc_role'] = 'marketing';
+  $_SESSION['mmc_username'] = 'meyda';
+  $_SESSION['mmc_role'] = 'marketing';
   echo "<div style='position:fixed; top:0; left:0; font-weight:bold; z-index:9999; background:red; padding:15px'>AUTOLOGIN MODE</div>";
 }
 

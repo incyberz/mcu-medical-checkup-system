@@ -18,6 +18,7 @@ if ($online_version) {
   $db_user = "mmcclini_admin";
   $db_pass = "MMC-Clinic2024";
   $db_name = "mmcclini_mmc";
+  $db_name = "mmcclini_mcu2";
 } else {
   $db_server = "localhost";
   $db_user = "root";

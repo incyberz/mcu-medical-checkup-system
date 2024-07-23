@@ -182,6 +182,7 @@ echo "
       </tr>
     </table>
   </div>
+  <a href="?list_pasien&order_no=<?= $order_no ?>" class="btn btn-primary">My List Pasien</a>
 
 </section>
 

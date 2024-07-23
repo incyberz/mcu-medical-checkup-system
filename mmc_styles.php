@@ -335,14 +335,18 @@
     background: #cc7719;
   }
 
-  td {
+  .td_transparan td {
     background: none !important;
   }
 
-  .kolom {
+  .th_toska th {
+    background: #cff;
+  }
+
+  /* .kolom {
     color: #888 !important;
     font-style: italic;
-  }
+  } */
 
   .tebal_biru {
     color: blue;

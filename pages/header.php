@@ -29,17 +29,18 @@ $li_nakes = '';
 # ============================================================
 # MENU INTERNAL USERS
 # ============================================================
-if ($username and ($role != 'pasien' || $role != 'pendaftar')) {
+if ($username) {
+  if ($role == 'pasien' || $role == 'pendaftar') {
+  } else {
+    $count_pasien_null = 0;
+    $count_pasien_ready = 0;
+    $count_pasien_sedang = 0;
 
-  $count_pasien_null = 0;
-  $count_pasien_ready = 0;
-  $count_pasien_sedang = 0;
-
-  $s = "SELECT * FROM tb_header WHERE id_klinik=$id_klinik";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  if (!mysqli_num_rows($q)) {
-    // auto create first
-    $s = "INSERT INTO tb_header (
+    $s = "SELECT * FROM tb_header WHERE id_klinik=$id_klinik";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if (!mysqli_num_rows($q)) {
+      // auto create first
+      $s = "INSERT INTO tb_header (
       id_klinik,
       count_pasien_null,
       count_pasien_ready,
@@ -52,25 +53,26 @@ if ($username and ($role != 'pasien' || $role != 'pendaftar')) {
       $count_pasien_sedang,
       '2020-1-1' -- initialisasi last_update pertama
     )";
-    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-    echo div_alert('success', 'Auto Create Header Count sukses.');
-    jsurl();
-  } else {
-    $d = mysqli_fetch_assoc($q);
-    $count_pasien_null = $d['count_pasien_null'];
-    $count_pasien_ready = $d['count_pasien_ready'];
-    $count_pasien_sedang = $d['count_pasien_sedang'];
-    $last_update_header = $d['last_update'];
-  }
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      echo div_alert('success', 'Auto Create Header Count sukses.');
+      jsurl();
+    } else {
+      $d = mysqli_fetch_assoc($q);
+      $count_pasien_null = $d['count_pasien_null'];
+      $count_pasien_ready = $d['count_pasien_ready'];
+      $count_pasien_sedang = $d['count_pasien_sedang'];
+      $last_update_header = $d['last_update'];
+    }
 
-  $count_pasien_null_show = !$count_pasien_null ? '' : "<span class='badge badge-red'>$count_pasien_null</span>";
-  $count_pasien_ready_show = !$count_pasien_ready ? '' : "<span class='badge badge-red'>$count_pasien_ready</span>";
-  $count_pasien_sedang_show = !$count_pasien_sedang ? '' : "<span class='badge badge-blue'>$count_pasien_sedang</span>";
+    $count_pasien_null_show = !$count_pasien_null ? '' : "<span class='badge badge-red'>$count_pasien_null</span>";
+    $count_pasien_ready_show = !$count_pasien_ready ? '' : "<span class='badge badge-red'>$count_pasien_ready</span>";
+    $count_pasien_sedang_show = !$count_pasien_sedang ? '' : "<span class='badge badge-blue'>$count_pasien_sedang</span>";
 
-  $li_nakes = "
+    $li_nakes = "
       <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran $count_pasien_null_show</a></li>
       <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=mcu'>Pemeriksaan $count_pasien_ready_show $count_pasien_sedang_show</a></li>
     ";
+  }
 } elseif (!$username) {
   $li_public = "
     <li><a class='nav-link scrollto' href='#why-us'>Keunggulan</a></li>

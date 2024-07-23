@@ -3,23 +3,35 @@ set_title("Hasil Pemeriksaan");
 only('users');
 $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', "Page ini membutuhkan index [id_pasien]"));
 $get_jenis = $_GET['jenis'] ?? die(div_alert('danger', "Page ini membutuhkan index [jenis]"));
+$get_jenis = strtolower($get_jenis);
+$kesimpulan = [];
+$kesimpulan_penunjang = [];
+$arr_id_pemeriksaan_penunjang = [];
+$dokter_pj = '<span class="tebal merah">UNKNOWN</span>';
+$tidak_ada = '<i class=hasil>--tidak ada--</i>';
 
 # ============================================================
 # INCLUDES
 # ============================================================
 include 'include/arr_status_pasien.php';
 include 'include/arr_user.php';
+include 'include/arr_pemeriksaan.php';
+include 'include/arr_pemeriksaan_detail.php';
+include 'hasil_pemeriksaan-functions.php';
+include 'hasil_pemeriksaan-styles.php';
 
 
-# ===========================================================
-# HASIL (IF EXISTS)
-# ===========================================================
+# ============================================================
+# HASIL MEDICAL AT DB
+# ============================================================
+$hasil = [];
 $arr_id_detail = [];
 $arr_pemeriksaan_tanggal = [];
 $arr_pemeriksaan_by = [];
 $arr_sampel_tanggal = [];
 $arr_sampel_by = [];
 include 'pemeriksaan-hasil_at_db.php';
+$dokter_pj = $arr_user[$arr_pemeriksaan_by[8]];
 
 
 
@@ -38,7 +50,10 @@ include 'pemeriksaan-hasil_at_db.php';
 # ============================================================
 # DATA PASIEN
 # ============================================================
-$s = "SELECT * FROM tb_pasien WHERE id=$id_pasien";
+$s = "SELECT a.*, 
+(SELECT perusahaan FROM tb_order  WHERE order_no=a.order_no) perusahaan  
+FROM tb_pasien a 
+WHERE a.id=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
 $order_no = '';
@@ -50,6 +65,9 @@ if (!mysqli_num_rows($q)) {
   $jenis = $pasien['jenis'];
   $JENIS = strtoupper($jenis);
 }
+
+
+
 
 
 
@@ -74,7 +92,7 @@ $joins = "
   JOIN tb_pemeriksaan e ON d.id_pemeriksaan=e.id 
   JOIN tb_jenis_pemeriksaan f ON e.jenis=f.jenis 
   WHERE a.id=$id_pasien 
-  AND e.jenis='$get_jenis'
+  -- AND e.jenis='$get_jenis'
 ";
 
 if ($JENIS == 'COR') {
@@ -105,22 +123,68 @@ $jumlah_row = mysqli_num_rows($q);
 while ($d = mysqli_fetch_assoc($q)) {
   $id_pemeriksaan = $d['id_pemeriksaan'];
   $jenis_pemeriksaan = $d['jenis_pemeriksaan'];
+  $nama_pemeriksaan = $d['nama_pemeriksaan'];
   $jenis = strtolower($d['jenis']);
-  echo "<br>$jenis ROW: $jumlah_row";
   // exit;
-  $file = "$lokasi_pages/hasil_pemeriksaan-$jenis.php";
   if ($jenis != 'mcu') {
-    if (file_exists($file)) {
-      include $file;
-    } else {
+    array_push($arr_id_pemeriksaan_penunjang, $id_pemeriksaan);
 
-      echo div_alert('danger', "Belum ada Format Hasil Pemeriksaan untuk jenis: $jenis_pemeriksaan");
+    // jika sesuai yang diminta
+    if ($jenis == $get_jenis) {
+      $is_mcu = 0;
+      break;
     }
   } else {
     $is_mcu = 1;
   }
 }
 
+
+
+# ============================================================
+# DIV HEADER
+# ============================================================
+$div_header = '';
+include 'hasil_pemeriksaan-header.php';
+
+# ============================================================
+# DETAIL PEMERIKSAAN
+# ============================================================
+$MC = $is_mcu ? 'MEDICAL CHECKUP' : 'PEMERIKSAAN ' . strtoupper($nama_pemeriksaan);
+echo "
+  <div class='wadah gradasi-hijau tengah'>
+    <div class='f30 abu mb2 mt4'>Preview Hasil Laboratorium</div>
+    <a href='?tampil_pasien&id_pasien=$id_pasien'>$img_prev</a>
+    <div class='flexy flex-center f12 mt2'>
+      <div class='kertas bg-white p4 mt2' id=kertas__mcu>
+        <div>$img_header_logo</div>
+        <div class='border-bottom mb2 pb2 f12 mt1'>Tambun Business Park Blok C12 Tambun - Bekasi<br>Telp.(021) 29487893</div>
+        
+        <h3 class='p1 f16 bold'>HASIL $MC</h3>
+
+        $div_header
+        ";
+
+
+# ============================================================
+# PEMERIKSAAN INTI
+# ============================================================
 if ($is_mcu) {
   include 'hasil_pemeriksaan-mcu.php';
+} else {
+  include 'hasil_pemeriksaan-lab.php';
 }
+
+
+# ============================================================
+# FOOTER
+# ============================================================
+include 'hasil_pemeriksaan-footer.php';
+
+
+echo "
+      </div>
+    </div>
+    <button class='btn btn-primary  mt3' onclick=window.print()>Print</button>
+  </div>
+";

@@ -1,13 +1,22 @@
 <?php
 $judul = 'Manage Order';
+$img_up = img_icon('up');
 
 $id_paket = $_GET['id_paket'] ?? '';
 $nama_paket = $_GET['nama_paket'] ?? '';
 $order_no = $_GET['order_no'] ?? '';
-$sub_judul = $nama_paket ? "Untuk Paket <b class=darkblue>$nama_paket</b> | <a href='?manage_order' class='f12'>All Paket</a>" : '';
+// $sub_judul = $nama_paket ? "Untuk Paket <b class=darkblue>$nama_paket</b> | <a href='?manage_order' class='f12'>All Paket</a>" : '';
+
+$arr_filter = [];
+if ($id_paket) array_push($arr_filter, "id_paket: $id_paket");
+if ($nama_paket) array_push($arr_filter, "nama_paket: $nama_paket");
+if ($order_no) array_push($arr_filter, "order_no: $order_no");
+
+$filter_info = '';
+if ($arr_filter) $filter_info = "<span class='f12 abu miring'>filtered by</span> : " . join(', ', $arr_filter) . " | <a href='?manage_order'>$img_up</a>";
 
 set_title($judul);
-set_h2($judul, $sub_judul);
+set_h2($judul, $filter_info);
 only(['admin', 'marketing']);
 include 'include/arr_status_order.php';
 
@@ -84,11 +93,14 @@ a.jumlah_peserta,
 (
   SELECT COUNT(1) FROM tb_pasien 
   WHERE order_no=a.order_no) registered_pasien, 
+(
+  SELECT COUNT(1) FROM tb_pasien 
+  WHERE order_no=a.order_no AND jadwal is not null) terjadwal, 
 a.status,
 a.username_pendaftar,
 b.id as id_paket,
 c.id as id_program,
-b.nama as nama_paket,
+b.singkatan as nama_paket,
 c.nama as program,
 (
   SELECT file_excel FROM tb_user 
@@ -145,6 +157,12 @@ if (!mysqli_num_rows($q)) {
         || $key == 'no_wa'
         || $key == 'file_excel'
         || $key == 'tanggal_verifikasi'
+        || $key == 'username_pendaftar'
+        || $key == 'program'
+        || $key == 'terjadwal'
+        || $key == 'status'
+        || $key == 'perusahaan'
+        || $key == 'registered_pasien'
       ) continue;
       if ($i == 1) {
         $kolom = ucwords(str_replace('_', ' ', $key));
@@ -158,11 +176,77 @@ if (!mysqli_num_rows($q)) {
       if ($key == 'tanggal_order') {
         $value = "<span class='f12'>$tanggal_order_show</span>";
         $value .= "<div class='f10'>$order_no</div>";
-      } elseif ($key == 'jumlah_peserta') {
-        $icon_excel = $d['file_excel'] ? "<a href='$lokasi_excel/$d[file_excel]' target=_blank>$img_excel</a>" : '';
 
-        $value .= "<div>$icon_excel</div>";
-        $value .= "<div class='f12 abu mt1'>$d[pesan_tambahan]</div>";
+        // add status
+        // $status = $d['status'];
+        $icon = '';
+        if ($status == 100) {
+          $icon = "$img_check $img_check $img_check";
+        } elseif ($status > 2) {
+          $icon = "$img_check $img_check $img_check";
+        } elseif ($status == 2) {
+          $icon = "$img_check $img_check ";
+        } elseif ($status == 1) {
+          $icon = "$img_check ";
+        }
+
+        $style_ok = $status > 0 ? 'green' : '';
+        $status_show = $status ? "$icon <div class='$style_ok f14'>$arr_status_order[$status]</div>" : "<span class='tebal red'>$img_warning Belum diperiksa</span>";
+
+        // encap with link
+        $value .= "<a href='?verifikasi-order&order_no=$order_no' >$status_show</a>";
+
+        if ($status == -1) {
+          $value .= "<div class='f12 abu'>dengan alasan $d[alasan_batal]";
+        } else {
+          $value .= "<div class='f12 abu mt1'>pesan: $d[pesan_tambahan]</div>";
+        }
+      } elseif ($key == 'jumlah_peserta') {
+        if ($status > 0) {
+          $icon_excel = $d['file_excel'] ? " - <a class=f12 href='$lokasi_excel/$d[file_excel]' target=_blank>Download $img_excel</a>" : '<div class="f12 abu miring">pendaftar belum upload</div>';
+        } elseif ($status < 0) {
+          $icon_excel = '<div class="f12 abu miring">(batal)</div>';
+        } else {
+          $icon_excel = '<div class="f12 abu miring">order belum diperiksa</div>';
+        }
+
+        $value = "<div>$value $icon_excel</div>";
+
+        // registered_pasien
+        if (!$d['registered_pasien']) {
+          $reg_count = ($status < 0) ? '' : $d['registered_pasien']; //' <div class="f12 abu miring">belum di import</div>';
+          if ($d['file_excel'] and !$d['registered_pasien']) { // file excel sudah ada tapi belum diupload
+            $value .= "<a href='?list_pasien&order_no=$order_no'>$img_warning UPLOAD<div class='tebal red f14 mt1'>File Excel sudah ada. Segera upload!</div></a>";
+          }
+        } else {
+          $reg_count = $d['registered_pasien'];
+          $cek_icon = '';
+          if ($d['file_excel'] and !$d['registered_pasien']) { // file excel sudah ada tapi belum diupload
+            $reg_count = "$img_warning UPLOAD<div class='tebal red f14 mt1'>File Excel sudah ada. Segera upload!</div>";
+            die('ZZZ');
+          } elseif ($d['registered_pasien']) { // jika sudah ada count pasien
+            if ($d['jumlah_peserta'] == $d['registered_pasien']) { // pasien lengkap
+              $cek_icon = "Complete $img_check";
+            } elseif ($d['jumlah_peserta'] > $d['registered_pasien']) {
+              $cek_icon = "Imported $img_warning ";
+            } else {
+              $cek_icon = "Imported $img_warning ";
+            }
+            // $d['registered_pasien'] .= "<div class='f10 mt1'>$cek_icon</div>";
+          }
+
+          $value .= "<a href='?list_pasien&order_no=$order_no'>$reg_count <span class=f12>of $d[jumlah_peserta]</span> - <span class='f12 abu'>$cek_icon</span> $img_next</a>";
+
+          // terjadwal
+          $terjadwal = $d['terjadwal'] ?? 0;
+          if ($d['terjadwal'] == $d['registered_pasien']) { // pasien lengkap
+            $cek_icon = "Terjadwal $img_check";
+          } else {
+            $cek_icon = "Terjadwal $img_warning ";
+          }
+
+          $value .= "<div class=mt1><a href='?list_pasien&order_no=$order_no&mode=jadwal'>$terjadwal <span class=f12>of $d[registered_pasien]</span>  - <span class='f12 abu'>$cek_icon</span> $img_next</a></div>";
+        }
       } elseif ($key == 'pendaftar') {
         $link_wa = '';
         if ($d['no_wa']) {
@@ -171,57 +255,21 @@ if (!mysqli_num_rows($q)) {
         }
         $value = "$value $link_wa";
         $value .= "<div class='f12 abu mt1'>$d[jabatan]</div>";
-      } elseif ($key == 'registered_pasien') {
-        if ($d['file_excel'] and !$value) { // file excel sudah ada tapi belum diupload
-          $value = "$img_warning UPLOAD<div class='tebal red f14 mt1'>File Excel sudah ada. Segera upload!</div>";
-        } elseif ($value) { // jika sudah ada count pasien
-          if ($d['jumlah_peserta'] == $d['registered_pasien']) { // pasien lengkap
-            $cek = "$img_check $img_check Complete";
-          } elseif ($d['jumlah_peserta'] > $d['registered_pasien']) {
-            $cek = "$img_warning Sebagian";
-          } else {
-            $cek = "$img_check Melebihi";
-          }
-          $value .= "<div class='f10 mt1'>$cek</div>";
-        } else { // jika count pasien masih nol dan belum ada file excel dari pendaftar
-          $value = $null_gray;
-        }
+        $value .= "<div class='f12 abu'>$d[perusahaan]</div>";
 
-        //encap
-        $value = "<a href='?list-pasien&order_no=$order_no'>$value</a>";
-      } elseif ($key == 'status') {
-        $icon = '';
-        if ($value == 100) {
-          $icon = "$img_check $img_check $img_check";
-        } elseif ($value > 2) {
-          $icon = "$img_check $img_check $img_check";
-        } elseif ($value == 2) {
-          $icon = "$img_check $img_check ";
-        } elseif ($value == 1) {
-          $icon = "$img_check ";
+        // username
+        if ($d['username_pendaftar']) {
+          $value .= "<div class='mt1 abu f12'>$d[username_pendaftar] <a href='?login_as&username=$d[username_pendaftar]&role=pendaftar' target=_blank>$img_login_as</a></div>";
         }
-
-        $style_ok = $value > 0 ? 'green' : '';
-        $value = $value ? "$icon <div class='$style_ok f14'>$arr_status_order[$status]</div>" : "<span class='tebal red'>$img_warning Belum diperiksa</span>";
-
-        // encap with link
-        $value = "<a href='?verifikasi-order&order_no=$order_no' >$value</a>";
-
-        if ($status == -1) {
-          $value .= "<div class='f12 abu'>dengan alasan $d[alasan_batal]";
-        }
-      } elseif ($key == 'username_pendaftar') {
-        if ($value) {
-          $value .= "<div class='mt1'><a href='?login-as&username=$value' target=_blank>$img_login_as</a></div>";
-          $value = "<div class='f12'>$value</div>";
-        }
+      } elseif ($key == 'nama_paket') {
+        $value .= "<div class='f14 miring abu'>$d[program]</div>";
       } elseif ($key == 'verifikator') {
         if ($value) {
           $value .= "<div class='f12'>$tanggal_verifikasi_show</div>";
         }
       }
 
-      $value = $value ? $value : $null_gray;
+      $value = $value ? $value : $null;
       $td .= "
         <td>
           <div class='$style_uncheck'>
@@ -232,10 +280,10 @@ if (!mysqli_num_rows($q)) {
       ";
     }
 
-    $tr_style = $status > 1 ? 'gradasi-hijau' : '';
+    $tr_style = $status != '' ? 'gradasi-hijau' : 'background: linear-gradient(#fee,#fcc) !important';
 
     $tr .= "
-      <tr class='$tr_style'>
+      <tr style='$tr_style'>
         $td
       </tr>
     ";
@@ -247,6 +295,7 @@ include 'include/select_program.php';
 $count_next = $count_paket + 1;
 
 echo "
+  <style>td{background:none !important}</style>
   <table class=table>
     <thead>
       <th>No</th>

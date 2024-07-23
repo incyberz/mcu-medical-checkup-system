@@ -16,12 +16,14 @@ for ($i = 0; $i < 32; $i++) {
 $arr = ['atas', 'bawah'];
 $i = 0;
 $j = 1;
+$nogi = '';
 foreach ($arr as $posisi) {
   $td[$posisi] = '';
   $nn[$posisi] = '';
   $pos = 8;
   $increment = -1;
   foreach ($rg[$posisi] as $key => $value) {
+    $value = abs($value);
     $i++;
     $NN = 1;
     if ($i > 8) $NN = 2;
@@ -30,11 +32,21 @@ foreach ($arr as $posisi) {
     $td_space = '';
     if ($i == 8 || $i == 24) $td_space = '<td style="background:#ccc !important">&nbsp;</td>';
 
-    $simbol = simbol_gigi(abs($value));
+    $simbol = simbol_gigi($value);
+
     $yellow = $simbol == '.' ? ' ' : 'style="background: yellow !important"';
     $simbol = $simbol == '.' ? ' ' : $simbol;
     $nn[$posisi] .= "<td width=6% style='background: #ddd !important'>$NN<br>$pos</td>$td_space";
     $td[$posisi] .= "<td $yellow>$simbol</td>$td_space";
+
+    # ============================================================
+    # PROCESSING KESIMPULAN GIGI
+    # ============================================================
+    if ($value != 1) {
+      $nogi .= "
+        <li><span class=column>Gigi  $NN-$pos:</span> <span class=hasil>" . arti_simbol_gigi($value) . "</span></li>
+      ";
+    }
 
     if ($i > 24) {
       $pos++;
@@ -48,10 +60,14 @@ foreach ($arr as $posisi) {
   }
 }
 
+$kesimpulan_gigi = '<span class=hasil>Dalam batas normal</span>';
+$kesimpulan_gigi = !$nogi ? $kesimpulan_gigi : "<ul class='mb1 pl2'>$nogi</ul>";
+$kesimpulan['Gigi'] = $kesimpulan_gigi;
+
 $str_hasil = "
-  <div class=row>
-    <div class=col-8>
-      <table class='table table-bordered tengah' style='border: solid 3px black'>
+  <div class='row mb0'>
+    <div class='col-8 mb0'>
+      <table class='table table-bordered tengah' style='border: solid 2px black'>
         <tr>$nn[atas]</tr>
         <tr>$td[atas]</tr>
         <tr style='height:20px'><td colspan=100%  style='background:#ccc !important; padding:0'>&nbsp;</td></tr>
@@ -59,7 +75,7 @@ $str_hasil = "
         <tr>$nn[bawah]</tr>
       </table>
     </div>
-    <div class=col-4>
+    <div class='col-4 mb0'>
       Tanda:
       $tb_penanda_gigi
     </div>
