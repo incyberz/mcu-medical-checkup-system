@@ -8,7 +8,7 @@ echo "<div id=lobby_pasien>$lobby_pasien</div>";
 # ============================================================
 # CARI PASIEN
 # ============================================================
-only(['admin', 'nakes', 'marketing', 'dokter']);
+only(['admin', 'nakes', 'marketing', 'dokter', 'dokter-pj']);
 
 # ===========================================================
 # PROCESSORS

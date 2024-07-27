@@ -1,12 +1,14 @@
 <?php
 $div_header = '';
-$tgl_pemeriksaan =  $arr_pemeriksaan_tanggal[$id_pemeriksaan] ?? $hasil['awal_periksa'];
+$tgl_pemeriksaan =  $hasil_at_db['awal_periksa'];
 
 if ($pasien['nikepeg']) $pasien['no_ktp'] = '';
+$no_mcu = 'MCU' . date('y', strtotime($pasien['date_created'])) . "-$id_pasien";
+$nama_pasien = ucwords(strtolower($pasien['nama']));
 
 $rh = [
   'Penanggung Jawab' => 'dr. Mutiara Putri Camelia',
-  'No. Lab' => 'MCU' . date('y', strtotime($pasien['date_created'])) . "-$id_pasien",
+  'No. Lab' => $no_mcu,
   'Tgl Pemeriksaan' => hari_tanggal($tgl_pemeriksaan, 0, 0, 1, 0, '-'),
   'Instansi' => $pasien['perusahaan'],
   'No. KTP' => $pasien['no_ktp'],
@@ -14,7 +16,7 @@ $rh = [
   'Alamat' => $pasien['alamat'] ?? '-',
   'Dokter Pengirim' => 'Dokter MCU',
   'No. RM' => '-',
-  'Nama Pasien' => ucwords(strtolower($pasien['nama'])),
+  'Nama Pasien' => $nama_pasien,
   'Tanggal Lahir' => hari_tanggal($pasien['tanggal_lahir'], 1, 0, 0),
   'Jenis Kelamin' => ucwords(gender($pasien['gender'])),
 ];

@@ -5,12 +5,57 @@ $s = "SELECT a.*,b.nama as jenis_pasien FROM tb_pasien a JOIN tb_jenis_pasien b 
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data Pasien tidak ditemukan.'));
 $pasien = mysqli_fetch_assoc($q);
+
+// validasi data pasien
+$id_paket_custom = $pasien['id_paket_custom'];
+$id_harga_perusahaan = $pasien['id_harga_perusahaan'];
+$order_no = $pasien['order_no'];
+$harga_perusahaan = [];
+
+if ($order_no) {
+  $err = '';
+  $jenis_pasien = $pasien['jenis_pasien'];
+} else {
+  $err = 'Tidak ada nomor order';
+  if ($id_paket_custom) {
+    $err = '';
+    $jenis_pasien = $pasien['jenis_pasien'];
+  } else {
+    $err = 'Belum membuat Paket Custom';
+    $jenis_pasien = 'Corporate Individu';
+    if ($id_harga_perusahaan) {
+      $err = '';
+
+      // 
+      $s = "SELECT a.nama as nama_perusahaan,b.* 
+      FROM tb_perusahaan a 
+      JOIN tb_harga_perusahaan b ON a.id=b.id_perusahaan 
+      JOIN tb_pasien c ON b.id=c.id_harga_perusahaan 
+      WHERE b.id = $id_harga_perusahaan";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      $harga_perusahaan = mysqli_fetch_assoc($q);
+    } else {
+      $err = 'Belum memilih harga perusahaan';
+    }
+  }
+}
+
+// if ($err) die(div_alert('danger', $err));
+if ($err) div_alert('danger', $err);
+
+// extract data pasien
 $JENIS = strtoupper($pasien['jenis']);
 $gender_icon = $pasien['gender'] ? img_icon('gender-' . $pasien['gender']) : '';
-set_h2('Manage Paket Custom', "
-Paket Custom untuk $gender_icon <b class=darkblue>$pasien[nama]</b> 
-pasien <b class=darkblue>$pasien[jenis_pasien]</b>
-<div class=mt2><a href='?pendaftaran'>$img_prev</a></div>
+
+$judul = $id_paket_custom ? 'Paket Custom' : 'Paket Corporate';
+$judul = $JENIS == 'COR' ? $judul : 'Paket Individu';
+$link_back = "<a href='?pendaftaran'>$img_prev</a>";
+$perusahaan_show = !$harga_perusahaan ? '' : "<div class='darkblue f20'>Karyawan $harga_perusahaan[nama_perusahaan]</div>";
+set_h2("Manage $judul", "
+$judul untuk $gender_icon <b class=darkblue>$pasien[nama]</b> 
+pasien <b class=darkblue>$jenis_pasien</b>
+$perusahaan_show
+<div class=mt2>$link_back</div>
 ");
 
 
@@ -28,6 +73,107 @@ pasien <b class=darkblue>$pasien[jenis_pasien]</b>
 
 
 
+# ============================================================
+# KHUSUS CORPORATE DATANG KE KLINIK
+# ============================================================
+if ($JENIS == 'COR') {
+
+  if (!$id_harga_perusahaan) {
+
+    # ============================================================
+    # PROCESSORS
+    # ============================================================
+    if (isset($_POST['btn_pilih_paket_corporate'])) {
+      $s = "UPDATE tb_pasien SET id_harga_perusahaan=$_POST[id_harga_perusahaan] WHERE id=$id_pasien";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      jsurl();
+    }
+
+
+    echo '<div class="biru tebal mb2">Silahkan Pilih Paket Corporate:</div>';
+
+    $s = "SELECT * FROM tb_paket 
+    WHERE id_program=1 -- corporate only
+    AND status = 1 -- active only
+    ";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+
+    // $default_harga[11] = 95000;
+    $tr = '';
+    $i = 0;
+    while ($d = mysqli_fetch_assoc($q)) {
+      $i++;
+
+      // ambil harga khusus perusahaan
+      $s2 = "SELECT a.id,
+      a.harga,
+      b.nama as nama_perusahaan 
+      FROM tb_harga_perusahaan a 
+      JOIN tb_perusahaan b ON a.id_perusahaan=b.id 
+      WHERE a.id_paket=$d[id]";
+      $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+
+      $opt = '';
+      while ($d2 = mysqli_fetch_assoc($q2)) {
+        $harga_show = 'Rp ' . number_format($d2['harga']) . ',-';
+        $opt = "<option value=$d2[id]>$d2[nama_perusahaan] - $harga_show</option>";
+      }
+      $belum_ada_harga = div_alert('danger mt2', "Belum ada harga khusus untuk Paket ini.");
+      $select_harga = !$opt ? $belum_ada_harga : "<select class='form-control' name='id_harga_perusahaan'>$opt</select>";
+
+      $btn_pilih = $opt ? "<button class='btn btn-primary' name=btn_pilih_paket_corporate>Pilih</button>" : "
+        <div class=pt2><a href='?manage_harga_perusahaan&id_harga_perusahaan=$d[id]'>Manage</a></div>
+      ";
+
+
+
+
+
+      $harga = $default_harga[$d['id']] ?? '';
+      $tr .= "
+        <tr>
+          <td>$i</td>
+          <td>
+            <form method=post class=mb4>
+              <div class='f20 darkblue'>$d[nama]</div>
+              <div class=flexy>
+                <div class='f14 pt2 abu miring'>Harga Paket Rp</div>
+                <div>$select_harga</div>
+                <div>
+                  $btn_pilih
+                </div>
+              </div>
+            </form>
+          </td>
+        </tr>
+      ";
+    }
+    echo "
+      <div class='wadah gradasi-hijau'>
+        <table class='table td_trans'>
+          $tr
+        </table>
+      </div>
+    ";
+    exit;
+  }
+
+  // exit;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -39,15 +185,11 @@ pasien <b class=darkblue>$pasien[jenis_pasien]</b>
 
 
 # ============================================================
-# PROCESSORS 
+# PROCESSORS PEMBAYARAN
 # ============================================================
 if (isset($_POST['btn_bayar'])) {
-  echo '<pre>';
-  var_dump($_POST);
-  echo '</pre>';
-
-
   if ($_POST['btn_bayar'] == -1) {
+    // Undo Pembayaran | Admin Only
     $pairs = "
       status_bayar=NULL, 
       sum_biaya=NULL, 
@@ -65,12 +207,59 @@ if (isset($_POST['btn_bayar'])) {
     ";
   }
 
-  $s = "UPDATE tb_paket_custom SET $pairs WHERE id=$_POST[id_paket_custom]";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  echo div_alert('success', 'Update Pembayaran sukses');
-  $s = "UPDATE tb_pasien SET status=7 WHERE id=$id_pasien";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  echo div_alert('success', 'Update Status pasien sukses');
+  if ($id_harga_perusahaan) {
+    $s = "INSERT INTO tb_pembayaran (
+      id_pasien, 
+      status_bayar, 
+      sum_biaya, 
+      nominal_bayar, 
+      tanggal_bayar, 
+      kasir
+    ) VALUES (
+      $id_pasien, 
+      $_POST[btn_bayar], 
+      $_POST[sum_biaya], 
+      $_POST[nominal_bayar], 
+      CURRENT_TIMESTAMP, 
+      $id_user
+    ) ON DUPLICATE KEY UPDATE 
+      $pairs 
+    ";
+
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    echo div_alert('success', 'Update Pembayaran sukses');
+    // pasien harus login add username
+
+
+    // echo '<br>ADD USERNAME';
+
+    $username_baru = strtolower(str_replace(' ', '', $pasien['nama']));
+    $s = "SELECT 1 FROM tb_pendaftar WHERE username like '$username_baru%'";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    $count = mysqli_num_rows($q);
+    if ($count) {
+      $count++;
+      $username_baru .= $count;
+    }
+
+    // echo "<br>$username_baru";
+
+
+
+
+
+    $s = "UPDATE tb_pasien SET username='$username_baru' WHERE id=$id_pasien";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    echo div_alert('success', 'Update Username pasien sukses');
+    // exit;
+  } else {
+    $s = "UPDATE tb_paket_custom SET $pairs WHERE id=$_POST[id_paket_custom]";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    echo div_alert('success', 'Update Pembayaran sukses');
+    $s = "UPDATE tb_pasien SET status=7 WHERE id=$id_pasien";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    echo div_alert('success', 'Update Status pasien sukses');
+  }
   jsurl('', 1000);
 }
 
@@ -106,7 +295,7 @@ $items = div_alert('danger', 'Belum ada item pemeriksaan');
 $sum_biaya = 0;
 $sum_biaya_show = 'Rp 0,-';
 $jumlah_pemeriksaan = 0;
-if (!$pasien['id_paket_custom']) {
+if (!$pasien['id_paket_custom'] and !$id_harga_perusahaan) {
   // auto-create id_paket_custom
   $s = "SELECT MAX(id)+1 as new_id FROM tb_paket_custom";
   echolog('select max id');
@@ -124,18 +313,36 @@ if (!$pasien['id_paket_custom']) {
   jsurl('', 2000);
 } else {
   $items = '';
-  $s = "SELECT 
-  b.nama as nama_pemeriksaan,
-  b.biaya  
-  FROM tb_paket_custom_detail a 
-  JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
-  WHERE a.id_paket_custom=$pasien[id_paket_custom]";
+
+  if ($id_harga_perusahaan) {
+
+    $s = "SELECT 
+    b.nama as nama_pemeriksaan,
+    b.biaya,
+    d.harga  
+    FROM tb_paket_detail a 
+    JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
+    JOIN tb_paket c ON a.id_paket=c.id 
+    JOIN tb_harga_perusahaan d ON d.id_paket=c.id 
+    WHERE d.id=$id_harga_perusahaan
+    ";
+  } else {
+    $s = "SELECT 
+    b.nama as nama_pemeriksaan,
+    b.biaya  
+    FROM tb_paket_custom_detail a 
+    JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
+    WHERE a.id_paket_custom=$pasien[id_paket_custom]";
+  }
+
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $i = 0;
   $jumlah_pemeriksaan = mysqli_num_rows($q);
+  $harga_perusahaan = 0;
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
-    $biaya_show = number_format($d['biaya']) . '.-';
+    $harga_perusahaan = $d['harga'];
+    $biaya_show = $id_harga_perusahaan ? '<span class="f12 abu miring">(harga paket)</span>' : number_format($d['biaya']) . '.-';
     $sum_biaya += $d['biaya'];
     $items .= "
       <tr>
@@ -146,7 +353,8 @@ if (!$pasien['id_paket_custom']) {
     ";
   }
 
-  $sum_biaya_show = 'Rp ' . number_format($sum_biaya) . ',-';
+  $sum_biaya =  $id_harga_perusahaan ? $harga_perusahaan : $sum_biaya;
+  $sum_biaya_show =  'Rp ' . number_format($sum_biaya) . ',-';
 
 
   $items = "
@@ -161,9 +369,9 @@ if (!$pasien['id_paket_custom']) {
   ";
 }
 
+// echo $items;
 
-
-
+$assign_pemeriksaan = $id_harga_perusahaan ? '' : "<a href='?assign_pemeriksaan&id_paket=$id_paket_custom&id_pasien=$id_pasien&nama_paket=Paket Custom $id_paket_custom&custom=1' >Assign Pemeriksaan</a>";
 
 $id_paket_custom = $pasien['id_paket_custom'];
 $tr_item = "
@@ -171,17 +379,31 @@ $tr_item = "
     <td>Item Pemeriksaan</td>
     <td>
       $items
-      <a href='?assign_pemeriksaan&id_paket=$id_paket_custom&id_pasien=$id_pasien&nama_paket=Paket Custom $id_paket_custom&custom=1' >Assign Pemeriksaan</a>
+      $assign_pemeriksaan
     </td>
   </tr>
 ";
 
 
 
-$s = "SELECT a.*,
-(SELECT nama FROM tb_user WHERE id=a.kasir) nama_kasir 
-FROM tb_paket_custom a 
-WHERE id='$pasien[id_paket_custom]'";
+if ($pasien['id_paket_custom']) {
+  $s = "SELECT a.*,
+  (SELECT nama FROM tb_user WHERE id=a.kasir) nama_kasir, 
+  (SELECT status_bayar FROM tb_pembayaran WHERE id_pasien=$id_pasien) status_bayar_corporate_mandiri 
+  FROM tb_paket_custom a 
+  WHERE id='$pasien[id_paket_custom]'
+  ";
+} elseif ($pasien['id_harga_perusahaan']) {
+
+  $s = "SELECT a.*,
+  (SELECT nama FROM tb_user WHERE id=a.kasir) nama_kasir, 
+  (SELECT status_bayar FROM tb_pembayaran WHERE id_pasien=$id_pasien) status_bayar_corporate_mandiri 
+  FROM tb_pembayaran a 
+  WHERE id_pasien='$id_pasien' 
+  ";
+} else {
+  die(div_alert('danger', "[id_paket_custom] dan [id_harga_perusahaan] masih null"));
+}
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (mysqli_num_rows($q)) {
@@ -192,6 +414,7 @@ if (mysqli_num_rows($q)) {
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
+        || $key == 'id_pasien'
         || $key == 'date_created'
         || $key == 'tanggal_bayar'
         || $key == 'kasir'
@@ -233,8 +456,10 @@ if (mysqli_num_rows($q)) {
         $form_action = '';
         $form_target = '';
         $form_cetak_sticker = '';
-        if ($value === '0' || $value === 0 || $value) {
-          if ($value) {
+        if ($value === '0' || $value === 0 || $value || $d['status_bayar_corporate_mandiri']) {
+          if ($d['status_bayar_corporate_mandiri']) {
+            $status_bayar = div_alert('success tengah', 'Terbayar LUNAS (Mandiri Corporate)');
+          } elseif ($value) {
             $status_bayar = div_alert('success tengah', 'Terbayar LUNAS');
           } else {
             $status_bayar = div_alert('info tengah', 'Terbayar dengan BPJS');
@@ -259,13 +484,16 @@ if (mysqli_num_rows($q)) {
           $id_paket_show = $id_paket < 100 ? "00$id_paket" : $id_paket;
           $nama_paket = "Paket-$id_paket_show";
 
+          $id_pasien_corporate_mandiri = $id_harga_perusahaan ? $id_pasien : '';
+
           $form_cetak_sticker = "
             <div class='wadah gradasi-kuning'>
               <h4 class='darkabu mb2'>Cetak Sticker Medis</h4>
               <form method=post target=_blank action='?cetak_sticker'>
-                <input type=hidden name=id_paket_custom class='form-control mb2' value='$id_paket_custom' readonly>
-                <input type=hidden name=id_pasien class='form-control mb2' value='$id_pasien' readonly>
-                <input type=hidden name=nama_paket class='form-control mb2' value='$nama_paket' readonly>
+                <input type=hiddena name=id_paket_custom class='form-control mb2' value='$id_paket_custom' readonly>
+                <input type=hiddena name=id_pasien class='form-control mb2' value='$id_pasien' readonly>
+                <input type=hiddena name=nama_paket class='form-control mb2' value='$nama_paket' readonly>
+                <input type=hiddena name=id_pasien_corporate_mandiri class='form-control mb2' value='$id_pasien_corporate_mandiri' readonly>
                 <button class='btn btn-primary' name=btn_cetak_kwitansi>CETAK STICKER</button>
               </form>
             </div>
@@ -277,7 +505,7 @@ if (mysqli_num_rows($q)) {
               $cara_bayar = "
                 <button class='btn btn-warning w-100' onclick='return confirm(`Set Dengan BPJS?`)' name=btn_bayar value=0>Bayar Dengan BPJS</button>
               ";
-            } elseif ($JENIS == 'IDV') {
+            } elseif ($JENIS == 'IDV' || ($JENIS == 'COR' and $id_harga_perusahaan)) {
               $cara_bayar = "
                 <span class='btn btn-primary w-100 btn_aksi' id=blok_bayar_cash__toggle>Pembayaran Cash</span>
               ";
@@ -303,10 +531,14 @@ if (mysqli_num_rows($q)) {
           ";
         }
 
+        $input_hidden = $id_harga_perusahaan
+          ? "<input type=hidden name=id_pasien_corporate_mandiri value='$id_pasien' >"
+          : "<input type=hidden name=id_paket_custom value='$id_paket_custom' >";
+
         $value = "
           $status_bayar
           <form method=post action='$form_action' target='$form_target' class='mb2'>
-            <input type=hidden name=id_paket_custom value='$id_paket_custom' >
+            $input_hidden
             $form_komponen
           </form>
           $form_cetak_sticker
@@ -327,11 +559,19 @@ if (mysqli_num_rows($q)) {
       ";
     }
   }
+} else {
+
+  if ($pasien['id_harga_perusahaan']) {
+    // auto insert tb_pembayaran IF NOT EXIST
+    $s = "INSERT INTO tb_pembayaran (id_pasien) VALUES ($id_pasien)";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    jsurl();
+  }
 }
 
 
 $tb = $tr ? "
-  <table class=table>
+  <table class='table td_trans'>
     $tr_item
     $tr
   </table>

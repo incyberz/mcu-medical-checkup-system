@@ -1,17 +1,18 @@
 <?php
 $thn = date('y');
-$print = $_GET['print'] ?? '';
-if ($print) {
-  $id_klinik = 1; ///zzz debug
-  include '../conn.php';
-  $lokasi_img = "../assets/img";
-}
+// $print = $_GET['print'] ?? '';
+// if ($print) {
+//   $id_klinik = 1; ///zzz debug
+//   include '../conn.php';
+//   $lokasi_img = "../assets/img";
+// }
 include 'include/arr_sampel_detail.php';
 
 $nama_paket = $_POST['nama_paket'] ?? die(div_alert('danger', 'Index nama_paket belum terdefinisi.'));
 $id_paket = $_POST['id_paket'] ?? null;
 $id_paket_custom = $_POST['id_paket_custom'] ?? '';
-if (!$id_paket and !$id_paket_custom) die(div_alert('danger', 'Index [id_paket | id_paket_custom] belum terdefinisi.'));
+$id_pasien_corporate_mandiri = $_POST['id_pasien_corporate_mandiri'] ?? '';
+if (!$id_paket and !$id_paket_custom and !$id_pasien_corporate_mandiri) die(div_alert('danger', 'Index [id_paket | id_paket_custom | id_pasien_corporate_mandiri] belum terdefinisi.'));
 $is_custom = $id_paket_custom ? 1 : 0;
 // $id_paket = $id_paket ?? $id_paket_custom;
 
@@ -19,28 +20,6 @@ $judul = 'Cetak Sticker';
 $id_pasien = $_POST['id_pasien'] ?? die(div_alert('danger', 'Index id_pasien belum terdefinisi.'));
 
 $where_id = "WHERE id='$id_pasien'";
-$mode = '';
-if ($id_pasien == 'random' || $id_pasien == 'random-klinik') {
-
-  if ($id_pasien == 'random') {
-    $mode = "Random Pasien pada Paket $nama_paket.";
-    $where_id = "
-      WHERE a.id_klinik=$id_klinik 
-      AND b.id_paket=$id_paket
-      ORDER BY RAND() 
-      LIMIT 1
-    ";
-  } elseif ($id_pasien == 'random-klinik') {
-    $mode = 'Random Pasien pada Klinik ini.';
-    $where_id = "
-      WHERE a.id_klinik=$id_klinik 
-      ORDER BY RAND() 
-      LIMIT 1
-    ";
-  }
-}
-$mode = $mode ? "<div class='red bold mb2'>Print mode: $mode (testing only)</div>" : '';
-
 
 $s = "SELECT a.*, 
 a.id as id_pasien,
@@ -55,6 +34,15 @@ if ($is_custom) {
   a.id as id_pasien 
   FROM tb_pasien a 
   $where_id
+  ";
+} elseif ($id_pasien_corporate_mandiri) {
+  $s = "SELECT a.*, 
+  a.id as id_pasien,
+  c.nama as perusahaan 
+  FROM tb_pasien a 
+  JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan 
+  JOIN tb_perusahaan c ON b.id_perusahaan=c.id 
+  WHERE a.id = $id_pasien_corporate_mandiri
   ";
 }
 
@@ -87,34 +75,26 @@ if (!mysqli_num_rows($q)) {
   $tanggal_lahir = $d['tanggal_lahir'];
   if ($status == 7 and $print) {
     $s2 = "UPDATE tb_pasien SET status=8 WHERE id=$id_pasien";
+    echolog('Updating status pasien from 7 to 8');
     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
   }
 }
 
 
-if (!$print) {
-  $caption_upd_status = $status == 7 ? ' dan Update Status Pasien' : '';
-  // $status_pasien_info = $status != 7 ? '' : "
-  //     Status pasien sudah Siap Pemeriksaan (7) maka otomatis akan diubah status ke Sudah Cetak Label (8)
-  // "; ZZZ
+$tanggal_lahir = $d['tanggal_lahir'] ? hari_tanggal($d['tanggal_lahir'], 1, 0, 0) : '-';
+$info_perusahaan = $is_custom ? $tanggal_lahir : "NIK. $nik_pasien | $perusahaan";
 
-  $tanggal_lahir = $d['tanggal_lahir'] ? hari_tanggal($d['tanggal_lahir'], 1, 0, 0) : '-';
-  $info_perusahaan = $is_custom ? $tanggal_lahir : "NIK. $nik_pasien | $perusahaan";
-
-  $sub_judul = "
-    $mode
-    Cetak Sticker untuk 
-    <b class='darkblue'>
-      $nama_pasien | 
-      $nomor_mcu | 
-      $info_perusahaan
-    </b>
-  ";
-  set_title($judul);
-  set_h2($judul, $sub_judul);
-  only(['admin', 'marketing', 'cs']);
-}
-// $img_sticker = "<img src='$lokasi_icon/sticker.png' height=25px class='zoom pointer' />";
+$sub_judul = "
+  Cetak Sticker untuk 
+  <b class='darkblue'>
+    $nama_pasien | 
+    $nomor_mcu | 
+    $info_perusahaan
+  </b>
+";
+set_title($judul);
+set_h2($judul, $sub_judul);
+only(['admin', 'marketing', 'cs']);
 
 
 
@@ -152,69 +132,22 @@ while ($d = mysqli_fetch_assoc($q)) {
 
 
 
-?>
-<style>
-  #tb_label {
-    max-width: 5cm;
-  }
+include 'cetak_sticker-styles.php';
 
-  #tb_label tr {
-    max-width: 5cm;
-  }
+if ($id_pasien_corporate_mandiri) {
+  $s = "SELECT 
+  b.nama as nama_pemeriksaan,
+  b.jenis as jenis_pemeriksaan,
+  b.sampel   
+  FROM tb_paket_detail a 
+  JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
+  JOIN tb_paket c ON c.id=a.id_paket  
+  JOIN tb_harga_perusahaan d ON c.id=d.id_paket 
+  JOIN tb_pasien e ON d.id=e.id_harga_perusahaan 
 
-  #tb_label td {
-    /* border: solid 1px red !important; */
-    vertical-align: top;
-
-  }
-
-  .img-qr {
-    margin-top: 0.2cm;
-    height: 1.8cm;
-  }
-
-  .nama_sticker {
-    margin-top: 0.35cm;
-    font-family: consolas;
-    font-size: 11px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 16px;
-  }
-
-  .nomor_mcu {
-    font-size: 12px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 18px;
-  }
-
-  .nama_pasien {
-    font-size: 9px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 13px;
-  }
-
-  .nik_pasien {
-    font-size: 11px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 16px;
-  }
-
-  .nama_sticker,
-  .nama_pasien,
-  .nomor_mcu,
-  .nik_pasien {
-    /* border: solid 1px red; */
-    border: none
-  }
-</style>
-<?php
-
-
-if ($is_custom) {
+  WHERE e.id=$id_pasien_corporate_mandiri
+  ";
+} elseif ($is_custom) {
   $s = "SELECT 
   b.nama as nama_pemeriksaan,
   b.sampel   
@@ -225,6 +158,7 @@ if ($is_custom) {
 } else {
   $s = "SELECT kode FROM tb_paket_sticker WHERE kode ZZZ like '$id_paket-%'";
 }
+
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (!mysqli_num_rows($q)) {
@@ -254,6 +188,16 @@ if (!mysqli_num_rows($q)) {
         </tr>
       ";
     } else {
+
+      if ($id_pasien_corporate_mandiri) {
+        $arr_sampel_paket[$d['nama_pemeriksaan']] = [
+          'warna_tabung' => '',
+          'zat' => '',
+          'volume' => '',
+          'satuan' => '',
+        ];
+      }
+
       $list_pemeriksaan .=  "
         <tr>
           <td>$i</td>
@@ -268,7 +212,7 @@ if (!mysqli_num_rows($q)) {
 
   echo "
     <div class='wadah gradasi-hijau'>
-      <table class='table'>
+      <table class='table td_trans'>
         <thead>
           <th>No</th>
           <th>Pemeriksaan</th>
@@ -284,13 +228,6 @@ if (!mysqli_num_rows($q)) {
 
 
 
-# ============================================================
-# UPDATE status pasien 
-# ============================================================
-$s = "UPDATE tb_pasien SET status=8 WHERE id=$id_pasien";
-echo div_alert('info tengah', 'Updating status pasien sukses. | Status pasien: Sudah Cetak Sticker (8)');
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-
 
 
 # ============================================================
@@ -302,7 +239,11 @@ $tr_preview = '';
 $data = '';
 foreach ($arr_sampel_paket as $key => $value) {
 
-  $nama_sticker = "$key - " . $value['zat'];
+  $nama_sticker = $value['zat'] ? "$key - " . $value['zat'] : $key;
+  if ($nama_sticker == 'PEMERIKSAAN FISIK (DOKTER MCU)') $nama_sticker = 'PEMFIS DOKTER';
+  if ($nama_sticker == 'HEMATOLOGI - DARAH EDTA') $nama_sticker = 'HEMA DARAH EDTA';
+  if ($nama_sticker == 'RONTGEN - Hasil Rontgen') $nama_sticker = 'HASIL RONTGEN';
+  if ($nama_sticker == 'URINALISA - URINE SEGAR') $nama_sticker = 'URINALISA';
   $data .= "$nama_sticker,$nomor_mcu,$nama_pasien,$info_perusahaan|||";
 
   $tr_preview .=  "

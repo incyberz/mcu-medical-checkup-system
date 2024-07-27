@@ -3,7 +3,7 @@
 # UPDATE | DELETE PEMERIKSAAN
 # =============================================================
 include 'ajax_session.php';
-ajax_only(['admin', 'marketing', 'nakes', 'dokter']);
+ajax_only(['admin', 'marketing', 'nakes', 'dokter', 'dokter-pj']);
 
 $aksi = $_GET['aksi'] ?? die(erid('aksi'));
 $id = $_GET['id'] ?? die(erid('id'));

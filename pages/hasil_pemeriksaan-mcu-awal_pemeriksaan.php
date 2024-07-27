@@ -3,7 +3,7 @@
 # ============================================================
 # AWAL PEMERIKSAAN
 # ============================================================
-blok_hasil('AWAL PEMERIKSAAN', $hasil['awal_periksa'], 1);
+blok_hasil('AWAL PEMERIKSAAN', $hasil_at_db['awal_periksa'], 1);
 
 # ============================================================
 # SAMPLING

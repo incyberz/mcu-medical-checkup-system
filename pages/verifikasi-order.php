@@ -26,44 +26,6 @@ $long_date_show = date('F d, Y, H:i:s');
 
 
 
-# ===========================================================
-# FUNCTIONS
-# ===========================================================
-function pesan_wa($event = 'after_order', $nama_pendaftar, $perusahaan_pendaftar, $order_no, $username_pendaftar, $password_pendaftar)
-{
-  $jam = date('H');
-  $long_date_show = date('F d, Y, H:i:s');
-  $tanggal_show = date('d-F-Y');
-
-  if ($jam >= 9) {
-    $waktu = "Siang";
-  } elseif ($jam >= 15) {
-    $waktu = "Sore";
-  } elseif ($jam >= 18) {
-    $waktu = "Malam";
-  } else {
-    $waktu = "Pagi";
-  }
-
-  if ($event == 'after_order') {
-    $link_login = urlencode("https://mmc-clinic.com/?login&as=pendaftar&username=$username_pendaftar");
-
-    return
-      "Selamat $waktu Saudara/i <b>$nama_pendaftar</b> dari <b>$perusahaan_pendaftar</b><br><br>Berdasarkan Request Order dari Anda dengan Order No. <i>$order_no</i> tanggal $tanggal_show, kami mengucapkan banyak terimakasih, dan kami telah memverifikasi request Anda, serta membuat username dan password untuk Anda:<br><br>~ <b>Username: $username_pendaftar</b><br>~ <b>Password: $password_pendaftar</b><br><br>Silahkan login ke Website MMC dengan username dan password tersebut untuk melengkapi data dan melanjutkan penawaran Anda.<br><br>$link_login<br><br><br>Untuk biaya Medical Checkup dan biaya lain dapat kita negosiasi bersama tergantung jumlah peserta, jarak lokasi, dan jenis paket (pemeriksaan) yang Anda inginkan. Terimakasih atas perhatian dan kerjasamanya.<br><br>Admin Medical Checkup<br><br>[Message from: MMC Information System, $long_date_show, Bekasi, Indonesia]";
-  } else {
-    return 'event undefined at pesan_wa()';
-  }
-}
-
-function html2wa($pesan_html)
-{
-  $pesan_html = str_replace('<br>', '%0a', $pesan_html);
-  $pesan_html = str_replace('<b>', '*', $pesan_html);
-  $pesan_html = str_replace('</b>', '*', $pesan_html);
-  $pesan_html = str_replace('<i>', '_', $pesan_html);
-  $pesan_html = str_replace('</i>', '_', $pesan_html);
-  return $pesan_html;
-}
 
 
 
@@ -105,7 +67,9 @@ if (isset($_POST['btn_batalkan'])) {
 } elseif (isset($_POST['btn_proses'])) {
 
   $order_no = $_POST['btn_proses'];
-  $username_pendaftar = $_POST['username_pendaftar'];
+  // unset($_POST['btn_proses']);
+  $username_baru = $_POST['username_pendaftar'];
+  $username_sama = $_POST['username_sama'] ?? false;
   $password = substr($_POST['no_wa_pendaftar'], -4);
   // echo '<pre>';
   // var_dump($_POST);
@@ -115,8 +79,31 @@ if (isset($_POST['btn_batalkan'])) {
   $s = "SELECT 1 FROM tb_pendaftar WHERE username = '$_POST[username_pendaftar]'";
   // echo $s;
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  if (mysqli_num_rows($q)) {
-    echo div_alert('danger', "Username $_POST[username_pendaftar] sudah digunakan.");
+  if (mysqli_num_rows($q) and !$username_sama) {
+    echo div_alert('danger', "Username [ $_POST[username_pendaftar] ] sudah digunakan.");
+    $tr = '';
+    foreach ($_POST as $key => $isi) {
+      $kolom = key2kolom($key);
+      $hideit = $key == 'btn_proses' ? 'hideit' : '';
+      $tr .= "
+        <tr class='$hideit'>
+          <td>$kolom</td>
+          <td>:</td>
+          <td>$isi<input type=hidden readonly name=$kolom class='form-control' value='$isi' /></td>
+        </tr>
+      ";
+    }
+    echo "
+      <form method=post class='wadah gradasi-kuning'>
+        <table class='table td_trans'>
+          $tr
+        </table>
+
+        <button class='btn btn-primary' name=username_sama value='1'>Proses Order untuk Pendaftar yang sama </button>
+        <a class='btn btn-danger' href='?verifikasi-order&order_no=$order_no'>Review</a>
+      </form>
+    ";
+    exit;
   } else {
 
     // password is last 4 digit of no_wa_pendaftar
@@ -298,25 +285,40 @@ if ($status) {
   </form>
   ";
 
-  $username_pendaftar = strtolower(str_replace(' ', '', $d['pendaftar']));
-  $s = "SELECT 1 FROM tb_pendaftar WHERE username like '$username_pendaftar%'";
+  $username_baru = strtolower(str_replace(' ', '', $d['pendaftar']));
+  $s = "SELECT 1 FROM tb_pendaftar WHERE username like '$username_baru%'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $count = mysqli_num_rows($q);
   if ($count) {
     $count++;
-    $username_pendaftar .= $count;
+    $username_baru .= $count;
   }
+
+  $opt_pendaftar = '<option value="">--Pendaftar Baru--</option>';
+  $s = "SELECT * FROM tb_pendaftar ORDER BY nama";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  while ($d = mysqli_fetch_assoc($q)) {
+    // $id=$d['id'];
+    $opt_pendaftar .= "<option value=$d[username]>$d[nama] - $d[no_wa] - $d[perusahaan]</option>";
+  }
+
+
 
   $form_proses_order = "
     <form class='hideita wadah gradasi-hijau' method='post' id=form_proses_order>
       <input type=hidden name=nama_pendaftar value='$nama_pendaftar'> 
       <input type=hidden name=perusahaan_pendaftar value='$perusahaan_pendaftar'> 
       <input type=hidden name=jabatan_pendaftar value='$jabatan_pendaftar'> 
+
+      <select class='form-control mb2'>$opt_pendaftar</select>
+
+      <div class='f14 darkabu mb1 mt4'>Username pendaftar baru:</div>
+      <input required class='form-control' name=username_pendaftar id=username_pendaftar value='$username_baru' placeholder='Username untuk Pendaftar...'>
+      <div class='f12 abu miring mb3 mt1'>Password default sama dengan username</div>
+
+      <div class='f14 darkabu mb1 mt4'>Whatsapp Pendaftar:</div>
       <input required class='form-control mb1' name=no_wa_pendaftar id=no_wa_pendaftar placeholder='Whatsapp Pendaftar...'>
       <div class='f12 abu miring mb3 ml1'>Lihat pada pesan whatsapp yang diterima</div>
-
-      <input required class='form-control mb1' name=username_pendaftar id=username_pendaftar value='$username_pendaftar' placeholder='Username untuk Pendaftar...'>
-      <div class='f14 abu miring mb3 ml1'>Username pendaftar dibutuhkan agar pendaftar dapat melanjutkan proses MoU Medical Checkup. Password default sama dengan username</div>
 
       <textarea class='form-control mb3' name=pesan_tambahan placeholder='Pesan tambahan untuk pendaftar ini jika ada...'></textarea>
 

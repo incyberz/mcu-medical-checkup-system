@@ -3,7 +3,9 @@ $arr_penanda_gigi = [];
 $tb_penanda_gigi = '';
 include 'include/arr_penanda_gigi.php';
 
-$tmp = explode(',', $arr_id_detail[94]);
+$array_gigi_default = '1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,';
+$tmp = explode(',', $arr_id_detail[94] ?? $array_gigi_default);
+
 $rg = [];
 for ($i = 0; $i < 32; $i++) {
   if ($i < 16) {

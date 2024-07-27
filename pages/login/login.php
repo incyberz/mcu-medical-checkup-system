@@ -109,7 +109,7 @@ $username = $_GET['username'] ?? '';
 $password = '';
 
 if (isset($_POST['btn_login_mmc'])) {
-  $username = strip_tags(clean_sql($_POST['username']));
+  $username = strip_tags(clean_sql(strtolower($_POST['username'])));
   $password = strip_tags(clean_sql($_POST['password']));
 
   if (strlen($username) > 20 || strlen($password) > 20) {

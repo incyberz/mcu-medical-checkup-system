@@ -1,62 +1,15 @@
 <style>
-  #tb_label {
-    max-width: 5cm;
-  }
-
-  #tb_label tr {
-    max-width: 5cm;
-  }
-
-  #tb_label td {
-    /* border: solid 1px red !important; */
-    vertical-align: top;
-
-  }
-
-  .img-qr {
-    margin-top: 0.2cm;
-    height: 1.8cm;
-  }
-
-  .nama_sticker {
-    margin-top: 0.35cm;
-    font-family: consolas;
-    font-size: 11px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 16px;
-  }
-
-  .nomor_mcu {
-    font-size: 12px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 18px;
-  }
-
-  .nama_pasien {
-    font-size: 10px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 13px;
-  }
-
-  .nik_pasien {
-    font-size: 10px;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 16px;
-  }
-
-  .nama_sticker,
-  .nama_pasien,
-  .nomor_mcu,
-  .nik_pasien {
-    /* border: solid 1px red; */
-    border: none
+  * {
+    margin: 0;
   }
 </style>
 <?php
+// require_once 'include/qrcode.php';
+// $qr = QRCode::getMinimumQRCode($nomor_mcu, QR_ERROR_CORRECT_LEVEL_L);
+// $qr->printHTML('3px');
+// exit;
+
+include 'pages/cetak_sticker-styles.php';
 $print = $_GET['print'] ?? '';
 if ($print)  $arr = explode('|||', $_POST['data']);
 
@@ -66,8 +19,7 @@ if ($print)  $arr = explode('|||', $_POST['data']);
 # LOOP JUMLAH STICKER PAKET INI
 # ============================================================
 
-echo "<table id=tb_label>";
-
+$i = 0;
 foreach ($arr as $key => $value) {
   if (!$value) continue;
 
@@ -77,21 +29,30 @@ foreach ($arr as $key => $value) {
   $nama_pasien = $arr2[2] ?? die('Array index 2 belum terdefinisi');
   $info_perusahaan = $arr2[3] ?? die('Array index 3 belum terdefinisi');
 
+  $i++;
+  $red = $i % 2 == 0 ? 'red' : 'yellow';
+  $red = '';
   echo  "
-    <tr>
-      <td>
-        <img src='assets/img/qr.png' class='img-qr'/>
-      </td>
-      <td>
-        <div class='nama_sticker'>$nama_sticker</div>
+  <div style='display:flex; height: 2.54cm; align-items:center; padding-left: 1mm'>
+    <div style='display:grid; grid-template-columns: 2cm 3cm; gap: 1mm'>
+      <div style='background:$red'>";
+
+  require_once 'include/qrcode.php';
+  $qr = QRCode::getMinimumQRCode($nomor_mcu, QR_ERROR_CORRECT_LEVEL_L);
+  $qr->printHTML('3px');
+
+  echo "
+    </div>
+      <div>
+        <div class='nama_sticker' style='margin:0'>$nama_sticker</div>
         <div class='nomor_mcu'>$nomor_mcu</div>
         <div class='nama_pasien'>$nama_pasien</div>
         <div class='nik_pasien'>$info_perusahaan</div>
-      </td>
-    </tr>
+      </div>
+    </div>
+  </div>
   ";
 }
 
 
-echo "</table>";
 if ($print) echo "<script>window.print()</script>";

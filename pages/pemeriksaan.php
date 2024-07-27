@@ -119,6 +119,7 @@ $status_show = $status ? "$arr_status_pasien[$status] ($status)" : '<span class=
 # ===========================================================
 if (!$punya_hasil) {
   include 'pemeriksaan-awal_periksa.php';
+  if ($ambil_sampel) echo $form_pemeriksaan;
 } elseif ($ambil_sampel) {
 
   $sampel = $_GET['sampel'] ?? die('Page ini membutuhkan index [sampel].');
@@ -136,7 +137,11 @@ if (!$punya_hasil) {
   }
 
 
+
+
+
   if ($sampel) {
+
     # ============================================================
     # SAMPEL PROPERTIES
     # ============================================================
@@ -175,7 +180,7 @@ if (!$punya_hasil) {
         <label for=cek>Saya sudah mengambil sampel <b class=darkblue>$sampel</b> dari <b class=darkblue>$Tn. $nama_pasien</b>.</label>
       </div>
       <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$id_pasien'>Submit Data</button>
-      <input type=hiddena name=sampel value='$sampel'>
+      <input type=hidden name=sampel value='$sampel'>
     </form>
   ";
 
@@ -208,18 +213,24 @@ if (!$punya_hasil) {
   // exit;
 } else { // punya data MCU
 
+
+  # ============================================================
+  # EXCEPTION FOR PEM.FISIK.DOKTER | RONTGEN
+  # ============================================================
+  if (strtolower($pemeriksaan['jenis']) == 'mcu') {
+    $singkatan = strtolower($pemeriksaan['singkatan']);
+    if ($singkatan == 'pemfis' || $singkatan == 'rontgen') {
+      if (!($role == 'dokter' || $role == 'dokter-pj')) {
+        die(div_alert('danger', "$link_prev Untuk Pemeriksaan Dokter MCU hanya dapat dilakukan oleh Role Dokter <hr>Role Anda : [ $role ]<hr><a onclick='return confirm(`Logout?`)' href='?logout'>Logout dan Relogin</a>"));
+      }
+    }
+  }
+
+
   # ============================================================
   # FORM PEMERIKSAAN
   # ============================================================
   $form_pemeriksaan = '';
-
-  # ============================================================
-  # EXCEPTION FOR PEM.FISIK.DOKTER
-  # ============================================================
-  if (strtolower($pemeriksaan['jenis']) == 'mcu' and strtolower($pemeriksaan['singkatan']) == 'pemfis' and $role != 'dokter') {
-    die(div_alert('danger', "$link_prev Untuk Pemeriksaan Dokter MCU hanya dapat dilakukan oleh Role Dokter <hr><a onclick='return confirm(`Logout?`)' href='?logout'>Logout dan Relogin</a>"));
-  }
-
   $s = "SELECT * FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=$id_pemeriksaan";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   if (mysqli_num_rows($q)) {
@@ -254,16 +265,14 @@ if (!$punya_hasil) {
           <label for=cek>Saya menyatakan bahwa data diatas sudah benar.</label>
         </div>
         <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$id_pasien'>Submit Data</button>
-        <input type=hiddena name=last_pemeriksaan value='$nama_pemeriksaan by $nama_user'>
-        <input type=hiddena name=id_pemeriksaan value='$id_pemeriksaan'>
+        <input type=hidden name=last_pemeriksaan value='$nama_pemeriksaan by $nama_user'>
+        <input type=hidden name=id_pemeriksaan value='$id_pemeriksaan'>
       </form>
     ";
   } else { // end ada detail
     $form_pemeriksaan =  div_alert('danger tengah', "Detail Pemeriksaan belum ada | <a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan&nama_pemeriksaan=$nama_pemeriksaan'>Manage</a>");
   }
 } // end punya data MCU
-
-
 
 
 

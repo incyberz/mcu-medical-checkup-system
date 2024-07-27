@@ -3,7 +3,7 @@
 # FOOTER
 # ============================================================
 $tanggal_cetak = hari_tanggal($now, 1, 0, 1, 1);
-$dokter_pj = $arr_user[$arr_pemeriksaan_by[$id_pemeriksaan]];
+$dokter_pj = $arr_user[$hasil_at_db['approv_by']];
 
 $http = $online_version ? 'https' : 'http';
 $rlink = explode('?', $http . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);
@@ -14,6 +14,8 @@ $qr_konten = str_replace('index.php', '', $qr_konten);
 $id1 = "000000000$id_pasien";
 $id1 = substr($id1, strlen($id1) - 6, 100);
 
+// jika mcu maka pemeriksaan pemfis dokter showAtQR
+if ($get_jenis == 'mcu') $id_pemeriksaan = 8;
 $id2 = "000000000$id_pemeriksaan";
 $id2 =  substr($id2, strlen($id2) - 3, 100);
 
@@ -41,7 +43,7 @@ echo "
       Mutiara Medical System, https://mmc-clinic.com
     </div>
     <div class=mb1>
-      <span class='abu miring'>By:</span> 
+      <span class='abu miring'>Dokter Pemeriksa:</span> 
       $dokter_pj
     </div>
 ";

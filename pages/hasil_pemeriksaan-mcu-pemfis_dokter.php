@@ -36,6 +36,7 @@ while ($d = mysqli_fetch_assoc($q)) {
           $kesimpulan['Kelainan Fisik'] = [$li_kesimpulan];
         } else {
           array_push($kesimpulan['Kelainan Fisik'], $li_kesimpulan);
+          $abnormal_count++;
         }
 
         // add abnormal color

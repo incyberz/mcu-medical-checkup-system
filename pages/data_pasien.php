@@ -3,6 +3,7 @@
 # INCLUDES 
 # ============================================================
 include 'include/arr_status_pasien.php';
+include 'include/arr_paket_corporate.php';
 $arr_status_pasien[0] = 'Belum Pembayaran';
 $count_status = [];
 foreach ($arr_status_pasien as $key => $value) {
@@ -22,6 +23,7 @@ a.id as id_pasien,
 a.nama,
 a.jenis ,
 a.order_no,
+a.id_harga_perusahaan,
 a.id_paket_custom,
 a.status,
 b.nama as jenis_pasien,
@@ -42,6 +44,14 @@ b.nama as jenis_pasien,
   SELECT tanggal_bayar FROM tb_paket_custom p
   WHERE p.id=a.id_paket_custom 
   ) tanggal_bayar,
+( 
+  SELECT tanggal_bayar FROM tb_pembayaran p
+  WHERE p.id_pasien=a.id 
+  ) tanggal_bayar_corporate_mandiri,
+( 
+  SELECT status_bayar FROM tb_pembayaran p
+  WHERE p.id_pasien=a.id 
+  ) status_bayar_corporate_mandiri,
 ( 
   SELECT COUNT(1) FROM tb_paket_custom_detail p 
   JOIN tb_paket_custom q ON p.id_paket_custom=q.id 
@@ -73,12 +83,15 @@ if (mysqli_num_rows($q)) {
     $JENIS = strtoupper($d['jenis']);
     $jenis[$JENIS]++;
     $count_status[$d['status'] ?? 0]++;
+    $belum_bayar = "<span class='f12 red bold miring'>belum bayar <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a></span>";
+
 
     $td = "<td>$i</td>";
     foreach ($d as $key => $value) {
       if (
         $key == 'id'
         || $key == 'id_pasien'
+        || $key == 'id_harga_perusahaan'
         || $key == 'id_paket_custom'
         || $key == 'jenis_pasien'
         || $key == 'order_no'
@@ -87,6 +100,8 @@ if (mysqli_num_rows($q)) {
         || $key == 'tanggal_bayar'
         || $key == 'last_pemeriksaan'
         || $key == 'status'
+        || $key == 'status_bayar_corporate_mandiri'
+        || $key == 'tanggal_bayar_corporate_mandiri'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
@@ -99,30 +114,48 @@ if (mysqli_num_rows($q)) {
           <div class='mt1 f14 miring abu'>
             $d[jenis_pasien]
             <a style='display:inline-block;margin-left:10px' href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]&mode=edit_pasien' onclick='return confirm(`Edit pasien ini?`)'>$img_edit</a>
-            <a href='?hapus_pasien&id_pasien=$d[id_pasien] onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
+            <a href='?super_delete_pasien&id_pasien=$d[id_pasien]' onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
           </div>
         ";
       } elseif ($key == 'status_bayar') {
-        $value = $JENIS == 'COR' ? "Corporate $img_check" : 'baru didaftarkan';
-        if ($d['id_paket_custom']) {
-          $value = 'sudah punya paket';
-          if ($d['count_detail_paket_custom']) {
-            $value = 'sudah memilih detail paket';
-            if ($d['tanggal_bayar']) {
-              if ($JENIS == 'BPJ') {
-                $value = '<span class="coklat bold">BPJS</span>';
-              } else {
-                $value = '<span class="green bold">LUNAS</span>';
+        if ($d['id_harga_perusahaan']) {
+          // jika coporate mandiri
+          if ($d['status_bayar_corporate_mandiri']) {
+            $tgl = hari_tanggal($d['tanggal_bayar_corporate_mandiri'], 0, 0, 1, 1, '-');
+            $value = "<div class='f12 abu miring'>$tgl</div><span class='f12 green'>Corp. Mandiri $img_check</span>";
+          } else {
+            $value = "CM-$belum_bayar";
+          }
+        } else {
+          if (!$d['status']) {
+            $value = $belum_bayar;
+          } else {
+            $value = $JENIS == 'COR' ? "Corporate $img_check" : 'baru didaftarkan';
+            if ($d['id_paket_custom']) {
+              $value = 'sudah punya paket';
+              if ($d['count_detail_paket_custom']) {
+                $value = 'sudah memilih detail paket';
+                if ($d['tanggal_bayar']) {
+                  if ($JENIS == 'BPJ') {
+                    $value = '<span class="coklat bold">BPJS</span>';
+                  } else {
+                    $value = '<span class="green bold">LUNAS</span>';
+                  }
+                  $tgl = hari_tanggal($d['tanggal_bayar'], 0, 0, 1, 1, '-');
+                  $value = "<div class=f12>$tgl</div>$value $img_check";
+                }
               }
-              $tgl = hari_tanggal($d['tanggal_bayar'], 0, 0, 1, 1, '-');
-              $value = "<div class=f12>$tgl</div>$value $img_check";
             }
+            $value = "<i class='f12 abu'>$value</i>";
           }
         }
-        $value = "<i class='f12 abu'>$value</i>";
       } elseif ($key == 'status_pasien') {
         if (!$value) {
-          $value = "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
+          if ($d['id_harga_perusahaan']) {
+            $value = "<span class='f12 green'>CORPORATE MANDIRI $img_check</span>";
+          } else {
+            $value = "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
+          }
         } elseif ($d['status'] == 10) {
           $value =  "<span class='f12 green'>$d[status] ~ $value $img_check</span>";
         } else {
@@ -133,7 +166,19 @@ if (mysqli_num_rows($q)) {
         $value = '<span class=f14>' . hari_tanggal($value, 0, 1, 1, 0, '-') . '</span>';
       } elseif ($key == 'nama_paket') {
         if ($JENIS == 'COR') {
-          $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[order_no]</a></div>";
+          if ($d['id_harga_perusahaan']) {
+            $s4 = "SELECT id_paket FROM tb_harga_perusahaan WHERE id=$d[id_harga_perusahaan]";
+            $q4 = mysqli_query($cn, $s4) or die(mysqli_error($cn));
+            if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data harga perusahaan tidak ditemukan'));
+            $d4 = mysqli_fetch_assoc($q4);
+
+            $value = $arr_paket_corporate[$d4['id_paket']];
+            $value = "<div class='f14 '>$value</div>";
+            $value = "<a href='?manage_paket_custom&id_pasien=$id_pasien' >$value</a>";
+          } else {
+            // biarkan
+            $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[order_no]</a></div>";
+          }
         } else {
           if (!$value and !$d['id_paket_custom']) {
             $value = '<span class="btn btn-primary btn-sm">Buat Baru</span>';
@@ -154,7 +199,7 @@ if (mysqli_num_rows($q)) {
         if ($d['status'] == 10) {
           $value = "<span class='f12 green'> selesai $img_check</span>";
         } elseif (!$value) {
-          $value = '<span class="f12 miring red bold">belum-pem.</span>';
+          $value = '<span class="f12 miring red bold">blm-periksa</span>';
         } elseif ($value == 1) {
           $value = "<span class='f12 miring green'>awal pemeriksaan $loading</span>";
         } elseif ($value == 2) {
@@ -177,10 +222,10 @@ if (mysqli_num_rows($q)) {
         # ============================================================
         # FINAL UI STATUS PEMERIKSAAN
         # ============================================================
-        if ($d['status']) {
+        if ($d['status'] || $d['status_bayar_corporate_mandiri']) {
           $value .= "
             <div class=>
-              <a href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]'>$img_next</a>
+              <a href='?tampil_pasien&id_pasien=$d[id_pasien]'>$img_next</a>
             </div>
           ";
         } else {

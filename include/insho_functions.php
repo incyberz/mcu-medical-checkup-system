@@ -14,9 +14,9 @@
 // v.1.3.0 revision with echolog
 // v.1.2.0 revision with function baca_csv
 
-function hari_tanggal($datetime, $long_mode = 1, $with_day = 1, $with_hour = 1, $with_second = false, $separator = ' ')
+function hari_tanggal($datetime = '', $long_mode = 1, $with_day = 1, $with_hour = 1, $with_second = false, $separator = ' ')
 {
-  $time = strtotime($datetime);
+  $time = $datetime ? strtotime($datetime) : strtotime('now');
   $nama_hari = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   $nama_bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   if (!$long_mode) {

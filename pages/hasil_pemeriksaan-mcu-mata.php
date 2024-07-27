@@ -3,6 +3,7 @@ $s = "SELECT * FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=7 ORDER BY nomor"
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $arr_mata = [];
 while ($d = mysqli_fetch_assoc($q)) {
+  if ($d['id'] == 141 || $d['id'] == 147) continue; // isokor
   $kika = $d['ki_ka'] ?? 'no_kika';
   $arr_mata[$kika][$d['id']] = [
     'label' => $d['label'],

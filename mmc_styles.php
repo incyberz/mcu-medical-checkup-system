@@ -335,7 +335,7 @@
     background: #cc7719;
   }
 
-  .td_transparan td {
+  .td_trans td {
     background: none !important;
   }
 

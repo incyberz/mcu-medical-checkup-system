@@ -60,8 +60,11 @@ include 'pemeriksaan-hasil_at_db.php';
 # ============================================================
 # MAIN SELECT PASIEN
 # ============================================================
+// $id_harga_perusahaan = $pasien['id_harga_perusahaan'] ?? '';
 include 'tampil_pasien-data_pasien.php';
-$id_paket = $pasien['id_paket'] ?? die(div_alert('danger', "Pasien ini belum mempunyai Paket Pemeriksaan. | <a href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>"));
+$id_paket = $pasien['id_paket'] ?? '';
+
+if (!$id_paket and !$id_harga_perusahaan) die(div_alert('danger', "Pasien ini belum mempunyai Paket Pemeriksaan. | <a href='?manage_paket_custom&id_pasien=$id_pasien'>Manage Paket</a>"));
 $nama_paket = $pasien['nama_paket'];
 
 
@@ -102,23 +105,43 @@ $nama_paket = $pasien['nama_paket'];
 # LIST PEMERIKSAAN
 # ============================================================
 if ($JENIS == 'COR') {
-  $s_pemeriksaan = "SELECT 
-  e.id as id_pemeriksaan,
-  e.nama as nama_pemeriksaan,
-  f.nama as jenis_pemeriksaan,
-  e.singkatan,
-  e.sampel,
-  e.jenis,
-  2 as status_bayar, -- status bayar 2 = corporate
-  (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
-  FROM tb_pasien a 
-  JOIN tb_order b ON a.order_no=b.order_no 
-  JOIN tb_paket c ON b.id_paket=c.id 
-  JOIN tb_paket_detail d ON d.id_paket=c.id 
-  JOIN tb_pemeriksaan e ON d.id_pemeriksaan=e.id 
-  JOIN tb_jenis_pemeriksaan f ON e.jenis=f.jenis 
-  WHERE a.id=$id_pasien 
-  ";
+  if ($id_harga_perusahaan) {
+    $s_pemeriksaan = "SELECT  
+    e.id as id_pemeriksaan,
+    e.nama as nama_pemeriksaan,
+    f.nama as jenis_pemeriksaan,
+    e.singkatan,
+    e.sampel,
+    e.jenis,
+    2 as status_bayar, -- status bayar 2 = corporate
+    (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
+    FROM tb_pasien a 
+    JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id 
+    JOIN tb_paket c ON b.id_paket=c.id 
+    JOIN tb_paket_detail d ON d.id_paket=c.id 
+    JOIN tb_pemeriksaan e ON d.id_pemeriksaan=e.id 
+    JOIN tb_jenis_pemeriksaan f ON e.jenis=f.jenis 
+    WHERE a.id=$id_pasien 
+    ";
+  } else {
+    $s_pemeriksaan = "SELECT 
+    e.id as id_pemeriksaan,
+    e.nama as nama_pemeriksaan,
+    f.nama as jenis_pemeriksaan,
+    e.singkatan,
+    e.sampel,
+    e.jenis,
+    2 as status_bayar, -- status bayar 2 = corporate
+    (SELECT COUNT(1) FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=e.id) count_pemeriksaan_detail
+    FROM tb_pasien a 
+    JOIN tb_order b ON a.order_no=b.order_no 
+    JOIN tb_paket c ON b.id_paket=c.id 
+    JOIN tb_paket_detail d ON d.id_paket=c.id 
+    JOIN tb_pemeriksaan e ON d.id_pemeriksaan=e.id 
+    JOIN tb_jenis_pemeriksaan f ON e.jenis=f.jenis 
+    WHERE a.id=$id_pasien 
+    ";
+  }
 } else { // pasien non COR
   $s_pemeriksaan = "SELECT 
   d.id as id_pemeriksaan,
@@ -141,6 +164,7 @@ if ($JENIS == 'COR') {
 $q_pemeriksaan = mysqli_query($cn, $s_pemeriksaan) or die(mysqli_error($cn));
 $jumlah_pemeriksaan = mysqli_num_rows($q_pemeriksaan);
 $tr_progress = '';
+$tr_progress_mobile = '';
 $jenis_pemeriksaan = '';
 $no = 0;
 $jumlah_pemeriksaan_selesai = 0;
@@ -152,6 +176,7 @@ if (!mysqli_num_rows($q_pemeriksaan)) {
       Assign Pemeriksaan
     </a>
   ");
+  $tr_progress_mobile = $tr_progress;
 }
 $arr_csampel = [];
 $link_hasil_penunjang = '';
@@ -199,10 +224,23 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
       </td>
     </tr>
   ";
+
+  $tr_progress_mobile .= "
+    <div class='wadah bg-white'>
+      <div class=row>
+        <div class=' col-lg-4'><div class='f12 abu miring'>$no</div> $pemeriksaan[nama_pemeriksaan]</div>
+        <div class=' col-lg-8'>
+          $info_pemeriksaan
+          <div><a href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$id_pasien'>$img_next</a></div>
+        </div>
+      </div>
+    </div>
+    ";
 }
 
 
 $tr_sampel = '';
+$tr_sampel_mobile = '';
 $info_sampel = '<span class="f12 miring abu">belum ambil sampel</span>';
 $no = 0;
 $jumlah_sampel = count($arr_csampel);
@@ -231,6 +269,17 @@ if ($arr_csampel) {
           <a href='?pemeriksaan&ambil_sampel=1&sampel=$sampel&id_pasien=$id_pasien'>$img_next</a>
         </td>
       </tr>
+    ";
+    $tr_sampel_mobile .= "
+    <div class='wadah bg-white'>
+      <div class=row>
+        <div class=' col-lg-4'><div class='f12 abu miring'>$no</div> $arr_sampel[$sampel]</div>
+        <div class=' col-lg-8'>
+          $info_sampel
+          <div><a href='?pemeriksaan&ambil_sampel=1&sampel=$sampel&id_pasien=$id_pasien'>$img_next</a></div>
+        </div>
+      </div>
+    </div>
     ";
   }
 }
@@ -269,7 +318,25 @@ $src = "$lokasi_pasien/$foto_profil";
 # ============================================================
 # FINAL ECHO PEM MCU
 # ============================================================
+?>
+<style>
+  .mobile_only {
+    display: none;
+  }
+
+  @media (max-width: 550px) {
+    .mobile_only {
+      display: block;
+    }
+
+    .desktop_only {
+      display: none;
+    }
+  }
+</style>
+<?php
 echo "
+
   <div class='wadah tengah gradasi-hijau'>
     <div><a href='?cari_pasien'>$img_prev</a></div>
     <div><img src='$src' class='foto_profil'></div>
@@ -279,13 +346,15 @@ echo "
     <div class='flexy flex-center'>
       <div class=wadah>
         Sampel Pemeriksaan
-        <table class='table table-striped table-hover mt4'>$tr_sampel</table>
+        <table class='table table-striped table-hover mt4 desktop_only'>$tr_sampel</table>
+        <div class='mt4 mobile_only tengah'>$tr_sampel_mobile</div>
       </div>
     </div>
     <div class='flexy flex-center'>
       <div class=wadah>
         Progress Pemeriksaan
-        <table class='table table-striped table-hover mt4'>$tr_progress</table>
+        <table class='table table-striped table-hover mt4 desktop_only'>$tr_progress</table>
+        <div class='mt4 mobile_only tengah'>$tr_progress_mobile</div>
         $info_selesai
       </div>
     </div>
@@ -297,7 +366,7 @@ echo "
 # ============================================================
 echo "
   <div class='tengah mb4'><span class='btn_aksi bold f14 darkblue' id=tb_detail__toggle>$img_detail Info Detail Pasien</span></div>
-  <div class='hideita border-top pt3' id=tb_detail>
+  <div class='hideit border-top pt3' id=tb_detail>
     <table class='table '>
       $tr
     </table>

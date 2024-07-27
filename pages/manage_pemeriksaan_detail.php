@@ -33,16 +33,16 @@ set_h2('Detail Pemeriksaan', "
   $DPem <b class='proper darkblue'>$nama_pemeriksaan</b>
   <div class=mt2><a href='?manage_pemeriksaan'>$img_prev</a> $link_up</div>
 ");
-$roles = ['admin', 'marketing', 'nakes', 'dokter'];
+$roles = ['admin', 'marketing', 'nakes', 'dokter', 'dokter-pj'];
 $str_roles = join(', ', $roles);
 only(
   $roles,
-  'Yang berhak update pertanyaan adalah: [$str_roles]
+  "Yang berhak update pertanyaan adalah: [ $str_roles ]
   <hr>
   <span class=biru>Silahkan Logout kemudian re-Login sebagai role diatas untuk editing Detail Pemeriksaan</span>
   <hr>
   <a href=# onclick=window.close()>Close Tab</a> | <a href=?logout>Logout</a>
-  ',
+  ",
   0
 );
 

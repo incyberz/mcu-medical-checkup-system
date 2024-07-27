@@ -10,7 +10,7 @@ $arr_id_detail_show = [
   'Tekanan Darah' => [7, 8],
   'Nadi' => 140,
   'Pernafasan' => 9,
-  'Suhu' => 139,
+  'Suhu' => 148,
   'Saturasi Oksigen' => 10,
 ];
 $li = '';
@@ -29,7 +29,7 @@ foreach ($arr_id_detail_show as $key => $id_detail) {
     $arr = [
       'Hipotensi' => ['sistol' => 100, 'distol' => 60],
       'Normal' => ['sistol' => 129, 'distol' => 84],
-      'Pre-Hipertensi' => ['sistol' => 139, 'distol' => 89],
+      'Pre-Hipertensi' => ['sistol' => 148, 'distol' => 89],
       'Hipertensi derajat 1' => ['sistol' => 159, 'distol' => 99],
       'Hipertensi derajat 2' => ['sistol' => 179, 'distol' => 109],
       'Hipertensi derajat 3' => ['sistol' => 299, 'distol' => 199],

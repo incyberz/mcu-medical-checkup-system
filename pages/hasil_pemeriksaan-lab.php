@@ -22,6 +22,7 @@ $detail = '';
 while ($d2 = mysqli_fetch_assoc($q2)) {
   if (strtolower($d2['label']) == 'separator') continue;
   $id_detail = $d2['id'];
+  if ($id_detail == 106) continue; // laju endap darah
   $id_pemeriksaan = $d2['id_pemeriksaan'];
   $hasil = strtolower($arr_id_detail[$id_detail]);
   $normal_value = strtolower($d2['normal_value']);

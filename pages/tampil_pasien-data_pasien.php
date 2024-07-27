@@ -1,44 +1,45 @@
 <?php
 $fields = "
   a.nama as nama_pasien,
-  a.status,
-  a.gender,
-  a.no_ktp,
-  a.no_bpjs,
   a.nikepeg as NIK,
-  a.tempat_lahir,
-  a.tanggal_lahir,
-  a.alamat,
-  a.kecamatan,
-  a.kabupaten,
   a.date_created as tanggal_daftar,
-  a.last_update,
-  a.username,
-  a.password,
-  a.riwayat_penyakit,
-  a.tanggal_mengisi_riwayat_penyakit,
-  a.gejala_penyakit,
-  a.tanggal_mengisi_gejala_penyakit,
-  a.gaya_hidup,
-  a.tanggal_mengisi_gaya_hidup,
-  a.keluhan,
-  a.tanggal_mengisi_keluhan,
-  a.id_paket_custom,
-  a.foto_profil,
+  a.*,
   (SELECT 1 FROM tb_hasil_pemeriksaan WHERE id_pasien=a.id) data_pemeriksaan
 ";
 
 if ($JENIS == 'COR') {
-  $s_pasien = "SELECT 
-  c.id as id_paket,
-  c.nama as nama_paket,
-  'Corporate' as jenis_pasien,
-  $fields
-  FROM tb_pasien a 
-  JOIN tb_order b ON a.order_no=b.order_no 
-  JOIN tb_paket c ON b.id_paket=c.id 
-  WHERE a.id=$id_pasien
-  ";
+
+  $s = "SELECT id_harga_perusahaan FROM tb_pasien WHERE id=$id_pasien";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $id_harga_perusahaan = '';
+  if (mysqli_num_rows($q)) {
+    $d = mysqli_fetch_assoc($q);
+    $id_harga_perusahaan = $d['id_harga_perusahaan'];
+
+    $s_pasien = "SELECT 
+    c.id as id_paket,
+    c.nama as nama_paket,
+    'Corporate Individu' as jenis_pasien,
+    $fields
+    FROM tb_pasien a 
+    JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id 
+    JOIN tb_paket c ON b.id_paket=c.id 
+    WHERE a.id=$id_pasien 
+    AND b.id = $id_harga_perusahaan 
+    ";
+  } else {
+
+    $s_pasien = "SELECT 
+    c.id as id_paket,
+    c.nama as nama_paket,
+    'Corporate' as jenis_pasien,
+    $fields
+    FROM tb_pasien a 
+    JOIN tb_order b ON a.order_no=b.order_no 
+    JOIN tb_paket c ON b.id_paket=c.id 
+    WHERE a.id=$id_pasien
+    ";
+  }
 } else {
   $s_pasien = "SELECT 
   b.id as id_paket,
@@ -51,6 +52,8 @@ if ($JENIS == 'COR') {
   WHERE a.id=$id_pasien
   ";
 }
+
+
 $q = mysqli_query($cn, $s_pasien) or die(mysqli_error($cn));
 $tr = '';
 $data_pemeriksaan = '';

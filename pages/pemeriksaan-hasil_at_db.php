@@ -13,11 +13,12 @@ $arr_sampel_by = [];
 # ============================================================
 $s = "SELECT * FROM tb_hasil_pemeriksaan WHERE id_pasien=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$hasil_at_db = [];
 if (mysqli_num_rows($q)) {
-  $hasil = mysqli_fetch_assoc($q);
-  $arr_hasil = explode('||', $hasil['arr_hasil']);
-  $arr_tanggal_by = explode('||', $hasil['arr_tanggal_by']);
-  $arr_sampel_tanggal_by = explode('||', $hasil['arr_sampel']);
+  $hasil_at_db = mysqli_fetch_assoc($q);
+  $arr_hasil = explode('||', $hasil_at_db['arr_hasil']);
+  $arr_tanggal_by = explode('||', $hasil_at_db['arr_tanggal_by']);
+  $arr_sampel_tanggal_by = explode('||', $hasil_at_db['arr_sampel']);
 
   foreach ($arr_hasil as $pair) {
     if (!$pair) continue;

@@ -30,7 +30,7 @@ $pukul = date('H:i');
 
 $form_pemeriksaan = "
   <form method='post' class='form-pemeriksaan wadah bg-white'>
-    <div class='wadah gradasi-toska'>
+    <div class='wadah gradasi-toska tengah'>
       <img src='assets/img/ilustrasi/medical-checkup.jpg' class='img-fluid img-thumbnail' />
     </div>  
     <div class='flexy mb2 flex-center'>

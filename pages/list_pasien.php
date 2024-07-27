@@ -254,7 +254,7 @@ if (!$mode) {
       <thead><th><div style='width:$no_width'>No</div></th>$th</thead>
     </table>
     <div class='border-bottom' style='max-height:300px; overflow-y:scroll; background: linear-gradient(white,#ccf) !important; position:relative'>
-      <table class='table td_transparan '>
+      <table class='table td_trans '>
         $tr
       </table>
     </div>

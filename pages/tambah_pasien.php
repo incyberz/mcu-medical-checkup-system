@@ -1,5 +1,5 @@
 <?php
-// set_h2('Tambah Pasien');
+set_title('Tambah Pasien');
 $bm = '<b class=red>*</b>';
 
 # ============================================================
@@ -79,12 +79,12 @@ $arr_jenis = [
     'option_value' => 'idv',
     'caption' => 'Individu',
   ],
-  // 'corporate' => [
-  //   'id_detail' => 'jenis_pasien',
-  //   'option_class' => 'jenis_pasien',
-  //   'value' => 1,
-  //   'caption' => 'Corporate',
-  // ],
+  'corporate' => [
+    'id_detail' => 'jenis',
+    'option_class' => 'jenis_pasien',
+    'option_value' => 'cor',
+    'caption' => 'Corporate',
+  ],
 ];
 $radio_jenis = radio_toolbar($arr_jenis, false);
 
@@ -112,11 +112,15 @@ $input_tanggal_lahir = "
 ";
 
 $input_alamat = "
+  <style>
+    .item_kab{}
+    .item_kab:hover, .item_kec:hover{background: yellow}
+  </style>
   <div class=flexy>
     <div class='kanan abu f14 miring pt2' style='min-width:100px'>Kabupaten $bm</div>
     <div>
-      <input required class='form-control' name=kabupaten placeholder='Kabupaten...' autocomplete=off>
-      <div class=hideit id=list_kabupaten>
+      <input class='form-control ' id=input_kab placeholder='Kabupaten...' autocomplete=off  value='bekasi' ZZZ>
+      <div class='hideita mb4 mt2' id=list_kab>
         <ul>
           <li>asd</li>
           <li>asd</li>
@@ -125,19 +129,33 @@ $input_alamat = "
       </div>
     </div>
   </div>
-  <div class=flexy>
-    <div class='kanan abu f14 miring pt2' style='min-width:100px'>Kecamatan $bm</div>
-    <div>
-      <input required class='form-control' name=kecamatan placeholder='Kecamatan...'>
-      <div id=list_kabupaten></div>
+  <div class='hideit' id=blok_kec>
+    <div class='flexy'>
+      <div class='kanan abu f14 miring pt2' style='min-width:100px'>Kecamatan $bm</div>
+      <div>
+      <input class='form-control ' id=input_kec placeholder='Kecamatan...' autocomplete=off >
+      <div class='hideita mb4 mt2' id=list_kec>
+        <ul>
+          <li>asd</li>
+          <li>asd</li>
+          <li>asd</li>
+        </ul>
+      </div>
+      </div>
     </div>
   </div>
-  <div style='display:grid; grid-template-columns: 100px auto; gap:15px'>
-    <div class='kanan abu f14 miring pt2' style='min-width:100px'>Desa, Rw, RT $bm</div>
-    <div>
-      <textarea required name=alamat id=alamat class='form-control' style='width:100%' placeholder='Desa, Blok, RT, RW...'></textarea>
+  <div class='hideit' id=blok_alamat>
+    <div style='display:grid; grid-template-columns: 100px auto; gap:15px'>
+      <div class='kanan abu f14 miring pt2' style='min-width:100px'>Desa, Rw, RT $bm</div>
+      <div>
+        <textarea requireda name=alamat id=alamat class='form-control' style='width:100%' placeholder='Desa, Blok, RT, RW...'></textarea>
+      </div>
     </div>
   </div>
+
+  <div class='hideit bg-red'>id_kab: <span id=id_kab></span></div>
+  <div class='hideit bg-red'>id_kec: <input type=hidden name=id_kec id=id_kec /></div>
+
 ";
 
 $input_image = "
@@ -189,6 +207,18 @@ $arr_input = [
     'maxlength' => '16',
     'required' => '',
   ],
+  'nikepeg' => [
+    'kolom' => 'N.I.K atau KTP',
+    'minlength' => '3',
+    'maxlength' => '16',
+    'required' => '',
+  ],
+  'whatsapp' => [
+    'kolom' => 'No. Whatsapp',
+    'minlength' => '10',
+    'maxlength' => '14',
+    'required' => 'required',
+  ],
   'alamat' => $input_alamat,
   // 'image' => $input_image,
 
@@ -231,7 +261,7 @@ foreach ($arr_input as $key => $arr) {
 echo "
   <div class='wadah gradasi-hijau'>
     <form method=post class=wadah>
-      <table class=table>
+      <table class='table td_trans'>
         $html_inputs
       </table>
       <button class='btn btn-primary w-100' name=btn_tambah_pasien id=btn_tambah_pasien disabled>Tambah Pasien</button>
@@ -272,7 +302,100 @@ echo "
 
 ?>
 <script>
+  function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
+  $(document).on('click', '.item_kab', function() {
+    let r = $(this).text().split(' - ');
+    let nama_kab = r[0];
+    let id_kab = r[1];
+    $('#id_kab').text(id_kab);
+    $('#input_kab').val(nama_kab);
+    $('#blok_kec').slideDown();
+    $('#list_kab').slideUp();
+
+    let link_ajax = `ajax/get_list_kec.php?keyword=none&id_kab=${id_kab}`;
+    $.ajax({
+      url: link_ajax,
+      success: function(a) {
+        $('#list_kec').slideDown(a);
+        $('#list_kec').html(a);
+
+      }
+    })
+
+    // console.log(r);
+  });
+
+
+  $(document).on('click', '.item_kec', function() {
+    let r = $(this).text().split(' - ');
+    let nama_kec = r[0];
+    let id_kec = r[1];
+    $('#id_kec').val(id_kec);
+    $('#input_kec').val(nama_kec);
+    $('#blok_alamat').slideDown();
+    $('#list_kec').slideUp();
+    $('#btn_tambah_pasien').slideDown();
+
+    // console.log(r);
+  })
+
+
   $(function() {
+    $('#input_kec').keyup(function() {
+      $('#blok_alamat').slideUp();
+      $('#btn_tambah_pasien').slideUp();
+      let val = $(this).val();
+      if (val.length < 3) {
+        $('#list_kec').html('');
+      } else {
+        let id_kab = $('#id_kab').text();
+        let link_ajax = `ajax/get_list_kec.php?keyword=${val}&id_kab=${id_kab}`;
+        $.ajax({
+          url: link_ajax,
+          success: function(a) {
+            $('#list_kec').slideDown(a);
+            $('#list_kec').html(a);
+
+          }
+        })
+
+      }
+
+    });
+
+    $('#input_kab').keyup(function() {
+      $('#blok_kec').slideUp();
+      $('#blok_alamat').slideUp();
+      $('#btn_tambah_pasien').slideUp();
+      $('#input_kec').val('');
+      let val = $(this).val();
+      if (val.length < 3) {
+        $('#list_kab').html('');
+      } else {
+        let link_ajax = `ajax/get_list_kab.php?keyword=${val}`;
+        $.ajax({
+          url: link_ajax,
+          success: function(a) {
+            $('#list_kab').slideDown(a);
+            $('#list_kab').html(a);
+
+          }
+        })
+
+      }
+
+    });
+    $('#input_kab').keyup();
+
+
     $('.input_tanggal_lahir').change(function() {
       $('.input_tanggal_lahir').addClass('gradasi-merah');
       $("#btn_tambah_pasien").prop('disabled', true);
@@ -317,6 +440,22 @@ echo "
       }
     });
 
+    $('#whatsapp').keyup(function() {
+      let val = $(this).val();
+
+      if (val.length > 2) {
+        if (val.substring(0, 1) == '0') {
+          $(this).val('62' + val.substring(1, 100));
+        }
+      }
+
+      $(this).val(
+        $(this).val().replace(/[^0-9]/g, '')
+      )
+    })
+    $('#nama').keyup(function() {
+      $(this).val(toTitleCase($(this).val()));
+    })
     $('.opsi_radio').change(function() {
       let tid = $(this).prop('id');
       let rid = tid.split('__');
@@ -324,13 +463,27 @@ echo "
       if (aksi == 'jenis') {
         let jenis = rid[1];
         // console.log(aksi, jenis, 'ZZZ');
+        $('#tr__no_bpjs').hide();
+        $('#tr__no_ktp').hide();
+        $('#tr__nikepeg').hide();
+        $('#no_bpjs').prop('required', false);
+        $('#no_ktp').prop('required', false);
+        $('#nikepeg').prop('required', false);
         if (jenis == 'bpj') {
+          $('#tr__no_ktp').show();
           $('#tr__no_bpjs').show();
           $('#no_bpjs').prop('required', true);
         } else {
-          $('#tr__no_bpjs').hide();
-          $('#no_bpjs').prop('required', false);
           $('#no_bpjs').val('');
+          $('#no_bpjs').prop('required', false);
+
+          if (jenis == 'cor') {
+            $('#tr__nikepeg').show();
+            $('#nikepeg').prop('required', true);
+          } else if (jenis == 'idv') {
+            $('#tr__no_ktp').show();
+            $('#no_ktp').prop('required', true);
+          }
         }
 
       }

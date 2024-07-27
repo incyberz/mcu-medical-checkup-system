@@ -155,7 +155,8 @@ include 'conn.php';
 include 'include/insho_functions.php';
 include 'include/terbilang.php';
 $id_paket_custom = $_POST['id_paket_custom'] ?? '';
-if (!$id_paket_custom) {
+$id_pasien_corporate_mandiri = $_POST['id_pasien_corporate_mandiri'] ?? '';
+if (!$id_paket_custom and !$id_pasien_corporate_mandiri) {
   echo '<h1 style=color:red>Page ini tidak bisa diakses secara langsung</h1>';
   jsurl('index.php', 5000);
 }
@@ -185,6 +186,32 @@ FROM tb_paket_custom a
 JOIN tb_pasien b ON a.id=b.id_paket_custom 
 JOIN tb_user c ON a.kasir=c.id 
 WHERE a.id=$id_paket_custom";
+
+if ($id_pasien_corporate_mandiri) {
+  $s = "SELECT 
+  a.nominal_bayar,
+  b.id as id_pasien,
+  b.nama as nama_pasien,
+  c.nama as nama_kasir,
+  a.tanggal_bayar,
+  # ============================================================
+  # DENGAN MCU ATAU LAB SAJA
+  # ============================================================
+  (
+    SELECT COUNT(1) FROM tb_paket_custom p 
+    JOIN tb_paket_custom_detail q ON p.id=q.id_paket_custom 
+    JOIN tb_pemeriksaan r ON r.id=q.id_pemeriksaan 
+    WHERE r.jenis = 'MCU'
+    ) is_mcu
+
+
+
+  FROM tb_pembayaran a 
+  JOIN tb_pasien b ON a.id_pasien=b.id 
+  JOIN tb_user c ON a.kasir=c.id 
+  WHERE a.id_pasien=$id_pasien_corporate_mandiri
+  ";
+}
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
 if (mysqli_num_rows($q) == 0) die(div_alert('danger', 'Data tidak ditemukan'));
