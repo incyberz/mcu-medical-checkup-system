@@ -313,6 +313,7 @@ if ($hasil_at_db['approv_date']) {
   $nama_file = "hasil-$get_jenis-$no_mcu-$nama_pasien.pdf";
   $nama_file = str_replace(' ', '_', $nama_file);
   $nama_file = strtolower($nama_file);
+  $btn_re_approv = $role != 'dokter-pj' ? '' : "<div><a class='btn btn-danger' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&re_approv=1'>Re-Approve</a></div>";
   $btn = "
       <div class='flexy flex-center mt3'>
         <div>Filename:</div>
@@ -325,9 +326,7 @@ if ($hasil_at_db['approv_date']) {
         <div>
           <button class='btn btn-primary' onclick=window.print()>Print</button>
         </div>
-        <div>
-          <a class='btn btn-danger' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&re_approv=1'>Re-Approve</a>
-        </div>
+        $btn_re_approv
       </div>
   ";
 }

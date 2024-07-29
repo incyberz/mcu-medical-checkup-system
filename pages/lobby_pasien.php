@@ -52,7 +52,7 @@ ORDER BY a.nama
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $jumlah_pasien_segera = mysqli_num_rows($q);
 $div = '';
-$nav = div_alert('info', "Tidak ada pasien di Lobby Pemeriksaan | <a href='?rekap_hasil_pemeriksaan'>Rekap Hasil Pemeriksaan</a>");
+$nav = div_alert('info', "Tidak ada pasien di Lobby Pemeriksaan | <a href='?rekap_pemeriksaan'>Rekap Hasil Pemeriksaan</a>");
 $jumlah_lobby = 0;
 if (mysqli_num_rows($q)) {
   while ($d = mysqli_fetch_assoc($q)) {
@@ -84,15 +84,6 @@ if (mysqli_num_rows($q)) {
     }
     $status_show = $d['status_pasien'] ? "<span class='warna_status_$status'>$d[status_pasien]</span>" : '<i class="f14 abu">belum pemeriksaan</i>';
 
-
-    $div .= "
-      <style>
-        .border_status_7,.border_status_8 {border: solid 5px #f44}
-        .border_status_9 {border: solid 5px #44f}
-        .warna_status_7,.warna_status_8 {color:#f44}
-        .warna_status_9 {color:#44f}
-      </style>
-    ";
 
     # ============================================================
     # ARR TANGGAL BY HANDLER
@@ -129,7 +120,18 @@ if (mysqli_num_rows($q)) {
         </div>
       ";
     }
-  }
+  } // end while
+
+  $div .= "
+    <style>
+      .border_status_7,.border_status_8 {border: solid 5px #f44}
+      .border_status_9 {border: solid 5px #44f}
+      .warna_status_7,.warna_status_8 {color:#f44}
+      .warna_status_9 {color:#44f}
+    </style>
+  ";
+
+
 
   // echo '<pre>';
   // var_dump($count_pemeriksaan);

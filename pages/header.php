@@ -19,6 +19,10 @@
   .badge-blue {
     background: blue;
   }
+
+  .badge-green {
+    background: green;
+  }
 </style>
 <?php
 // hide other info menu when parameter terisi
@@ -35,6 +39,8 @@ if ($username) {
     $count_pasien_null = 0;
     $count_pasien_ready = 0;
     $count_pasien_sedang = 0;
+    $count_pasien_selesai = 0;
+    $count_pasien_unverif = 0;
 
     $s = "SELECT * FROM tb_header WHERE id_klinik=$id_klinik";
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -45,32 +51,41 @@ if ($username) {
       count_pasien_null,
       count_pasien_ready,
       count_pasien_sedang,
+      count_pasien_selesai,
+      count_pasien_unverif,
       last_update
     ) VALUES (
       $id_klinik,
       $count_pasien_null,
       $count_pasien_ready,
       $count_pasien_sedang,
+      $count_pasien_selesai,
+      $count_pasien_unverif,
       '2020-1-1' -- initialisasi last_update pertama
     )";
       $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
       echo div_alert('success', 'Auto Create Header Count sukses.');
       jsurl();
     } else {
-      $d = mysqli_fetch_assoc($q);
-      $count_pasien_null = $d['count_pasien_null'];
-      $count_pasien_ready = $d['count_pasien_ready'];
-      $count_pasien_sedang = $d['count_pasien_sedang'];
-      $last_update_header = $d['last_update'];
+      $header = mysqli_fetch_assoc($q);
+      $count_pasien_null = $header['count_pasien_null'];
+      $count_pasien_ready = $header['count_pasien_ready'];
+      $count_pasien_sedang = $header['count_pasien_sedang'];
+      $count_pasien_selesai = $header['count_pasien_selesai'];
+      $count_pasien_unverif = $header['count_pasien_unverif'];
+      $last_update_header = $header['last_update'];
     }
 
     $count_pasien_null_show = !$count_pasien_null ? '' : "<span class='badge badge-red'>$count_pasien_null</span>";
     $count_pasien_ready_show = !$count_pasien_ready ? '' : "<span class='badge badge-red'>$count_pasien_ready</span>";
     $count_pasien_sedang_show = !$count_pasien_sedang ? '' : "<span class='badge badge-blue'>$count_pasien_sedang</span>";
+    $count_pasien_selesai_show = !$count_pasien_selesai ? '' : "<span class='badge badge-green'>$count_pasien_selesai</span>";
+    $count_pasien_unverif_show = !$count_pasien_unverif ? '' : "<span class='badge badge-red'>$count_pasien_unverif</span>";
 
     $li_nakes = "
       <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?pendaftaran'>Pendaftaran $count_pasien_null_show</a></li>
       <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?cari_pasien&aksi=mcu'>Pemeriksaan $count_pasien_ready_show $count_pasien_sedang_show</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_nakes' href='?rekap_pemeriksaan'>Rekap $count_pasien_selesai_show $count_pasien_unverif_show</a></li>
     ";
   }
 } elseif (!$username) {

@@ -162,6 +162,7 @@ if (!mysqli_num_rows($q)) {
           'option_values',
           'option_default',
           'option_labels',
+          'normal_value',
           'class',
           'option_class',
           'satuan',

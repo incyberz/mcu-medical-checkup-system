@@ -5,6 +5,9 @@
 // $s = "SELECT a.id as id_pemeriksaan a"
 set_title('Hasil Lab - ' . $nama_pemeriksaan);
 
+$get_jenis = $_GET['jenis'] ?? '';
+if ($get_jenis) $get_jenis = strtolower($get_jenis);
+
 # ============================================================
 # DETAIL PEMERIKSAAN
 # ============================================================
@@ -18,13 +21,23 @@ $detail_header = '
   <div class=detail_header>NILAI NORMAL</div>
   <div class=detail_header>CATATAN</div>
 ';
+
+// fix for eritrosit bernilai 0
+if (!isset($arr_id_detail[129])) $arr_id_detail[129] = 0; // eritrosit
+
 $detail = '';
+
+// khusus URI
+$detail2 = '';
+$arr_uri_mikro = [128, 129, 130, 131, 132, 133];
+
 while ($d2 = mysqli_fetch_assoc($q2)) {
   if (strtolower($d2['label']) == 'separator') continue;
   $id_detail = $d2['id'];
   if ($id_detail == 106) continue; // laju endap darah
   $id_pemeriksaan = $d2['id_pemeriksaan'];
-  $hasil = strtolower($arr_id_detail[$id_detail]);
+
+  $hasil =  strtolower($arr_id_detail[$id_detail]);
   $normal_value = strtolower($d2['normal_value']);
   $lo = $d2['normal_lo_l'];
   $hi = $d2['normal_hi_l'];
@@ -65,21 +78,43 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
   $satuan = (!$d2['satuan'] || $d2['satuan'] == 'satuan') ? '-' : $d2['satuan'];
   if (strtoupper($satuan) == 'LBP') $hasil = "0-$hasil";
 
+  $blok = "
+      <div class=miring>$d2[label]</div>
+      <div>$hasil</div>
+      <div>$hl</div>
+      <div class=miring>$satuan</div>
+      <div>$nilai_normal</div>
+      <div>-</div>
+    ";
 
-  $detail .= "
-    <div class=miring>$d2[label]</div>
-    <div>$hasil</div>
-    <div>$hl</div>
-    <div class=miring>$satuan</div>
-    <div>$nilai_normal</div>
-    <div>-</div>
-  ";
+  if ($get_jenis == 'uri' and in_array($id_detail, $arr_uri_mikro)) {
+    $detail2 .= $blok;
+  } else {
+    $detail .= $blok;
+  }
 }
 
-echo "
-  <h4 class='kiri biru f14 mt4 mb2 bold' style='letter-spacing: 2px; color: #4cc'>$d[jenis_pemeriksaan]</h4>
+if ($get_jenis == 'uri') {
+  $blok_detail = "
+    <h5 class='kiri f14 mt2 mb2 bold' style='letter-spacing: 2px; color: #4cc'>Makroskopik</h5>
+    <div 
+      class='f12 left border-bottom pb2' 
+      style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
+    >
+      $detail_header
+      $detail
+    </div>
 
-  
+    <h5 class='kiri f14 mt2 mb2 bold' style='letter-spacing: 2px; color: #4cc'>Mikroskopik</h5>
+    <div 
+      class='f12 left border-bottom pb2' 
+      style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
+    >
+      $detail2
+    </div>
+  ";
+} else {
+  $blok_detail = "
   <div 
     class='f12 left border-bottom pb2' 
     style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
@@ -87,6 +122,13 @@ echo "
     $detail_header
     $detail
   </div>
+  ";
+}
+
+echo "
+  <h4 class='kiri biru f14 mt4 mb2 bold' style='letter-spacing: 2px; color: #4cc'>$d[jenis_pemeriksaan]</h4>
+
+  $blok_detail
 
   <div class='f12 left mt2 border-bottom pb2'>
     <div>Catatan:</div>

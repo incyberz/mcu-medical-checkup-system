@@ -93,7 +93,8 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     $str_hasil = '';
     $str_tanggal_by = '';
     foreach ($arr_id_detail as $key => $value) {
-      if ($value) $str_hasil .= "$key=$value||";
+      if ($value === '' || $value === null) continue;
+      $str_hasil .= "$key=$value||";
     }
     foreach ($arr_id_pemeriksaan_tanggal as $key => $value) {
       if ($value) $str_tanggal_by .= "$key=$value||";
