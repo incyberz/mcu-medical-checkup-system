@@ -27,6 +27,7 @@ function radio_toolbar($arr_radio, $full_width = true)
     if ($value_from_db) {
       $checked = $option_value == $value_from_db ? 'checked' : '';
     }
+    echo "<hr>$checked = $option_value == $value_default ";
 
     $html .= "
       <div class='radio-toolbar abu mb2 mt2' style='$flex_1'>

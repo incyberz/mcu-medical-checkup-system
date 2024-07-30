@@ -340,7 +340,7 @@
   }
 
   .th_toska th {
-    background: #cff;
+    background: #cff !important;
   }
 
   /* .kolom {

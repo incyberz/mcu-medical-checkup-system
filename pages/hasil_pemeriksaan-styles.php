@@ -49,7 +49,7 @@
       top: 0;
       margin: 0;
       padding: 0 1cm;
-      box-shadow: none;
+      box-shadow: none !important;
     }
   }
 </style>

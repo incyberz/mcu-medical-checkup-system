@@ -42,11 +42,7 @@ include 'hasil_pemeriksaan-mcu-kesimpulan.php';
 # ============================================================
 include 'hasil_pemeriksaan-mcu-kesimpulan_penunjang.php';
 
-$arr_hasil_at_db = [
-  0 => 'Unfit',
-  1 => 'Fit On Job',
-  2 => 'Fit with Medical Note',
-];
+include 'include/arr_kesimpulan.php';
 $belum_ada = '<span class="red miring">belum diverifikasi</span>';
-$hasil_at_db_show = $hasil_at_db['hasil'] ? $arr_hasil_at_db[$hasil_at_db['hasil']] : $belum_ada;
+$hasil_at_db_show = $hasil_at_db['hasil'] ? $arr_kesimpulan[$hasil_at_db['hasil']] : $belum_ada;
 blok_hasil('KESIMPULAN', $hasil_at_db_show);

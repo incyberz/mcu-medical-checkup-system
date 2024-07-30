@@ -75,10 +75,15 @@ $toggle_form_pemeriksaan = '';
 $hide_form_pemeriksaan = '';
 if ($tanggal_periksa) {
   include 'include/arr_user.php';
+  $JENIS = strtoupper($pemeriksaan['jenis']);
+  $link_preview = $JENIS == 'MCU' ? '' : "<a class='btn btn-success' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$JENIS'>Preview</a>";
+
+
   $hari = hari_tanggal($tanggal_periksa);
-  $info_tanggal_periksa = div_alert('info mt2', "Pemeriksaan ini telah diperiksa oleh <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>$link_prev");
+  $info_tanggal_periksa = div_alert('info mt2', "Pemeriksaan ini telah diperiksa oleh <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>$link_prev $link_preview");
   $toggle_form_pemeriksaan = "<div class='tengah mb2'><span class='btn_aksi btn btn-secondary' id=form_pemeriksaan__toggle> <i class='bx bx-refresh f20'></i> Periksa Kembali</span></div>";
   $hide_form_pemeriksaan = 'hideit';
+  $hide_form_pemeriksaan = 'hideita'; // ZZZ DEBUg
 }
 
 
@@ -191,7 +196,7 @@ if (!$punya_hasil) {
   echo "
     <div class='wadah tengah gradasi-hijau'>
       $sub_header
-      $link_prev
+      $link_prev 
       
       <div><img src='$src' class='foto_profil'></div>
       <div class='mb1'>$gender_icon $pasien[nama]</div>
@@ -215,7 +220,7 @@ if (!$punya_hasil) {
 
 
   # ============================================================
-  # EXCEPTION FOR PEM.FISIK.DOKTER | RONTGEN
+  # ROLE VALIDATION | EXCEPTION FOR PEM.FISIK.DOKTER | RONTGEN
   # ============================================================
   if (strtolower($pemeriksaan['jenis']) == 'mcu') {
     $singkatan = strtolower($pemeriksaan['singkatan']);
@@ -226,51 +231,61 @@ if (!$punya_hasil) {
     }
   }
 
-
   # ============================================================
   # FORM PEMERIKSAAN
   # ============================================================
   $form_pemeriksaan = '';
-  $s = "SELECT * FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=$id_pemeriksaan";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  if (mysqli_num_rows($q)) {
-    $arr_input = [];
-    while ($d = mysqli_fetch_assoc($q)) {
-      $arr_input[$d['id']] = $d;
+
+  if (strtolower($pemeriksaan['jenis']) == 'ron') {
+    # ============================================================
+    # UI FOR RONTGEN
+    # ============================================================
+    include 'pemeriksaan-rontgen.php';
+  } else {
+    # ============================================================
+    # FORM PEMERIKSAAN FOR OTHERS | HEMA, URINE, DLL
+    # ============================================================
+    $s = "SELECT * FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=$id_pemeriksaan";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if (mysqli_num_rows($q)) {
+      $arr_input = [];
+      while ($d = mysqli_fetch_assoc($q)) {
+        $arr_input[$d['id']] = $d;
+      }
+
+
+      # ============================================================
+      # PENENTUAN BLOK INPUT
+      # ============================================================
+      # $arr_input['blok'] : - radio-toolbar
+      #                      - input-range
+      #                      - select
+      # ============================================================
+      $blok_inputs = '';
+      include 'pemeriksaan-blok_input_handler.php';
+
+      $tanggal_show = date('d-F-Y H:i');
+
+      $form_pemeriksaan = "
+        <form method='post' class='form-pemeriksaan wadah bg-white' id=blok_form>
+
+          <!-- =========================================================== -->
+          <!-- BLOK INPUTS -->
+          <!-- =========================================================== -->
+          $blok_inputs
+
+          <div class='flexy mb2 flex-center'>
+            <input type=checkbox required id=cek>
+            <label for=cek>Saya menyatakan bahwa data diatas sudah benar.</label>
+          </div>
+          <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$id_pasien'>Submit Data</button>
+          <input type=hidden name=last_pemeriksaan value='$nama_pemeriksaan by $nama_user'>
+          <input type=hidden name=id_pemeriksaan value='$id_pemeriksaan'>
+        </form>
+      ";
+    } else { // end ada detail
+      $form_pemeriksaan =  div_alert('danger tengah', "Detail Pemeriksaan belum ada | <a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan&nama_pemeriksaan=$nama_pemeriksaan'>Manage</a>");
     }
-
-
-    # ============================================================
-    # PENENTUAN BLOK INPUT
-    # ============================================================
-    # $arr_input['blok'] : - radio-toolbar
-    #                      - input-range
-    #                      - select
-    # ============================================================
-    $blok_inputs = '';
-    include 'pemeriksaan-blok_input_handler.php';
-
-    $tanggal_show = date('d-F-Y H:i');
-
-    $form_pemeriksaan = "
-      <form method='post' class='form-pemeriksaan wadah bg-white' id=blok_form>
-
-        <!-- =========================================================== -->
-        <!-- BLOK INPUTS -->
-        <!-- =========================================================== -->
-        $blok_inputs
-
-        <div class='flexy mb2 flex-center'>
-          <input type=checkbox required id=cek>
-          <label for=cek>Saya menyatakan bahwa data diatas sudah benar.</label>
-        </div>
-        <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$id_pasien'>Submit Data</button>
-        <input type=hidden name=last_pemeriksaan value='$nama_pemeriksaan by $nama_user'>
-        <input type=hidden name=id_pemeriksaan value='$id_pemeriksaan'>
-      </form>
-    ";
-  } else { // end ada detail
-    $form_pemeriksaan =  div_alert('danger tengah', "Detail Pemeriksaan belum ada | <a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan&nama_pemeriksaan=$nama_pemeriksaan'>Manage</a>");
   }
 } // end punya data MCU
 
@@ -284,7 +299,7 @@ if (!$ambil_sampel) {
   echo "
     <div class='wadah tengah gradasi-hijau'>
       $sub_header
-      $link_prev
+      $link_prev 
       
       <div><img src='$src' class='foto_profil'></div>
       <div class='mb1'>$gender_icon $pasien[nama]</div>

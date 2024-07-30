@@ -25,7 +25,7 @@ foreach ($arr as $posisi) {
   $pos = 8;
   $increment = -1;
   foreach ($rg[$posisi] as $key => $value) {
-    $value = abs($value);
+    $value = $value < 0 ? abs($value) : $value;
     $i++;
     $NN = 1;
     if ($i > 8) $NN = 2;

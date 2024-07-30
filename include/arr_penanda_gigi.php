@@ -18,6 +18,7 @@ $tb_penanda_gigi = "<table>$tr</table>";
 
 function simbol_gigi($kode)
 {
+  // $kode = intval($kode);
   $arr = [
     2 => 'O',
     3 => '@',
@@ -28,7 +29,13 @@ function simbol_gigi($kode)
     8 => 'V',
     1 => '.',
   ];
-  if (!array_key_exists($kode, $arr)) die("<span class=red>Kode gigi: $kode tidak ada dalam arr_penanda_gigi</span>");
+  if (!array_key_exists($kode, $arr)) {
+    return '';
+    echo '<pre>';
+    var_dump($kode);
+    echo '</pre>';
+    die("<span class=red>Kode gigi: $kode tidak ada dalam arr_penanda_gigi</span>");
+  }
   return $arr[$kode];
 }
 

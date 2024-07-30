@@ -136,7 +136,7 @@ if (isset($_POST['btn_submit_data_pasien'])) {
   # UPDATE status pasien 
   # ============================================================
   $s = "UPDATE tb_pasien SET status=9 -- sedang pemeriksaan
-  WHERE id=$id_pasien -- AND status <= 9
+  WHERE id=$id_pasien  AND status <= 9
   ";
   echolog('updating status pasien');
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

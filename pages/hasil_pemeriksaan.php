@@ -99,10 +99,17 @@ if (!mysqli_num_rows($q)) {
   $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
   $id_paket_custom = $pasien['id_paket_custom'];
   $jenis = $pasien['jenis'];
+  $gender = strtolower($pasien['gender']);
   $JENIS = strtoupper($jenis);
 }
 
 
+// if (!$gender) {
+//   echo '<pre>';
+//   var_dump($gender);
+//   echo '</pre>';
+//   die(div_alert('danger', "Membutuhkan gender untuk kalkulasi"));
+// }
 
 
 
@@ -201,6 +208,7 @@ echo "
   <div class='wadah gradasi-hijau tengah'>
     <div class='f30 abu mb2 mt4'>Preview Hasil Laboratorium</div>
     <a href='?tampil_pasien&id_pasien=$id_pasien'>$img_prev</a>
+    <a href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$id_pasien'>$img_edit</a>
     <div class='flexy flex-center f12 mt2'>
       <div class='kertas bg-white p4 mt2' id=kertas__mcu>
         <div>$img_header_logo</div>

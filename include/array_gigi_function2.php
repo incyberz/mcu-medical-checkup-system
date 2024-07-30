@@ -31,7 +31,8 @@ foreach ($arr_posisi as $posisi) {
     $td_space = '';
     if ($i == 8 || $i == 24) $td_space = '<td style="background:#ccc !important">&nbsp;</td>';
 
-    $simbol = simbol_gigi(abs($value));
+    $value = $value < 0 ? abs($value) : $value;
+    $simbol = simbol_gigi($value);
     $gigi_bermasalah = $simbol == '.' ? '' : 'gigi_bermasalah';
     $simbol = $simbol == '.' ? ' ' : $simbol;
     $tmp_value = "<div class='tmp_value bg-red hideit' id=tmp_value__$i>$value</div>";
