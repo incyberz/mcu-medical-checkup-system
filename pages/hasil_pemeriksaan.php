@@ -225,6 +225,8 @@ echo "
 # ============================================================
 if ($is_mcu) {
   include 'hasil_pemeriksaan-mcu.php';
+} elseif ($id_pemeriksaan == 9) {
+  include 'hasil_pemeriksaan-rontgen.php';
 } else {
   include 'hasil_pemeriksaan-lab.php';
 }
@@ -322,6 +324,7 @@ if ($hasil_at_db['approv_date']) {
   $nama_file = str_replace(' ', '_', $nama_file);
   $nama_file = strtolower($nama_file);
   $btn_re_approv = $role != 'dokter-pj' ? '' : "<div><a class='btn btn-danger' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&re_approv=1'>Re-Approve</a></div>";
+  $btn_re_approv = ''; // aborted
   $btn = "
       <div class='flexy flex-center mt3'>
         <div>Filename:</div>

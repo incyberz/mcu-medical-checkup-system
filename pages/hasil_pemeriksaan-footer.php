@@ -32,18 +32,21 @@ for ($i = 0; $i < 6; $i++) {
 
 $qr_konten .= "qr/?$id3";
 
+$Dokter_pemeriksa = $id_pemeriksaan == 9 ? 'Dokter Radiologi' : 'Dokter Pemeriksa';
+$dokter_pj = $id_pemeriksaan == 9 ? 'dr. Yuliawati H, Sp.Rad' : $dokter_pj;
+
 echo "
   <div class='mt2 kiri f11' style='margin-left:11cm; margin-bottom: 1cm'>
     <div>
       <span class='abu miring'>Printed at:</span> 
       Bekasi, $tanggal_cetak
     </div>
-    <div>
+    <div class=hideit>
       <span class='abu miring'>From:</span> 
       Mutiara Medical System, https://mmc-clinic.com
     </div>
     <div class=mb1>
-      <span class='abu miring'>Dokter Pemeriksa:</span> 
+      <span class='abu miring'>$Dokter_pemeriksa:</span> 
       $dokter_pj
     </div>
 ";

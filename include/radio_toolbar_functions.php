@@ -27,7 +27,6 @@ function radio_toolbar($arr_radio, $full_width = true)
     if ($value_from_db) {
       $checked = $option_value == $value_from_db ? 'checked' : '';
     }
-    echo "<hr>$checked = $option_value == $value_default ";
 
     $html .= "
       <div class='radio-toolbar abu mb2 mt2' style='$flex_1'>
@@ -39,8 +38,19 @@ function radio_toolbar($arr_radio, $full_width = true)
   return "<div style='display:flex; gap:5px'>$html</div>";
 }
 
-function radio_toolbar2($label, $id_detail, $option_values, $option_labels = null, $class = null, $option_class = null, $value_default = null, $value_from_db = null)
-{
+function radio_toolbar2(
+  $label,
+  $id_detail,
+  $option_values,
+  $option_labels = null,
+  $class = null,
+  $option_class = null,
+  $value_default = null,
+  $value_from_db = null,
+  $show_edit = true,
+  $show_info_default = true,
+  $show_info_id = true,
+) {
   $arr_value = explode(',', $option_values);
   $arr_label = explode(',', $option_labels);
 
@@ -70,20 +80,25 @@ function radio_toolbar2($label, $id_detail, $option_values, $option_labels = nul
   }
 
   $radio_toolbar = radio_toolbar($arr);
+  $link_edit = $show_edit ? "
+    <a href='?manage_pemeriksaan_detail&id_detail=$id_detail' target=_blank onclick='return confirm(`Edit Pertanyaan ini?`)'>
+      <img src='assets/img/icon/edit5.png' height=20px>
+    </a>
+    " : '';
+  $hide_info_default = $show_info_default ? '' : 'hideit';
+  $info_id = $show_info_id ? "id: $id_detail" : '&nbsp;';
 
   return "
-    <div class='$red_class'>
+    <div class='$red_class' id=blok_radio__$id_detail>
       <div class='flexy flex-between' >
-        <div class='f10 abu miring'>id: $id_detail</div>
+        <div class='f10 abu miring'>$info_id</div>
         <div>
-          <a href='?manage_pemeriksaan_detail&id_detail=$id_detail' target=_blank onclick='return confirm(`Edit Pertanyaan ini?`)'>
-            <img src='assets/img/icon/edit5.png' height=20px>
-          </a>
+          $link_edit
         </div>
       </div>
-      <div class='$class'>$label</div>
-      $radio_toolbar
-      <div class='hideita f12 abu' ><i>default</i> : <span class=proper id=value_default__$id_detail>$value_default</span></div>
+      <div class='$class' id=title__$id_detail>$label</div>
+      <div id=blok_option_radio__$id_detail>$radio_toolbar</div>
+      <div class='$hide_info_default f12 abu' ><i>default</i> : <span class=proper id=value_default__$id_detail>$value_default</span></div>
     </div>
   ";
 }

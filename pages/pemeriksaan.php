@@ -334,11 +334,12 @@ if (!$ambil_sampel) {
       // restore UI
       $('.label__' + id_detail).prop('style', '');
 
-      console.log(id_detail, value, value_default);
+      // console.log(id_detail, value, value_default);
       if (value_default) {
         if (value_default.trim().toLowerCase() == value.trim().toLowerCase()) {
-          console.log('DEFAULT');
+          // console.log('DEFAULT');
         } else {
+          // console.log('SET RED');
           // ============================================================
           // NILAI ABNORMAL != NILAI DEFAULT
           // ============================================================

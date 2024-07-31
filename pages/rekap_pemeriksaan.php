@@ -3,6 +3,7 @@ $mode = $_GET['mode'] ?? 'detail';
 set_h2('Rekap Pemeriksaan', "List Mode | <a href='?rekap_perusahaan'>Rekap Perusahaan</a>");
 
 
+
 # ============================================================
 # MAIN SELECT
 # ============================================================
@@ -47,6 +48,7 @@ if (mysqli_num_rows($q)) {
     $i++;
     if ($d['approv_date']) $jumlah_verif++;
     $jenis = strtolower($d['jenis']);
+    $id_pasien = $d['id_pasien'];
     $status = $d['status'];
     $src = "assets/img/profile_na.jpg";
     if ($d['foto_profil']) {
@@ -66,7 +68,24 @@ if (mysqli_num_rows($q)) {
     }
     $status_show = $d['status_pasien'] ? "<span class='warna_status_$status'>$d[status_pasien]</span>" : '<i class="f14 abu">belum pemeriksaan</i>';
 
-    $link_verif = $d['approv_date'] ? $img_check : " | 
+    if ($d['whatsapp']) {
+
+      $zdatetime = date('idymhs');
+      $rand = rand(1, 999999);
+      $rand = str_replace('0', '9', $rand);
+      $rand2 = rand(10, 99);
+      $id_pasien2024 = ($id_pasien * 7) + 2024;
+      $zid_pasien = $rand . "0$id_pasien2024$zdatetime$rand2";
+
+      $Tn = strtoupper($d['gender']) == 'L' ? 'Tn' : 'Ny';
+      $link_akses = urlencode("https://mmc-clinic.com/k/?");
+      $text_wa = "Selamat $waktu $Tn. $d[nama],%0a%0aTerima kasih telah mengikuti Medical Checkup di Mutiara Medical Center. Semoga Anda selalu sehat.%0a%0aSilahkan buka hasil MCU Anda:%0a$link_akses$zid_pasien%0a%0a_Mutiara Medical System, $now _";
+      $link_wa = "<a target=_blank href='https://api.whatsapp.com/send?phone=$d[whatsapp]&text=$text_wa'>$img_wa</a>";
+    } else {
+      $link_wa = 'ISI WA DULU';
+    }
+
+    $link_verif = $d['approv_date'] ? $link_wa : " | 
       <a class='upper tebal ' href='?hasil_pemeriksaan&id_pasien=$d[id]&jenis=mcu'>
         <b class=red>Unverified</b> $img_next
       </a>

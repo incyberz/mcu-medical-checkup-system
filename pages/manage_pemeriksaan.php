@@ -28,7 +28,7 @@ $sub_judul = "
   <div class='flexy flex-center' id=nav_for>$navs</div>
 ";
 set_h2($judul, $sub_judul);
-only(['admin', 'marketing']);
+only(['admin', 'marketing', 'dokter', 'dokter-pj']);
 
 if (!array_key_exists($for, $arr_for)) die("index [$for] invalid");
 $fields = '';

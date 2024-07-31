@@ -50,24 +50,27 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     # ============================================================
     $last_pemeriksaan = $_POST['last_pemeriksaan'] ?? die('index [last_pemeriksaan] undefined');
     $id_pemeriksaan = $_POST['id_pemeriksaan'] ?? die('index [id_pemeriksaan] undefined');
-    unset($_POST['btn_submit_data_pasien']);
-    unset($_POST['last_pemeriksaan']);
-    unset($_POST['id_pemeriksaan']);
+    if ($id_pemeriksaan == 9) { // KHUSUS RONTGEN
+      $id_detail = 134;
+      // echo '<pre>';
+      // var_dump($_POST);
+      // echo '</pre>';
+      $value = trim($_POST['catatan__KESAN']);
+      $value = $value ? $value : 'dalam batas normal';
+      $arr_id_detail[$id_detail] = $value;
+      // exit;
+    } else { // bukan rontgen
+      unset($_POST['btn_submit_data_pasien']);
+      unset($_POST['last_pemeriksaan']);
+      unset($_POST['id_pemeriksaan']);
 
-    // echolog('data POST');
-    // echo '<pre>';
-    // var_dump($_POST);
-    // echo '</pre>';
-
-
-
-
-    # ============================================================
-    # UPDATE ARRAY ID DETAIL WITH DATA POSTS
-    # ============================================================
-    echolog('updating array hasil');
-    foreach ($_POST as $key => $value) {
-      $arr_id_detail[$key] = $value;
+      # ============================================================
+      # UPDATE ARRAY ID DETAIL WITH DATA POSTS
+      # ============================================================
+      echolog('updating array hasil');
+      foreach ($_POST as $key => $value) {
+        $arr_id_detail[$key] = $value;
+      }
     }
 
     # ============================================================

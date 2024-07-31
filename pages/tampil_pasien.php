@@ -192,11 +192,18 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
     exit;
   }
 
-  if (strtolower($pemeriksaan['jenis']) != 'mcu') $link_hasil_penunjang .= " 
-    <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$pemeriksaan[jenis]&id_pemeriksaan=$id_pemeriksaan'>
-      $nama_pemeriksaan
-    </a>
-  ";
+  if (strtolower($pemeriksaan['jenis']) != 'mcu') {
+    $np_show = strtoupper($nama_pemeriksaan);
+    if ($np_show == 'URINE LENGKAP') $np_show = 'Hasil MCU Urine';
+    if ($np_show == 'DARAH LENGKAP') $np_show = 'Hasil MCU Darah';
+    if ($np_show == 'RONTGEN (DADA)') $np_show = 'Hasil Rontgen';
+
+    $link_hasil_penunjang .= " 
+      <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$pemeriksaan[jenis]&id_pemeriksaan=$id_pemeriksaan'>
+        $np_show
+      </a>
+    ";
+  }
 
   $sampel = $pemeriksaan['sampel'];
   if (!in_array($sampel, $arr_csampel) and $sampel) array_push($arr_csampel, $sampel);
@@ -300,7 +307,7 @@ if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_sampel_selesa
       Pasien telah menjalani semua pemeriksaan $img_check
 
       <div class=mt2>
-        <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Hasil Pemeriksaan MCU</a>
+        <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Kesimpulan MCU Fisik</a>
       </div>
       <div class='wadah mt2'>
         <div class='mb2 mt1 abu'>Pemeriksaan Penunjang</div>
