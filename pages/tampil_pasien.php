@@ -296,7 +296,7 @@ if ($arr_csampel) {
 # ============================================================
 $info_selesai = '';
 if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_sampel_selesai == $jumlah_sampel and $jumlah_pemeriksaan) {
-  if ($status == 9) {
+  if ($status == 9 || $status == '') {
     //update status pasien menjadi 10 (pasien selesai)
     $s2 = "UPDATE tb_pasien SET status=10 WHERE id='$id_pasien'";
     $q_pemeriksaan = mysqli_query($cn, $s2) or die(mysqli_error($cn));

@@ -28,3 +28,5 @@ $blok_jadwal = $status < 2 ? '' : "
     </div>
   </div>
 ";
+
+$blok_jadwal = div_alert('info', "Untuk Informasi Penjadwalan MCU masih dalam tahap pengembangan. Silahkan langsung menghubungi Whatsapp Marketing kami. terimakasih");

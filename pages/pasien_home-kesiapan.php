@@ -44,15 +44,22 @@ $blok_kesiapan = $status < 6 ? '' : "
   </div>
 ";
 
+$pesan = "
+  <div class='mb2'>
+    <img src='assets/img/ilustrasi/lengkap.jpg' class='img-thumbnail img-fluid' />
+  </div>
+  Silahkan Anda mengikuti Pemeriksaan Medical Checkup sesuai dengan jadwal Anda. Nantikan info terbaru tentang progres pemeriksaan MCU Anda di laman ini.
+";
+if ($is_login_as) {
+  $pesan = div_alert('danger', "Anda (Petugas) sedang login as sebagai pasien. Mohon berhati-hati dalam mengubah data pasien.");
+}
+
 if ($status >= 7) { // sudah mengisi kesiapan
   $blok_kesiapan = "
   <div class='card mb4 gradasi-hijau'>
     <div class='card-body tengah'>
       <h3>Progress Medical Checkup</h3>
-      <div class='mb2'>
-        <img src='assets/img/ilustrasi/lengkap.jpg' class='img-thumbnail img-fluid' />
-      </div>
-      Silahkan Anda mengikuti Pemeriksaan Medical Checkup sesuai dengan jadwal Anda. Nantikan info terbaru tentang progres pemeriksaan MCU Anda di laman ini.
+      $pesan
       <hr>
       Jika Petugas sudah publish hasil Medical Checkup, maka Anda dapat Download Hasil MCU disini
 

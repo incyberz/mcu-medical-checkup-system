@@ -1,5 +1,9 @@
 <?php
 $mode = $_GET['mode'] ?? 'detail';
+if ($mode == 'kirim_link') {
+  include 'rekap_perusahaan-kirim_link.php';
+  exit;
+}
 include 'pages/hasil_pemeriksaan-styles.php';
 include 'include/arr_kesimpulan.php';
 $belum_ada = '<span class="red bold miring">belum ada</span>';
@@ -113,7 +117,13 @@ if ($mode == 'approv') {
   $link = $link_approv;
   $sub_h = 'Preview untuk Perusahaan';
 }
-set_h2('Rekap Pemeriksaan', "$sub_h | $link");
+set_h2('Rekap Pemeriksaan', "
+  $sub_h | $link 
+  <div class='mt2'>
+    <a class='btn btn-sm btn-success' href='?rekap_perusahaan&id_perusahaan=1&mode=kirim_link'>Kirim Link Pasien ke HRD</a>
+  </div>
+  <a href='https://youtu.be/AkDSnkaBMFc' target=_blank >Lihat Tutorial </a>
+");
 
 
 

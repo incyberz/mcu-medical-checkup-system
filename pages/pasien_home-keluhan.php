@@ -10,11 +10,13 @@ $btn_link = "
 ";
 
 if ($status >= 6) { // sudah mengisi keluhan
-  if (!$tanggal_mengisi_keluhan) {
-    die(div_alert('danger', "Tanggal mengisi keluhan tidak sama dengan status pasien. Mohon segera laporkan ke Petugas!"));
-  }
-  if (!$keluhan) {
-    die(div_alert('danger', "Data keluhan pasien tidak terbaca. Mohon segera laporkan ke Petugas!"));
+  if (!$is_login_as) {
+    if (!$tanggal_mengisi_keluhan) {
+      die(div_alert('danger', "Tanggal mengisi keluhan tidak sama dengan status pasien. Mohon segera laporkan ke Petugas!"));
+    }
+    if (!$keluhan) {
+      die(div_alert('danger', "Data keluhan pasien tidak terbaca. Mohon segera laporkan ke Petugas!"));
+    }
   }
 
   $arr = explode(',', $keluhan);

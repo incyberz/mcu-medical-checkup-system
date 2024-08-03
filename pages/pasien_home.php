@@ -1,33 +1,13 @@
-<style>
-  #info_pasien h3 {
-    font-size: 18px;
-    color: darkblue;
-    text-align: center;
-    border-bottom: solid 1px #cccccccc;
-    padding-bottom: 10px;
-  }
-
-
-
-  .radio-toolbar label {
-    padding: 7px 10px;
-  }
-
-  .nomor {
-    font-family: consolas;
-    letter-spacing: 1.5px;
-    font-size: 20px;
-  }
-</style>
 <?php
 $judul = 'Pasien Home';
 $sub_judul = "Selamat datang $nama_user di MMC Information System";
 set_title($judul);
 set_h2($judul, $sub_judul);
 only(['pasien', 'pendaftar']);
-// require_once 'include/mcu_functions.php';
+$is_login_as = isset($_SESSION['mmc_username_master']) ? 1 : 0;
 
-
+require_once 'pasien_home-styles.php';
+unset($_SESSION['mcu_id_pasien']);
 
 
 
@@ -79,21 +59,87 @@ only(['pasien', 'pendaftar']);
 # NORMAL FLOW
 # ============================================================
 $s = "SELECT 
-a.*, 
 a.id as id_pasien,
-a.status, -- status pasien
-b.pendaftar,
-b.tanggal_order,
-c.id as id_paket,
-c.nama as paket,
-d.nama as program,
-d.id as id_program,
-(SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
-FROM tb_pasien a 
-JOIN tb_order b ON a.order_no=b.order_no 
-JOIN tb_paket c ON b.id_paket=c.id
-JOIN tb_program d ON c.id_program=d.id 
-WHERE a.id='$id_user'";
+a.order_no,
+a.id_harga_perusahaan,
+a.id_paket_custom 
+FROM tb_pasien a WHERE a.id='$id_user' -- user login pasien
+";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+if (!mysqli_num_rows($q)) {
+  echo div_alert('danger', "Data pasien tidak ditemukan.");
+  exit;
+} else {
+  $d = mysqli_fetch_assoc($q);
+  $id_pasien = $d['id_pasien'];
+  $order_no = $d['order_no'];
+  $id_paket_custom = $d['id_paket_custom'];
+  $id_harga_perusahaan = $d['id_harga_perusahaan'];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if ($order_no) {
+  # ============================================================
+  # PASIEN CORPORATE
+  # ============================================================
+  $s = "SELECT 
+  a.*, 
+  a.id as id_pasien,
+  a.status, -- status pasien
+  b.pendaftar,
+  b.tanggal_order,
+  c.id as id_paket,
+  c.nama as paket,
+  d.nama as program,
+  d.id as id_program,
+  (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
+  FROM tb_pasien a 
+  JOIN tb_order b ON a.order_no=b.order_no 
+  JOIN tb_paket c ON b.id_paket=c.id
+  JOIN tb_program d ON c.id_program=d.id 
+  WHERE a.id='$id_user'";
+} elseif ($id_harga_perusahaan) {
+  # ============================================================
+  # PASIEN INDIVIDU CORPORATE
+  # ============================================================
+  $s = "SELECT 
+  a.*, 
+  a.id as id_pasien,
+  a.status, -- status pasien
+  (CONCAT(a.nama,' (Anda sendiri)')) pendaftar,
+  a.date_created as tanggal_order,
+  c.id as id_paket,
+  c.nama as paket,
+  d.nama as program,
+  d.id as id_program,
+  (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
+  FROM tb_pasien a 
+  JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id 
+  JOIN tb_paket c ON b.id_paket=c.id
+  JOIN tb_program d ON c.id_program=d.id 
+  WHERE a.id='$id_user'";
+} elseif ($id_paket_custom) {
+  die(div_alert('danger', "Belum ada handler untuk pasien custom [id_paket_custom: $id_paket_custom]"));
+} else {
+  die(div_alert('danger', "Jenis pasien tidak ditemukan."));
+}
+
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (!mysqli_num_rows($q)) {
@@ -245,7 +291,8 @@ $blok_gaya_hidup = '';
 $blok_keluhan = '';
 $blok_kesiapan = '';
 
-if ($foto_profil) {
+
+if ($foto_profil || $is_login_as) {
   include 'pasien_home-biodata.php';
   include 'pasien_home-jadwal.php';
   include 'pasien_home-kuesioner.php';

@@ -1,10 +1,31 @@
 <?php
 
 
-
-set_title("Hasil Pemeriksaan");
-only('users');
-$id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', "Page ini membutuhkan index [id_pasien]"));
+$id_pasien_session = $_SESSION['mcu_id_pasien'] ?? null;
+if ($id_pasien_session) {
+  $id_pasien = $id_pasien_session;
+  echo "
+    <style>
+      header,
+      .admin_only,
+      #topbar
+      {
+        display:none !important;
+      }
+    </style>
+    <div class='mb4 tengah ' style='margin-top:-30px'>
+      <div class='biru tebal'>Jika menggunakan handphone, pastikan Seting Browser: Mode Desktop</div>
+      <div class='mt4 mb2'>Lihat Tutorial:</div>
+      <a class='btn btn-sm btn-success mb2' href='https://youtu.be/XJ771E_a9E8' target=_blank>Save as PDF via Handphone</a>
+      <br>
+      <a class='btn btn-sm btn-success mb2' href='https://youtu.be/mnKlZ_kUtIg' target=_blank>Save as PDF via Laptop</a>
+    </div>
+  ";
+} else {
+  set_title("Hasil Pemeriksaan");
+  only('users');
+  $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', "Page ini membutuhkan index [id_pasien]"));
+}
 $get_jenis = $_GET['jenis'] ?? die(div_alert('danger', "Page ini membutuhkan index [jenis]"));
 $get_jenis = strtolower($get_jenis);
 $kesimpulan = [];
@@ -207,8 +228,10 @@ $MC = $is_mcu ? 'MEDICAL CHECKUP' : 'PEMERIKSAAN ' . strtoupper($nama_pemeriksaa
 echo "
   <div class='wadah gradasi-hijau tengah'>
     <div class='f30 abu mb2 mt4'>Preview Hasil Laboratorium</div>
-    <a href='?tampil_pasien&id_pasien=$id_pasien'>$img_prev</a>
-    <a href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$id_pasien'>$img_edit</a>
+    <div class='admin_only'>
+      <a href='?tampil_pasien&id_pasien=$id_pasien'>$img_prev</a>
+      <a href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$id_pasien'>$img_edit</a>
+    </div>
     <div class='flexy flex-center f12 mt2'>
       <div class='kertas bg-white p4 mt2' id=kertas__mcu>
         <div>$img_header_logo</div>
@@ -327,11 +350,11 @@ if ($hasil_at_db['approv_date']) {
   $btn_re_approv = ''; // aborted
   $btn = "
       <div class='flexy flex-center mt3'>
-        <div>Filename:</div>
-        <div>
+        <div class=admin_only>Filename:</div>
+        <div class=admin_only>
           <input class='form-control js-copytextarea' value='$nama_file' />
         </div>
-        <div>
+        <div class=admin_only>
           <button class='btn btn-success js-textareacopybtn' id=btn_copy>Copy</button>
         </div>
         <div>

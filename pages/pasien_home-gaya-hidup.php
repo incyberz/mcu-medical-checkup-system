@@ -10,11 +10,13 @@ $btn_link = "
 ";
 
 if ($status >= 5) { // sudah mengisi gaya hidup
-  if (!$tanggal_mengisi_gaya_hidup) {
-    die(div_alert('danger', "Tanggal mengisi gaya hidup tidak sama dengan status pasien. Mohon segera laporkan ke Petugas!"));
-  }
-  if (!$gaya_hidup) {
-    die(div_alert('danger', "Data gaya hidup pasien tidak terbaca. Mohon segera laporkan ke Petugas!"));
+  if (!$is_login_as) {
+    if (!$tanggal_mengisi_gaya_hidup) {
+      die(div_alert('danger', "Tanggal mengisi gaya hidup tidak sama dengan status pasien. Mohon segera laporkan ke Petugas!"));
+    }
+    if (!$gaya_hidup) {
+      die(div_alert('danger', "Data gaya hidup pasien tidak terbaca. Mohon segera laporkan ke Petugas!"));
+    }
   }
 
   $arr = explode(',', $gaya_hidup);

@@ -23,12 +23,19 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
     while ($d = mysqli_fetch_assoc($q)) {
       $id_detail = $d['id_detail'];
       $option_default = $d['option_default'];
+      $hasil = $arr_id_detail[$id_detail] ?? 0;
 
       // jika punya option default
       if ($option_default) {
-        if ($option_default != $arr_id_detail[$id_detail]) {
-          // echo "<br> $d[nama_pemeriksaan] $d[label] $arr_id_detail[$id_detail] $d[option_default]";
-          $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$arr_id_detail[$id_detail]</span></li>";
+        if ($id_detail == 129) {
+          // exception for eritrosit - URINE - boleh nol
+        } elseif (strpos(strtolower("salt$hasil"), 'dalam batas normal')) {
+          // exception for hasil dalam batas normal
+        } else {
+          if ($option_default != $hasil) {
+            // echo "<br> $d[nama_pemeriksaan] $d[label] $hasil $d[option_default]";
+            $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil</span></li>";
+          }
         }
       }
     }

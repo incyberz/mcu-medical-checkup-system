@@ -12,8 +12,10 @@ $button_link = "
 ";
 
 if ($status >= 3) {
-  if (!$tanggal_mengisi_riwayat_penyakit) {
-    die(div_alert('danger', 'Status pasien tidak sesuai dengan data riwayat pada database. Mohon segera laporkan ke Petugas!'));
+  if (!$is_login_as) {
+    if (!$tanggal_mengisi_riwayat_penyakit) {
+      die(div_alert('danger', 'Status pasien tidak sesuai dengan data riwayat pada database. Mohon segera laporkan ke Petugas!'));
+    }
   }
 
 
