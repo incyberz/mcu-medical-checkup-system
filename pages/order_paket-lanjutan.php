@@ -96,8 +96,47 @@ echo "
   <h2 class='sub-judul mt4 btn_aksi' id=data_order_awal__toggle>Data Order Awal</h2>
   <div class=wadah id=data_order_awal>
     $tb
+
+    <div class=wadah>
+      Apa yang ingin Anda lakukan berikutnya?
+      <div class=row>
+        <div class=col-lg-3>
+          <div class=wadah>
+            <hr>
+            Lihat Harga/Proposal
+            <hr>
+            <hr>
+          </div>
+        </div>
+        <div class=col-lg-3>
+          <div class=wadah>
+            <hr>
+            Mengisi Opsi MCU
+            <hr>
+            <hr>
+          </div>
+        </div>
+        <div class=col-lg-3>
+          <div class=wadah>
+            <hr>
+            Upload List Peserta
+            <hr>
+            <hr>
+          </div>
+        </div>
+        <div class=col-lg-3>
+          <div class=wadah>
+            <hr>
+            Batalkan Order
+            <hr>
+            <hr>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class='mt4 mb2 f14 darkred kanan'><span class='btn btn-danger btn-sm btn_aksi' id=form_batal__toggle>Batalkan Order</span></div>
-    <form method=post class='hideita wadah gradasi-kuning' id=form_batal>
+    <form method=post class='hideit wadah gradasi-kuning' id=form_batal>
       <div class='mt1 f14 darkred'>Untuk memberikan kejelasan dan kepastian proses, Anda boleh membatalkan Order Anda, dan kami tetap sangat mengharapkan feedback dari Anda agar performa pelayanan kami tetap menjadi yang terbaik.</div>
       <div class='mt4 mb1'>Alasan Pembatalan:</div>
       <select class='form-control mb1' name=pilihan_alasan>

@@ -64,12 +64,16 @@ b.nama as jenis_pasien,
 ( 
   SELECT status FROM tb_hasil_pemeriksaan p 
   WHERE p.id_pasien=a.id 
-  ) status_pemeriksaan
+  ) status_pemeriksaan,
+( 
+  SELECT perusahaan FROM tb_order p 
+  WHERE p.order_no=a.order_no 
+  ) perusahaan
 
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
 WHERE a.date_created > '$tanggal_awal' 
-ORDER BY date_created DESC
+ORDER BY a.status, a.nama, date_created DESC
 ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
@@ -102,6 +106,7 @@ if (mysqli_num_rows($q)) {
         || $key == 'status'
         || $key == 'status_bayar_corporate_mandiri'
         || $key == 'tanggal_bayar_corporate_mandiri'
+        || $key == 'perusahaan'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
@@ -118,19 +123,18 @@ if (mysqli_num_rows($q)) {
           </div>
         ";
       } elseif ($key == 'status_bayar') {
-        if ($d['id_harga_perusahaan']) {
-          // jika coporate mandiri
+        if ($d['id_harga_perusahaan']) { // corporate bayar sendiri
           if ($d['status_bayar_corporate_mandiri']) {
             $tgl = hari_tanggal($d['tanggal_bayar_corporate_mandiri'], 0, 0, 1, 1, '-');
             $value = "<div class='f12 abu miring'>$tgl</div><span class='f12 green'>Corp. Mandiri $img_check</span>";
           } else {
             $value = "CM-$belum_bayar";
           }
-        } else {
-          if (!$d['status']) {
+        } else { // corporate atau individu
+          if (!$d['status'] and $JENIS == 'IDV') {
             $value = $belum_bayar;
-          } else {
-            $value = $JENIS == 'COR' ? "Corporate $img_check" : 'baru didaftarkan';
+          } else { // pure COR dibayarkan perusahaan / free
+            $value = $JENIS == 'COR' ? "by Corporate $img_check" : 'baru didaftarkan';
             if ($d['id_paket_custom']) {
               $value = 'sudah punya paket';
               if ($d['count_detail_paket_custom']) {
@@ -177,7 +181,7 @@ if (mysqli_num_rows($q)) {
             $value = "<a href='?manage_paket_custom&id_pasien=$id_pasien' >$value</a>";
           } else {
             // biarkan
-            $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[order_no]</a></div>";
+            $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[perusahaan]</a></div>";
           }
         } else {
           if (!$value and !$d['id_paket_custom']) {

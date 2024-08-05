@@ -13,7 +13,8 @@
 <body>
 
   <?php
-
+  $tanggals = $_GET['tanggals'] ?? '';
+  $tanggals_show = '';
 
   $is_valid = 1;
   $day_expire = 7;
@@ -31,6 +32,23 @@
 
   include '../conn.php';
   include '../include/arr_kesimpulan.php';
+  include '../include/insho_functions.php';
+
+  $sql_tanggals = 1;
+  if ($tanggals) {
+
+    $sql_tanggals = '';
+    $arr = explode(',', $tanggals);
+    foreach ($arr as $key => $tanggal) {
+      if ($tanggal) {
+        $sql_tanggals .= $sql_tanggals ? ' || ' : '';
+        $sql_tanggals .= " (awal_periksa >= '$tanggal' AND awal_periksa <= '$tanggal 23:59:59') ";
+        $tanggals_show .= $tanggals_show ? ', ' : '';
+        $tanggals_show .= hari_tanggal($tanggal, 1, 1, 0);
+      }
+    }
+  }
+  $sql_tanggals = "($sql_tanggals)";
 
   $s = "SELECT 
   a.hasil as status_hasil,
@@ -41,8 +59,10 @@
   JOIN tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id
   WHERE c.id_perusahaan=$id_perusahaan 
   AND b.status = 10 -- selesai pemeriksaan 
+  AND $sql_tanggals
   ORDER BY b.nama 
   ";
+
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $count_pasien = mysqli_num_rows($q);
   if ($count_pasien) {
@@ -92,26 +112,8 @@
       ";
     }
 
-
-    // include '../include/insho_functions.php';
     $date_now = date('Y-m-d H:i:s');
-    // $selisih = $day_expire * 24 * 60 * 60 + $is_valid - strtotime('now');
-    // $selisih =  60 * 60 + $is_valid - strtotime('now');
-    // $eta = eta($selisih);
     $hijau  = 'hijau';
-    // $tgl_time = strtotime($tgl);
-    // $date_now_time = strtotime($date_now);
-
-    // $valid_show = "
-    //   <div>$nama</div>
-    //   <div class='mb2 f12 abu'>MCU-$id_pasien</div>
-    //   <a href='../?hasil_pemeriksaan&jenis=mcu' target=_blank class='btn btn-primary w-100 mb2'>Kesimpulan Fisik MCU</a>
-    //   <a href='../?hasil_pemeriksaan&jenis=uri' target=_blank class='btn btn-primary w-100 mb2'>Hasil MCU Urine</a>
-    //   <a href='../?hasil_pemeriksaan&jenis=hem' target=_blank class='btn btn-primary w-100 mb2'>Hasil MCU Darah</a>
-    //   <a href='../?hasil_pemeriksaan&jenis=ron' target=_blank class='btn btn-primary w-100 mb2'>Hasil Rontgen</a>
-    //   <div class='mb2 f12 abu'>link expire dalam $eta</div>
-    // ";
-
   } else {
     $hijau  = 'merah';
     $valid_show = "
@@ -134,7 +136,12 @@
     <div class='flex flex-center' style=' align-items: center'>
       <div class='p2 pt4 gradasi-$hijau tengah consolas' style='min-width:600px; min-height:100vh'>
         <img src='../qr/logo.png' alt='logo'>
-        <div class='darkblue mt2 mb2 f18 bold'>MEDICAL RESULT</div>
+        <div class='darkblue mt2 mb2 f18 bold'>
+          MEDICAL RESULT
+          <div>
+            $tanggals_show
+          </div>
+        </div>
         <hr>
         $valid_show
         <div class='mb4' style='margin-top: 55px'>

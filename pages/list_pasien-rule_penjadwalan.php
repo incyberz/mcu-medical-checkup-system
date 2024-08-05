@@ -53,7 +53,7 @@ if (isset($_POST['btn_apply'])) {
       if (!$d['awal_periksa']) {
 
         $alokasi_ke++;
-        $jadwal = date('Y-m-d H:i:s', strtotime($jam_awal) + (($alokasi_ke - $loket) * $speed) / $jumlah_pos);
+        $jadwal = date('Y-m-d H:i:s', strtotime($awal) + (($alokasi_ke - $loket) * $speed) / $jumlah_pos);
         $pair_loket = $jumlah_pos > 1 ? ", loket=$loket" : '';
         $s2 = "UPDATE tb_pasien SET jadwal='$jadwal' $pair_loket where id=$d[id]";
         echolog("$alokasi_ke. Updating jadwal [ $jadwal$pair_loket ] for [ $d[nama] | $d[perusahaan] ]");

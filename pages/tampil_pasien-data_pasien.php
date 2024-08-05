@@ -1,4 +1,6 @@
 <?php
+if (!$id_pasien) die(div_alert('danger', "Index [id_pasien] undefined at tampil_pasien-data_pasien."));
+
 $fields = "
   a.nama as nama_pasien,
   a.nikepeg as NIK,
@@ -9,7 +11,7 @@ $fields = "
 
 if ($JENIS == 'COR') {
 
-  $s = "SELECT id_harga_perusahaan FROM tb_pasien WHERE id=$id_pasien";
+  $s = "SELECT id_harga_perusahaan FROM tb_pasien WHERE id=$id_pasien AND id_harga_perusahaan is not null";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $id_harga_perusahaan = '';
   if (mysqli_num_rows($q)) {
@@ -40,7 +42,7 @@ if ($JENIS == 'COR') {
     WHERE a.id=$id_pasien
     ";
   }
-} else {
+} else { // JENIS = IDV
   $s_pasien = "SELECT 
   b.id as id_paket,
   CONCAT('Paket Custom ',b.id) as nama_paket,
@@ -53,6 +55,9 @@ if ($JENIS == 'COR') {
   ";
 }
 
+echo '<pre>';
+var_dump($s_pasien);
+echo '</pre>';
 
 $q = mysqli_query($cn, $s_pasien) or die(mysqli_error($cn));
 $tr = '';

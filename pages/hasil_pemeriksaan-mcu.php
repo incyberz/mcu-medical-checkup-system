@@ -25,17 +25,20 @@ include 'hasil_pemeriksaan-mcu-mata.php';
 # ============================================================
 # GIGI 
 # ============================================================
-include 'hasil_pemeriksaan-mcu-gigi.php';
+// include 'hasil_pemeriksaan-mcu-gigi.php';
 
 # ============================================================
 # PEMFIS DOKTER
 # ============================================================
 include 'hasil_pemeriksaan-mcu-pemfis_dokter.php';
 
+
+
 # ============================================================
 # PEMFIS DOKTER
 # ============================================================
 include 'hasil_pemeriksaan-mcu-kesimpulan.php';
+include 'hasil_pemeriksaan-mcu-gigi.php';
 
 # ============================================================
 # PEM.PENUNJANG

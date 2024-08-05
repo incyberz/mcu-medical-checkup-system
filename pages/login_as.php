@@ -58,4 +58,4 @@ echo '<pre>';
 var_dump($_SESSION);
 echo '</pre>';
 
-jsurl('?', 5000);
+jsurl('?', 2000);
