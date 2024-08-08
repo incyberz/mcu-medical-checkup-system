@@ -1,6 +1,10 @@
 <?php
 $mode = $_GET['mode'] ?? 'detail';
-set_h2('Rekap Pemeriksaan', "List Mode | <a href='?rekap_perusahaan'>Rekap Perusahaan</a>");
+set_h2('Rekap Pemeriksaan', "
+  List Mode 
+  | <a href='?rekap_perusahaan'>Rekap Perusahaan</a>
+  | <a href='?rekap_perusahaan&mode=monitoring_pasien'>Monitoring Pasien</a>
+");
 
 
 

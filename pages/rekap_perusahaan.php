@@ -69,23 +69,37 @@ if (!$id_perusahaan) {
     JOIN tb_harga_perusahaan r ON q.id_harga_perusahaan=r.id 
     WHERE r.id_perusahaan=a.id 
     ORDER BY p.awal_periksa DESC LIMIT 1
-    ) last_active
+    ) last_active,
+  (
+    SELECT p.awal_periksa FROM tb_hasil_pemeriksaan p
+    JOIN tb_pasien q ON p.id_pasien = q.id 
+    JOIN tb_order r ON q.order_no=r.order_no  
+    WHERE r.id_perusahaan=a.id 
+    ORDER BY p.awal_periksa DESC LIMIT 1
+    ) last_active_corporate
   FROM tb_perusahaan a 
   ORDER BY last_active DESC, a.nama";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $tr = '';
   $i = 0;
-  while ($d9 = mysqli_fetch_assoc($q)) {
+  while ($pasien = mysqli_fetch_assoc($q)) {
+    if ($pasien['last_active']) {
+      if (strtotime($pasien['last_active']) < strtotime('-1 years')) continue;
+      $last_active_show = hari_tanggal($pasien['last_active']) . ' | ' . eta2($pasien['last_active']);
+    }
+    if ($pasien['last_active_corporate']) {
+      if (strtotime($pasien['last_active_corporate']) < strtotime('-1 years')) continue;
+      $last_active_show = hari_tanggal($pasien['last_active_corporate']) . ' | ' . eta2($pasien['last_active_corporate']);
+    }
+    if (!$pasien['last_active'] && !$pasien['last_active_corporate']) continue;
     $i++;
-    if (strtotime($d9['last_active']) < strtotime('-1 years')) continue;
 
-    $last_active_show = hari_tanggal($d9['last_active']) . ' | ' . eta2($d9['last_active']);
     $tr .= "
       <tr>
         <td>$i</td>
         <td>
-          <a href='?rekap_perusahaan&id_perusahaan=$d9[id]'>
-            $d9[nama] $img_next
+          <a href='?rekap_perusahaan&id_perusahaan=$pasien[id]&mode=$mode'>
+            $pasien[nama] $img_next
           </a>  
         </td>
         <td>$last_active_show</td>
@@ -108,21 +122,35 @@ if (!$id_perusahaan) {
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $perusahaan = mysqli_fetch_assoc($q);
 }
+
+# ============================================================
+# MODE MONITORING PASIEN
+# ============================================================
+if ($mode == 'monitoring_pasien') {
+  include 'monitoring_pasien.php';
+  exit;
+}
+
 $link_approv = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=approv'>Mode Approv Kesimpulan</a>";
 $link_preview = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan'>Preview untuk Perusahaan</a>";
+$link_hrd = "<div class='mt2'>
+  <a class='btn btn-sm btn-success' href='?rekap_perusahaan&id_perusahaan=1&mode=kirim_link'>Kirim Link Pasien ke HRD</a>
+</div>
+<a href='https://youtu.be/AkDSnkaBMFc' target=_blank >Lihat Tutorial </a>";
 if ($mode == 'approv') {
   $link = $link_preview;
   $sub_h = 'Mode Approv Kesimpulan';
+} elseif ($mode == 'monitoring_pasien') {
+  $link = $link_approv;
+  $sub_h = 'Monitoring Pasien';
+  $link_hrd = '';
 } else {
   $link = $link_approv;
   $sub_h = 'Preview untuk Perusahaan';
 }
 set_h2('Rekap Pemeriksaan', "
   $sub_h | $link 
-  <div class='mt2'>
-    <a class='btn btn-sm btn-success' href='?rekap_perusahaan&id_perusahaan=1&mode=kirim_link'>Kirim Link Pasien ke HRD</a>
-  </div>
-  <a href='https://youtu.be/AkDSnkaBMFc' target=_blank >Lihat Tutorial </a>
+  $link_hrd
 ");
 
 
@@ -171,22 +199,22 @@ AND c.id_perusahaan=$id_perusahaan
 ORDER BY a.nama 
 ";
 
-$q9 = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$jumlah_rekap = mysqli_num_rows($q9);
+$qpasien = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$jumlah_rekap = mysqli_num_rows($qpasien);
 $tr = '';
 $tr_approv = '';
 $i = 0;
 $jumlah_verif = 0;
 $awal_periksa = '';
 $nav = div_alert('info', "Belum ada Pasien yang Selesai Pemeriksaan | <a href='?cari_pasien'>Lobby Pasien</a>");
-if (mysqli_num_rows($q9)) {
-  while ($d9 = mysqli_fetch_assoc($q9)) {
+if (mysqli_num_rows($qpasien)) {
+  while ($pasien = mysqli_fetch_assoc($qpasien)) {
     $i++;
-    if ($d9['approv_date']) $jumlah_verif++;
-    $jenis = strtolower($d9['jenis']);
-    $status = $d9['status'];
-    $id_pasien = $d9['id_pasien'];
-    $gender = strtolower($d9['gender']);
+    if ($pasien['approv_date']) $jumlah_verif++;
+    $jenis = strtolower($pasien['jenis']);
+    $status = $pasien['status'];
+    $id_pasien = $pasien['id_pasien'];
+    $gender = strtolower($pasien['gender']);
 
     include 'pages/pemeriksaan-hasil_at_db.php';
     $awal_periksa = $hasil_at_db['awal_periksa'];
@@ -275,7 +303,7 @@ if (mysqli_num_rows($q9)) {
     $berat_badan = $arr_id_detail[1];
     $imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
 
-    $keluhan = $d9['keluhan'] ?? 'tidak ada';
+    $keluhan = $pasien['keluhan'] ?? 'tidak ada';
     $kesimpulan = $hasil_at_db['hasil'] ? $arr_kesimpulan[$hasil_at_db['hasil']] : $belum_ada;
     $konsultasi = $hasil_at_db['konsultasi'] ?? '-';
 
@@ -291,7 +319,7 @@ if (mysqli_num_rows($q9)) {
     }
 
 
-    $kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$d9[id_pasien]&jenis=mcu'>$belum_ada</a>";
+    $kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$pasien[id_pasien]&jenis=mcu'>$belum_ada</a>";
 
     $arr_konsultasi = [];
     if (strpos("salt$kesimpulan_fisik", 'obese') || strpos("salt$kesimpulan_fisik", 'underweight')) array_push($arr_konsultasi, 'dokter ahli gizi');
@@ -332,11 +360,11 @@ if (mysqli_num_rows($q9)) {
       // $konsultasi = "<textarea name=konsultasi__$id_pasien rows=5>$konsultasi</textarea>";
       // $rekomendasi = "<textarea name=rekomendasi__$id_pasien rows=5>$rekomendasi</textarea>";
 
-      $gender = strtoupper($d9['gender']);
+      $gender = strtoupper($pasien['gender']);
       if ($gender == 'L') {
         $is_haid_show = '';
       } else {
-        $is_haid_show = $d9['is_haid'] === null ? 'haidh: no-data' : 'sedang haidh';
+        $is_haid_show = $pasien['is_haid'] === null ? 'haidh: no-data' : 'sedang haidh';
         $is_haid_show = "<div class=red>$is_haid_show</div>";
       }
 
@@ -346,8 +374,8 @@ if (mysqli_num_rows($q9)) {
 
       $tr_approv .= "
         <tr>
-          <td>MCU-$d9[id_pasien]</td>
-          <td>$d9[nama_pasien]</td>
+          <td>MCU-$pasien[id_pasien]</td>
+          <td>$pasien[nama_pasien]</td>
           <td>$gender$is_haid_show</td>
           <td><span class=hideit>KELUHAN</span>$keluhan</td>
           <td id='kesFis'><span class=hideit>KESIMPULAN FISIK</span>$kesimpulan_fisik</td>
@@ -373,9 +401,9 @@ if (mysqli_num_rows($q9)) {
 
       $tr .= "
         <tr>
-          <td>MCU-$d9[id_pasien]</td>
-          <td>$d9[nama_pasien]</td>
-          <td>$d9[tanggal_lahir]</td>
+          <td>MCU-$pasien[id_pasien]</td>
+          <td>$pasien[nama_pasien]</td>
+          <td>$pasien[tanggal_lahir]</td>
           <td><span class=hideit>KELUHAN</span>$keluhan</td>
           <td><span class=hideit>TENSI</span>$arr_id_detail[7]/$arr_id_detail[8]</td>
           <td><span class=hideit>NADI</span>$arr_id_detail[140]</td>

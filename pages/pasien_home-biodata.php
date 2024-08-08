@@ -48,17 +48,25 @@ $notif_btn_biodata = "<div class='tengah f12 abu mt1' id=btn_update_biodata_info
 $hide_form = '';
 $ubah_biodata = '';
 $my_biodata = '';
+
 if ($status >= 1) {
-  $gender_show = strtolower($gender) == 'l' ? 'Laki-laki' : 'Perempuan';
+  $belum_input = '<i class="red bold">belum input Nomor KTP</i>';
+  $no_ktp_show = $no_ktp ? $no_ktp : $belum_input;
+  $usia_show = $no_ktp ? "$usia tahun" : $belum_input;
+  if ($gender) {
+    $gender_show = strtolower($gender) == 'l' ? 'Laki-laki' : 'Perempuan';
+  } else {
+    $gender_show = $belum_input;
+  }
   $my_biodata = "
-    <table class='table table-hover'>
+    <table class='table table-hover td_trans'>
       <tr>
         <td class='kolom f12'>Nama</td>
         <td>$nama_user</td>
       </tr>
       <tr>
         <td class='kolom f12'>Nomor KTP</td>
-        <td>$no_ktp</td>
+        <td>$no_ktp_show</td>
       </tr>
       <tr>
         <td class='kolom f12'>N.I.Karyawan</td>
@@ -70,12 +78,13 @@ if ($status >= 1) {
       </tr>
       <tr>
         <td class='kolom f12'>Usia</td>
-        <td>$usia tahun</td>
+        <td>$usia_show</td>
       </tr>
     </table>
   ";
   $hide_form = 'hideit';
-  $ubah_biodata = "<div class='tengah'><span class='btn_aksi darkblue f14' id=form_biodata__toggle>Ubah Biodata</div>";
+  $btn_primary = $no_ktp ? '' : 'btn btn-primary';
+  $ubah_biodata = "<div class='tengah'><span class='btn_aksi darkblue f14 $btn_primary' id=form_biodata__toggle>Ubah Biodata</div>";
   $type_btn_biodata = 'primary';
   $notif_btn_biodata = "<div class='tengah f12 blue mt1 tebal' id=btn_update_biodata_info>Silahkan update biodata Anda agar dapat melihat Jadwal Medical Checkup</div>";
 }
@@ -91,7 +100,7 @@ $blok_biodata = "
         <input type=hidden name=tanggal_lahir id=tanggal_lahir>
         <input type=hidden name=usia id=usia>
         <input type=hidden name=kode_kec id=kode_kec>
-        <table class=table>
+        <table class='table td_trans'>
           <tr><td colspan=100%><input class='form-control tengah ' value='$d[nama]' name=nama_pasien id=nama_pasien placeholder='Nama Lengkap Anda...' /></td></tr>
 
           <tr>
@@ -283,7 +292,7 @@ $blok_biodata = "
 
               $("#auto_bio").html(
                 $("#auto_bio").html() +
-                "<div class='tebal green'>dari Kecamatan" + nama_kec +
+                "<div class='tebal green'>dari Kecamatan " + nama_kec +
                 ", " + nama_kab + ", " + nama_prov + "</div>"
               );
 

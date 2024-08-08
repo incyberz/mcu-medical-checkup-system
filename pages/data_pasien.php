@@ -26,6 +26,7 @@ a.order_no,
 a.id_harga_perusahaan,
 a.id_paket_custom,
 a.status,
+a.whatsapp,
 b.nama as jenis_pasien,
 ( 
   SELECT p.nama FROM tb_status_pasien p WHERE p.status=a.status
@@ -107,6 +108,7 @@ if (mysqli_num_rows($q)) {
         || $key == 'status_bayar_corporate_mandiri'
         || $key == 'tanggal_bayar_corporate_mandiri'
         || $key == 'perusahaan'
+        || $key == 'whatsapp'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
@@ -114,12 +116,22 @@ if (mysqli_num_rows($q)) {
       }
 
       if ($key == 'nama') {
+        $img_wa_disabled = img_icon('wa_disabled');
+        $link_wa = "<span onclick='alert(`pasien belum punya wa`)'>$img_wa_disabled</span>";
+        if ($d['whatsapp']) {
+          $link_login = urlencode("https://mmc-clinic.com/?login&as=pasien&username=mcu$id_pasien");
+          $text_wa = "Selamat $waktu $d[nama]!%0a%0aSilahkan Anda login untuk mengisi Riwayat Penyakit dan melihat hasil MCU dengan akun:%0a%0a- user: mcu$id_pasien%0a- password: mcu$id_pasien%0a- link login: $link_login%0a%0a[ Mutiara Medical System, $now ]";
+          $href_wa = "https://api.whatsapp.com/send?phone=$d[whatsapp]&text=$text_wa";
+          $link_wa = "<a target=_blank href='$href_wa'>$img_wa</a>";
+        }
+
         $value = "
           $value
           <div class='mt1 f14 miring abu'>
             $d[jenis_pasien]
             <a style='display:inline-block;margin-left:10px' href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]&mode=edit_pasien' onclick='return confirm(`Edit pasien ini?`)'>$img_edit</a>
             <a href='?super_delete_pasien&id_pasien=$d[id_pasien]' onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
+            $link_wa
           </div>
         ";
       } elseif ($key == 'status_bayar') {

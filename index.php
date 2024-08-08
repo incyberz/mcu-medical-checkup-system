@@ -46,8 +46,8 @@ if (0) {
   $_SESSION['mmc_role'] = 'dokter';
   $_SESSION['mmc_username'] = 'meyda';
   $_SESSION['mmc_role'] = 'marketing';
-  $_SESSION['mmc_username'] = 'mutiara';
-  $_SESSION['mmc_role'] = 'dokter-pj';
+  // $_SESSION['mmc_username'] = 'mutiara';
+  // $_SESSION['mmc_role'] = 'dokter-pj';
   echo "<div style='position:fixed; top:0; left:0; font-weight:bold; z-index:9999; background:red; padding:15px'>AUTOLOGIN MODE</div>";
 }
 

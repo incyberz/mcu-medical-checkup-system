@@ -11,10 +11,13 @@ $button_link = "
   </div>
 ";
 
+// echo '<hr>debug at pasien_home-kuesioner<hr>';
+
 if ($status >= 3) {
   if (!$is_login_as) {
     if (!$tanggal_mengisi_riwayat_penyakit) {
-      die(div_alert('danger', 'Status pasien tidak sesuai dengan data riwayat pada database. Mohon segera laporkan ke Petugas!'));
+      // die(div_alert('danger', "Status pasien tidak sesuai dengan data riwayat pada database. Mohon segera laporkan ke Petugas!<hr>status: $status"));
+      // status 9 boleh mengisi kuesioner
     }
   }
 
@@ -26,8 +29,14 @@ if ($status >= 3) {
   }
 
   $riwayat_penyakit_show = "<ul class='pl3 f14s '>$li</ul>";
-  $tanggal_mengisi_riwayat_penyakit_show = date('d-M-Y H:i', strtotime($tanggal_mengisi_riwayat_penyakit));
-  $tanggal_mengisi_riwayat_penyakit_show .= '<span class="f12 abu miring"> ~ ' . eta2($tanggal_mengisi_riwayat_penyakit) . '</span>';
+  if ($tanggal_mengisi_riwayat_penyakit) {
+    $tanggal_mengisi_riwayat_penyakit_show = date('d-M-Y H:i', strtotime($tanggal_mengisi_riwayat_penyakit));
+    $tanggal_mengisi_riwayat_penyakit_show .= '<span class="f12 abu miring"> ~ ' . eta2($tanggal_mengisi_riwayat_penyakit) . '</span>';
+    $Isi_Kuesioner = 'Kuesioner Ulang';
+  } else {
+    $Isi_Kuesioner = 'Isi Kuesioner';
+    $tanggal_mengisi_riwayat_penyakit_show = '<span class="f14 red bold">Belum mengisi Riwayat Penyakit</span>';
+  }
 
 
 
@@ -37,7 +46,7 @@ if ($status >= 3) {
     $riwayat_penyakit_show
     <div class='mb2 tengah mt1'>
       <a href='?isi-kuesioner&id_program=$id_program&id_pasien=$id_user'>
-        Kuesioner Ulang $img_edit
+        $Isi_Kuesioner $img_edit
       </a>
     </div>
     <div class='f12 tengah mb4'>$tanggal_mengisi_riwayat_penyakit_show</div>
@@ -54,8 +63,14 @@ if ($status >= 3) {
     }
 
     $gejala_penyakit_show = "<ul class='pl3 '>$li</ul>";
-    $tanggal_mengisi_gejala_penyakit_show = date('d-M-Y H:i', strtotime($tanggal_mengisi_gejala_penyakit));
-    $tanggal_mengisi_gejala_penyakit_show .= '<span class="f12 abu miring"> ~ ' . eta2($tanggal_mengisi_gejala_penyakit) . '</span>';
+    if ($tanggal_mengisi_gejala_penyakit) {
+      $tanggal_mengisi_gejala_penyakit_show = date('d-M-Y H:i', strtotime($tanggal_mengisi_gejala_penyakit));
+      $tanggal_mengisi_gejala_penyakit_show .= '<span class="f12 abu miring"> ~ ' . eta2($tanggal_mengisi_gejala_penyakit) . '</span>';
+      $Isi_Kuesioner = 'Kuesioner Ulang';
+    } else {
+      $tanggal_mengisi_gejala_penyakit_show = '<span class="f14 red bold">Belum mengisi Gejala Penyakit</span>';
+      $Isi_Kuesioner = 'Isi Kuesioner';
+    }
 
 
     $info_kuesioner .= "
@@ -63,7 +78,7 @@ if ($status >= 3) {
       $gejala_penyakit_show
       <div class='tengah mb2'>
         <a href='?isi-kuesioner&id_program=$id_program&id_pasien=$id_user&kolom=gejala'>
-          Kuesioner Ulang $img_edit
+          $Isi_Kuesioner $img_edit
         </a>
       </div>            
       <div class='tengah f12'>$tanggal_mengisi_gejala_penyakit_show</div>
@@ -97,6 +112,18 @@ if ($status >= 3) {
 
 $type_btn_jadwal = 'primary';
 $blok_kuesioner = $status < 2 ? '' : "
+  <div class='card mb4 gradasi-hijau'>
+    <div class='card-body'>
+      <h3>Kuesioner Online</h3>
+      $info_kuesioner
+      $button_link
+    </div>
+  </div>
+";
+
+
+// skipped
+$blok_kuesioner =  "
   <div class='card mb4 gradasi-hijau'>
     <div class='card-body'>
       <h3>Kuesioner Online</h3>

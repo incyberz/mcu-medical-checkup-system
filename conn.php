@@ -24,10 +24,11 @@ if ($online_version) {
   $db_user = "root";
   $db_pass = '';
   $db_name = "db_mcu";
-  // if (1) {
-  //   $dm_db = 1;
-  //   $db_name = "db_online_mcu";
-  // }
+  if (1) {
+    echo "<div style='position:fixed; top:60px; left:0; font-weight:bold; z-index:9999; background:red; padding:5px'>DB-ONLINE MODE</div>";
+    $dm_db = 1;
+    $db_name = "db_online_mcu";
+  }
 }
 
 $cn = new mysqli($db_server, $db_user, $db_pass, $db_name);

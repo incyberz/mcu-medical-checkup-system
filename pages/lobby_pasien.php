@@ -47,22 +47,34 @@ WHERE (a.status is null or a.status <= 9) -- a.status >= 7 AND a.status <= 9
 ORDER BY a.nama 
 ";
 
+// echo '<pre>';
+// var_dump($s);
+// echo '</pre>';
+
 // YANG BAYAR DI BLONG ZZZ
 
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $jumlah_pasien_segera = mysqli_num_rows($q);
 $div = '';
-$nav = div_alert('info', "Tidak ada pasien di Lobby Pemeriksaan | <a href='?rekap_pemeriksaan'>Rekap Hasil Pemeriksaan</a>");
+$nav = div_alert('info', "
+  Tidak ada pasien di Lobby Pemeriksaan | 
+  <a href='?rekap_pemeriksaan'>Rekap Hasil Pemeriksaan</a>
+  <a href='?monitoring_pasien'>Monitoring Pasien Corporate</a>
+");
 $jumlah_lobby = 0;
 if (mysqli_num_rows($q)) {
   while ($d = mysqli_fetch_assoc($q)) {
     $jenis = strtolower($d['jenis']);
+    // echo "<br>CCC";
+    // echo '<pre>';
+    // var_dump($d);
+    // echo '</pre>';
     // echo '<pre>';
     // var_dump($d['status_bayar_corporate_mandiri']);
     // echo '</pre>';
     if ($jenis == 'cor' and $d['status_bayar'] === null and $d['status_bayar_corporate_mandiri'] === null) {
       // corporate belum bayar
-      continue;
+      // continue;
     }
     $jumlah_lobby++;
     $status = $d['status'];

@@ -37,8 +37,9 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
   $id_detail = $d2['id'];
   if ($id_detail == 106) continue; // laju endap darah
   $id_pemeriksaan = $d2['id_pemeriksaan'];
+  $hasil = $arr_id_detail[$id_detail] ?? 0;
 
-  $hasil =  strtolower($arr_id_detail[$id_detail]);
+  $hasil =  strtolower($hasil);
   $normal_value = strtolower($d2['normal_value']);
   $lo = $d2['normal_lo_l'];
   $hi = $d2['normal_hi_l'];
@@ -138,7 +139,7 @@ if ($get_jenis == 'uri') {
 }
 
 echo "
-  <h4 class='kiri biru f14 mt4 mb2 bold' style='letter-spacing: 2px; color: #4cc'>$d[jenis_pemeriksaan]</h4>
+  <h4 class='kiri biru f14 mt4 mb2 bold' style='letter-spacing: 2px; color: #4cc'>$jenis_pemeriksaan</h4>
 
   $blok_detail
 

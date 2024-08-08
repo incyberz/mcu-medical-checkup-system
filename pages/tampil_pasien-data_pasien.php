@@ -55,10 +55,6 @@ if ($JENIS == 'COR') {
   ";
 }
 
-echo '<pre>';
-var_dump($s_pasien);
-echo '</pre>';
-
 $q = mysqli_query($cn, $s_pasien) or die(mysqli_error($cn));
 $tr = '';
 $data_pemeriksaan = '';

@@ -57,7 +57,7 @@ $img_profil = '';
 if ($foto_profil) {
   $src = "$lokasi_pasien/$foto_profil";
   if (!file_exists($src)) {
-    die(div_alert('danger', 'Profil Anda hilang di sisi server. Segera laporkan hal ini ke Petugas via nomor whatsApp paling atas.'));
+    echo (div_alert('danger', 'Profil Image Anda hilang di sisi server. Segera laporkan hal ini ke Petugas via nomor whatsApp paling atas, atau silahkan Anda upload ulang.'));
   } else {
     $hide_form = 'hideit';
     $reupload = "<div class=tengah><span class=btn_aksi id=form_upload_foto_profil__toggle>Reupload</span></div>";

@@ -108,6 +108,7 @@ if ($order_no) {
   c.nama as paket,
   d.nama as program,
   d.id as id_program,
+  (SELECT awal_periksa FROM tb_hasil_pemeriksaan WHERE id_pasien=a.id) awal_periksa, 
   (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
   FROM tb_pasien a 
   JOIN tb_order b ON a.order_no=b.order_no 
@@ -128,6 +129,7 @@ if ($order_no) {
   c.nama as paket,
   d.nama as program,
   d.id as id_program,
+  (SELECT awal_periksa FROM tb_hasil_pemeriksaan WHERE id_pasien=a.id) awal_periksa, 
   (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
   FROM tb_pasien a 
   JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id 
@@ -157,6 +159,7 @@ if (!mysqli_num_rows($q)) {
   $nikepeg = $d['nikepeg'];
   $nikepeg_or_strip = $nikepeg ?? '-';
   $status = $d['status'];
+  $awal_periksa = $d['awal_periksa'];
 
   $riwayat_penyakit = $d['riwayat_penyakit'];
   $tanggal_mengisi_riwayat_penyakit = $d['tanggal_mengisi_riwayat_penyakit'];
@@ -196,19 +199,7 @@ if (!mysqli_num_rows($q)) {
 
 if (!$id_paket) die(div_alert('danger', "id_paket pasien ini belum ditentukan."));
 
-// $s2 = "SELECT 
-// a.nama as nama_pemeriksaan 
-// FROM tb_paket_sub a 
-// JOIN tb_paket_detail b ON a.id=b.id_paket_sub
-// WHERE b.id_paket='$id_paket'";
-// $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
-$li = '';
-// if (mysqli_num_rows($q2)) {
-//   while ($d2 = mysqli_fetch_assoc($q2)) {
-//     $li .= "<li>$d2[nama_pemeriksaan]</li>";
-//   }
-// }
-$detail_pemeriksaan = "<ol>$li</ol>";
+
 
 $tanggal_order_show = date('d-m-Y', strtotime($d['tanggal_order']));
 $last_update_show = $d['last_update'] . ' | ' . eta(strtotime($d['last_update']) - strtotime('now'));
@@ -251,17 +242,11 @@ $blok_info_paket = "
   <div class='card mb4 gradasi-hijau'>
     <div class='card-body'>
       <h3>Paket Medical Checkup Anda</h3>
-      <table class=table>
+      <table class='table td_trans'>
         <tr><td class=kolom>Paket</td><td>$d[paket]</td></tr>
         <tr><td class=kolom>Program</td><td>$d[program]</td></tr>
         <tr><td class=kolom>Didaftarkan oleh</td><td>$d[pendaftar]</td></tr>
         <tr><td class=kolom>Tanggal</td><td>$tanggal_order_show</td></tr>
-        <tr>
-          <td colspan=100%>
-            <div class=''><span class='btn_aksi darkblue' id=detail_pemeriksaan__toggle>Lihat detail pemeriksaan $img_detail</span></div>
-            <div id=detail_pemeriksaan class='mt2 hideit'>$detail_pemeriksaan</div>
-          </td>
-        </tr>
       </table>
 
       <h3 class='mt4 green'>Status Anda</h3>
@@ -291,8 +276,8 @@ $blok_gaya_hidup = '';
 $blok_keluhan = '';
 $blok_kesiapan = '';
 
-
-if ($foto_profil || $is_login_as) {
+$skiped = 1;
+if ($foto_profil || $is_login_as || $skiped) {
   include 'pasien_home-biodata.php';
   include 'pasien_home-jadwal.php';
   include 'pasien_home-kuesioner.php';
@@ -320,7 +305,8 @@ $BLOK = "
     $blok_gaya_hidup
     $blok_keluhan
     $blok_kesiapan
-    
+    <hr>
+
 
   </div>
 

@@ -51,19 +51,19 @@ if ($JENIS == 'COR') {
   $joins
   ";
 }
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-if (!mysqli_num_rows($q)) die('Belum ada data pemeriksaan untuk pasien ini');
-$jumlah_row = mysqli_num_rows($q);
-while ($d = mysqli_fetch_assoc($q)) {
-  $id_pemeriksaan = $d['id_pemeriksaan'];
-  $jenis_pemeriksaan = $d['jenis_pemeriksaan'];
-  $nama_pemeriksaan = $d['nama_pemeriksaan'];
+$q_detail = mysqli_query($cn, $s) or die(mysqli_error($cn));
+if (!mysqli_num_rows($q_detail)) die('Belum ada data pemeriksaan untuk pasien ini');
+$jumlah_row = mysqli_num_rows($q_detail);
+while ($d_detail = mysqli_fetch_assoc($q_detail)) {
+  $id_pemeriksaan = $d_detail['id_pemeriksaan'];
+  $jenis_pemeriksaan = $d_detail['jenis_pemeriksaan'];
+  $nama_pemeriksaan = $d_detail['nama_pemeriksaan'];
   // exit;
-  if (strtolower($d['jenis']) != 'mcu') {
-    array_push($arr_id_pemeriksaan_penunjang, $d['id_pemeriksaan']);
+  if (strtolower($d_detail['jenis']) != 'mcu') {
+    array_push($arr_id_pemeriksaan_penunjang, $d_detail['id_pemeriksaan']);
 
     // jika sesuai yang diminta
-    if (strtolower($d['jenis']) == $get_jenis) {
+    if (strtolower($d_detail['jenis']) == $get_jenis) {
       $is_mcu = 0;
       break;
     }

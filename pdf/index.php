@@ -6,10 +6,14 @@ include '../include/insho_functions.php';
 include '../include/arr_pemeriksaan.php';
 include '../include/arr_pemeriksaan_detail.php';
 include '../include/arr_penanda_gigi.php';
+include '../include/arr_kesimpulan.php';
 
 $tidak_ada = '--tidak ada--';
 $total_page = 4;
 $border_debug = 0;
+$ln1 = 1;
+$ln0 = 0;
+
 
 # ===========================================
 # CONSTANT SETTINGS
@@ -117,11 +121,11 @@ $s = "SELECT
 * 
 FROM tb_hasil_pemeriksaan a 
 JOIN tb_pasien b ON a.id_pasien=b.id 
-WHERE id_pasien < 3";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+WHERE id_pasien =37";
+$q_pasien_pdf = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $pasien = [];
-if (mysqli_num_rows($q)) {
-  while ($pasien = mysqli_fetch_assoc($q)) {
+if (mysqli_num_rows($q_pasien_pdf)) {
+  while ($pasien = mysqli_fetch_assoc($q_pasien_pdf)) {
     # ============================================================
     # EXTRACT HASIL
     # ============================================================
@@ -203,6 +207,11 @@ if (mysqli_num_rows($q)) {
     include 'pdf-pemeriksaan_fisik_awal.php';
 
     # ============================================================
+    # PROCESSING pemeriksaan_fisik_dokter
+    # ============================================================
+    $pasien['pemeriksaan_fisik_dokter'] = []; // setting in new file
+
+    # ============================================================
     # PROCESSING visus_mata
     # ============================================================
     $pasien['visus_mata'] = [];
@@ -246,21 +255,24 @@ if (mysqli_num_rows($q)) {
 
 
 
+    $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan'];
+    $total_page = count($arr_page_at);
 
     # ============================================================
     # MAIN LOOPING
     # ============================================================
     $arr = [
-      // 'riwayat_penyakit_pasien' => $pasien['riwayat_penyakit_pasien'],
-      // 'riwayat_pengobatan' => $pasien['riwayat_pengobatan'],
-      // 'riwayat_penyakit_ayah' => $pasien['riwayat_penyakit_ayah'],
-      // 'riwayat_penyakit_ibu' => $pasien['riwayat_penyakit_ibu'],
-      // 'gejala_penyakit' => $pasien['gejala_penyakit'],
-      // 'gaya_hidup' => $pasien['gaya_hidup'],
-      // 'keluhan' => $pasien['keluhan'],
-      // 'pemeriksaan_fisik_awal' => $pasien['pemeriksaan_fisik_awal'],
-      // 'visus_mata' => $pasien['visus_mata'],
-      // 'pemeriksaan_gigi' => $pasien['array_gigi'],
+      'riwayat_penyakit_pasien' => $pasien['riwayat_penyakit_pasien'],
+      'riwayat_pengobatan' => $pasien['riwayat_pengobatan'],
+      'riwayat_penyakit_ayah' => $pasien['riwayat_penyakit_ayah'],
+      'riwayat_penyakit_ibu' => $pasien['riwayat_penyakit_ibu'],
+      'gejala_penyakit' => $pasien['gejala_penyakit'],
+      'gaya_hidup' => $pasien['gaya_hidup'],
+      'keluhan' => $pasien['keluhan'],
+      'pemeriksaan_fisik_awal' => $pasien['pemeriksaan_fisik_awal'],
+      'pemeriksaan_fisik_dokter' => $pasien['pemeriksaan_fisik_dokter'],
+      'visus_mata' => $pasien['visus_mata'],
+      'pemeriksaan_gigi' => $pasien['array_gigi'],
       'pemeriksaan_penunjang' => $pasien['pemeriksaan_penunjang'],
     ];
 
@@ -269,13 +281,37 @@ if (mysqli_num_rows($q)) {
       $KOLOM = strtoupper(str_replace('_', ' ', $k));
 
       // add page
-      if ($k == 'pemeriksaan_fisik_awal') {
+      if ($k == 'pemeriksaan_fisik_awal' || $k == 'visus_mata') {
         $pdf->AddPage();
       }
 
       // exclusion pemeriksaan gigi
       if ($k == 'pemeriksaan_gigi') {
         include 'pdf-pemeriksaan_gigi.php';
+        $pdf->Cell(0, $shv, ' ', '', 1, ''); // spacer
+        continue;
+      } elseif ($k == 'pemeriksaan_fisik_dokter') {
+        include 'pdf-pemeriksaan_fisik_dokter.php';
+        $pdf->Cell(0, $shv, ' ', '', 1, ''); // spacer
+        if (in_array($k, $arr_page_at)) {
+          // echo "<br>$k ----------------";
+          $pdf->SetY(273);
+          $pdf->SetFont('Arial', '', 8);
+          foreach ($arr_page_at as $k3 => $v3) {
+            if ($v3 == $k) {
+              $page = $k3 + 1;
+              break;
+            }
+          }
+          $pdf->Cell(
+            0,
+            3,
+            "MCU-$id_pasien --- Page $page of $total_page",
+            $border_debug,
+            0,
+            'C'
+          );
+        }
         continue;
       }
 
@@ -306,15 +342,8 @@ if (mysqli_num_rows($q)) {
                 $pdf->Cell(95, LH, " - " . trim($v2[1]), 'R', 1);
               }
             }
-          } else {
-            // echo '<pre>DATA ARRAY TIDAK KIRI KANAN<hr>';
-            // var_dump($arr2);
-            // echo '</pre>';
-            // array data tidak kiri kanan
+          } else { // DATA ARRAY TIDAK KIRI KANAN
             foreach ($arr2 as $k2 => $v2) {
-              // echo '<pre>';
-              // var_dump($v2);
-              // echo '</pre>';
               if (!is_array($v2)) {
                 $pdf->Cell(0, LHB, " - $k2: $v2", 'LR', 1);
               } else {
@@ -325,8 +354,7 @@ if (mysqli_num_rows($q)) {
               }
             }
           }
-        } else {
-          // list item normal
+        } else { // list item normal
           $dt = explode(',', $pasien[$k]);
           $str = '';
           foreach ($dt as $v2) {
@@ -342,13 +370,40 @@ if (mysqli_num_rows($q)) {
       $pdf->Cell(0, $shv, ' ', '', 1, ''); // spacer
 
       // footer after keluhan
-      if ($k == 'keluhan') {
+      if (in_array($k, $arr_page_at)) {
+        // echo "<br>$k ----------------";
         $pdf->SetY(273);
         $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell(0, 3, "MCU-$id_pasien --- Page 1 of $total_page", $border_debug, 0, 'C');
+        foreach ($arr_page_at as $k3 => $v3) {
+          if ($v3 == $k) {
+            $page = $k3 + 1;
+            break;
+          }
+        }
+        $pdf->Cell(0, 3, "MCU-$id_pasien --- Page $page of $total_page", $border_debug, 0, 'C');
       }
     } // end foreach main looping
-  } // end while
+
+    # ============================================================
+    # KESIMPULAN MCU
+    # ============================================================
+    include 'pdf-kesimpulan_mcu.php';
+
+    # ============================================================
+    # PAGE URINE LENGKAP
+    # ============================================================
+    include 'pdf-urine_lengkap.php';
+
+    # ============================================================
+    # PAGE DARAH LENGKAP
+    # ============================================================
+    include 'pdf-darah_lengkap.php';
+
+    # ============================================================
+    # PAGE RONTGEN
+    # ============================================================
+    include 'pdf-rontgen.php';
+  } // end while data pasien
 } else {
   die(div_alert('danger', "Data pasien tidak ditemukan"));
 }
