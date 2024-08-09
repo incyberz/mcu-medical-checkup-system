@@ -84,7 +84,7 @@ if (!mysqli_num_rows($q)) {
 
     $td_pem = '';
     while ($d2 = mysqli_fetch_assoc($q2)) {
-      $sudah = array_key_exists($d2['id'], $arr_hasil) ? $img_check : 'blm';
+      $sudah = array_key_exists($d2['id'], $arr_hasil) ? $img_check : '<span class="bold red">blm</span>';
       $id_pemeriksaan = $d2['id_pemeriksaan'];
       if (!isset($count[$id_pemeriksaan])) $count[$id_pemeriksaan] = 0;
       if (array_key_exists($d2['id'], $arr_hasil)) $count[$id_pemeriksaan]++;
@@ -95,7 +95,11 @@ if (!mysqli_num_rows($q)) {
         $th_pem .= "<th>$d2[singkatan] <div class='f10'>$count[$id_pemeriksaan] <span class=f8>of $total_pasien</span> ($persen%)</div></th>";
       }
 
-      $td_pem .= "<td>$sudah</td>";
+      $td_pem .= "
+        <td>
+          <a target=_blank href='?pemeriksaan&id_pemeriksaan=$id_pemeriksaan&id_pasien=$pasien[id]'>$sudah</a>
+        </td>
+      ";
     }
 
     $td_sudah_mengisi = '';

@@ -3,7 +3,7 @@
 # HEADER ALL
 # ===========================================
 $pdf->Cell(0, 2, ' ', '', 1, ''); // spacer top
-$pdf->SetFont('Arial', '', 8);
+$pdf->SetFont(FF, '', FS);
 
 $awal_periksa_show = hari_tanggal($awal_periksa, 1, 0, 0);
 $tanggal_lahir_show = hari_tanggal($pasien['tanggal_lahir'], 1, 0, 0);

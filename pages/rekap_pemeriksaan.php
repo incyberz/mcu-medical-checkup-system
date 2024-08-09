@@ -99,7 +99,8 @@ if (mysqli_num_rows($q)) {
     if ($mode == 'detail') {
       $div_mobile .= "
         <div class='mb4'>
-          <a class='upper tebal ' href='$href'>$i. $d[nama_pasien] $img_detail</a>
+          <a target=_blank class='upper tebal ' href='$href'>$i. $d[nama_pasien] $img_detail</a>
+          <a target=_blank href='?login_as&role=pasien&username=$d[username]'>$img_login_as</a>
           $link_verif
         </div>
       ";

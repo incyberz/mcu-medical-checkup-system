@@ -14,13 +14,21 @@ $border_debug = 0;
 $ln1 = 1;
 $ln0 = 0;
 
+# ============================================================
+# DEBUG 
+# ============================================================
+$id_pasien = 31; // urine abnor
+$id_pasien = 9; // hema abnor
+$id_pasien = 21; // abnor gigi & gizi
+
 
 # ===========================================
 # CONSTANT SETTINGS
 # ===========================================
+define('FF', 'Arial'); //FONT FAMILY
+define('FS', 8); //FONT SIZE
 define('LH', 4.3); //LINE HEIGHT
 define('LHB', 6); //LINE HEIGHT BOX | TITLE
-
 
 
 
@@ -37,7 +45,7 @@ class PDF extends FPDF
 {
   public function Header()
   {
-    $this->SetFont('Arial', 'B', 10);
+    $this->SetFont(FF, 'B', 10);
     $this->Cell(
       0,
       15,
@@ -46,7 +54,7 @@ class PDF extends FPDF
       1,
       'C'
     );
-    $this->SetFont('Arial', '', 8);
+    $this->SetFont(FF, '', FS);
     $this->Cell(0, 4, 'Tambun Business Park Blok C12 Tambun - Bekasi, Telp.(021) 29487893', 0, 1, 'C');
     // $this->Cell(0, 4, '', 0, 1, 'C');
     $this->Cell(0, 2, ' ', 'B', 1, 'C');
@@ -56,10 +64,10 @@ class PDF extends FPDF
   public function Footer()
   {
     // $this->SetY(-15);
-    // $this->SetFont('Arial', 'I', 8);
+    // $this->SetFont(FF, 'I', FS);
     // $this->Cell(0, 10, "Page " . $this->PageNo() . '/{nb}', 0, 0, 'C');
     // $this->SetY(-10);
-    // $this->SetFont('Arial', 'I', 8);
+    // $this->SetFont(FF, 'I', FS);
     // $this->Cell(0, 5, "Page " . $this->PageNo() . '/{nb}', 1, 0, 'R');
   }
 }
@@ -106,6 +114,8 @@ class PDF extends FPDF
 # ============================================================
 $pdf = new PDF();
 $pdf->AliasNbPages();
+$pdf->SetFont(FF, '', FS);
+
 
 
 
@@ -121,7 +131,10 @@ $s = "SELECT
 * 
 FROM tb_hasil_pemeriksaan a 
 JOIN tb_pasien b ON a.id_pasien=b.id 
-WHERE id_pasien =37";
+WHERE 
+1 -- id_pasien =$id_pasien 
+AND id_pasien <= 37 -- yasunli
+";
 $q_pasien_pdf = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $pasien = [];
 if (mysqli_num_rows($q_pasien_pdf)) {
@@ -129,6 +142,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     # ============================================================
     # EXTRACT HASIL
     # ============================================================
+    $nama_pasien = $pasien['nama'];
     $arr_hasil = explode('||', $pasien['arr_hasil']);
     $arr_tanggal_by = explode('||', $pasien['arr_tanggal_by']);
 
@@ -167,7 +181,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     $id_paket_custom = $pasien['id_paket_custom'];
     $order_no = $pasien['order_no'];
     $JENIS = strtoupper($pasien['jenis']);
-    $gender = $pasien['gender'];
+    $gender = strtolower($pasien['gender']);
     $no_mcu = "MCU-$id_pasien";
 
 
@@ -185,6 +199,11 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
 
+
+    # ===========================================
+    # HEADER MCU
+    # ===========================================
+    include 'pdf-cover.php';
 
     # ===========================================
     # HEADER MCU
@@ -255,7 +274,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
 
-    $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan'];
+    $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
     $total_page = count($arr_page_at);
 
     # ============================================================
@@ -296,7 +315,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
         if (in_array($k, $arr_page_at)) {
           // echo "<br>$k ----------------";
           $pdf->SetY(273);
-          $pdf->SetFont('Arial', '', 8);
+          $pdf->SetFont(FF, '', FS);
           foreach ($arr_page_at as $k3 => $v3) {
             if ($v3 == $k) {
               $page = $k3 + 1;
@@ -373,7 +392,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
       if (in_array($k, $arr_page_at)) {
         // echo "<br>$k ----------------";
         $pdf->SetY(273);
-        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetFont(FF, '', FS);
         foreach ($arr_page_at as $k3 => $v3) {
           if ($v3 == $k) {
             $page = $k3 + 1;
@@ -384,10 +403,33 @@ if (mysqli_num_rows($q_pasien_pdf)) {
       }
     } // end foreach main looping
 
+
+    # ============================================================
+    # DATA PERUSAHAAN 
+    # ============================================================
+    $order_no = $pasien['order_no'];
+    $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
+    if ($order_no) {
+      $s = "SELECT id_perusahaan FROM tb_order WHERE order_no='$order_no'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+      $d = mysqli_fetch_assoc($q);
+      $id_perusahaan = $d['id_perusahaan'];
+    } elseif ($id_harga_perusahaan) {
+      $s = "SELECT id_perusahaan FROM tb_harga_perusahaan WHERE id='$id_harga_perusahaan'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+      $d = mysqli_fetch_assoc($q);
+      $id_perusahaan = $d['id_perusahaan'];
+    }
+
+
     # ============================================================
     # KESIMPULAN MCU
     # ============================================================
     include 'pdf-kesimpulan_mcu.php';
+
+
 
     # ============================================================
     # PAGE URINE LENGKAP
@@ -430,6 +472,6 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
 
-
-$pdf->Output('D', "kurikulum.pdf");
+$nama = str_replace(' ', '-', strtolower($nama_pasien));
+$pdf->Output('D', "hasil-mcu$id_pasien-$nama.pdf");
 ob_end_flush();

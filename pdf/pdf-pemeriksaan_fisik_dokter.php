@@ -3,7 +3,7 @@
 # PROCESSING PEMERIKSAAN FISIK DOKTER
 # ============================================================
 $width = [27, 15, 148];
-$pdf->SetFont('Arial', 'B', 10);
+$pdf->SetFont(FF, 'B', 10);
 $pdf->Cell(0, LH * 2, "PEMERIKSAAN FISIK DOKTER", 0, 1, 'L');
 $abnormal_count = 0;
 // $pdf->Cell(0, LH, ' ', 'LR', 1);
@@ -11,12 +11,12 @@ $abnormal_count = 0;
 # ============================================================
 # HEADER
 # ============================================================
-$pdf->SetFont('Arial', 'B', 8);
+$pdf->SetFont(FF, 'B', FS);
 $pdf->SetFillColor(200, 255, 255);
 $pdf->Cell($width[0], LHB, 'BAGIAN', 'TLRB', 0, 'L', true);
 $pdf->Cell($width[1], LHB, 'NORMAL', 'TLRB', 0, 'L', true);
 $pdf->Cell($width[2], LHB, 'DESKRIPSI DAN KELAINAN', 'TLRB', 1, 'L', true);
-$pdf->SetFont('Arial', '', 8);
+$pdf->SetFont(FF, '', FS);
 // $pdf->SetFillColor(200, 255, 255);
 
 $s = "SELECT * FROM tb_bagian_tubuh ORDER BY nomor";
@@ -62,10 +62,10 @@ while ($d = mysqli_fetch_assoc($q)) {
   $str_hasil = $str_hasil ? $str_hasil : '-';
 
   if (!$str_hasil2) {
-    $pdf->SetFont('Arial', 'B', 8);
+    $pdf->SetFont(FF, 'B', FS);
     $pdf->Cell($width[0], $h, $d['bagian'], 'TLR', 0, 'L', false);
 
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont(FF, '', FS);
     $pdf->SetTextColor(0, 200, 0);
     $pdf->Cell($width[1], $h, "$NORMAL", 'TLR', 0, 'L', false);
     $pdf->SetTextColor(0, 0, 0);
@@ -82,10 +82,10 @@ while ($d = mysqli_fetch_assoc($q)) {
     }
 
     if (!$str_hasil3) {
-      $pdf->SetFont('Arial', 'B', 8);
+      $pdf->SetFont(FF, 'B', FS);
       $pdf->Cell($width[0], $h, $d['bagian'], 'TLR', 0, 'L', false);
 
-      $pdf->SetFont('Arial', '', 8);
+      $pdf->SetFont(FF, '', FS);
       $pdf->SetTextColor(0, 200, 0);
       $pdf->Cell($width[1], $h, "$NORMAL", 'TLR', 0, 'L', false);
       $pdf->SetTextColor(0, 0, 0);
@@ -95,10 +95,10 @@ while ($d = mysqli_fetch_assoc($q)) {
       $pdf->Cell($width[1], $h, ' ', 'LR', 0, 'L', false);
       $pdf->Cell($width[2], $h,  trim($str_hasil2), 'LR', 1, 'L', false);
     } else { // terdapat 3 baris konten normal 
-      $pdf->SetFont('Arial', 'B', 8);
+      $pdf->SetFont(FF, 'B', FS);
       $pdf->Cell($width[0], $h, $d['bagian'], 'TLR', 0, 'L', false);
 
-      $pdf->SetFont('Arial', '', 8);
+      $pdf->SetFont(FF, '', FS);
       $pdf->SetTextColor(0, 200, 0);
       $pdf->Cell($width[1], $h, "$NORMAL", 'TLR', 0, 'L', false);
       $pdf->SetTextColor(0, 0, 0);
@@ -116,7 +116,7 @@ while ($d = mysqli_fetch_assoc($q)) {
 
   if ($str_kelainan) {
     $pdf->SetTextColor(255, 0, 0);
-    $pdf->SetFont('Arial', 'B', 8);
+    $pdf->SetFont(FF, 'B', FS);
     $pdf->Cell($width[0], $h,  ' ', 'LR', 0, 'L', false);
     $pdf->Cell($width[1], $h, ' ', 'LR', 0, 'L', false);
     $pdf->Cell($width[2], $h, 'Kelainan: ' . trim($str_kelainan), 'LR', 1, 'L', false);

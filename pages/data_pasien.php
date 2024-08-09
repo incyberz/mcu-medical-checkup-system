@@ -1,5 +1,14 @@
 <?php
 # ============================================================
+# PROCESSORS UPDATE WA
+# ============================================================
+if (isset($_POST['update_wa'])) {
+  $s = "UPDATE tb_pasien SET whatsapp = '62$_POST[update_wa]' WHERE id=$_POST[id_pasien] ";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echo div_alert('success', 'Nomor whatsapp updated.');
+  jsurl('', 1000);
+}
+# ============================================================
 # INCLUDES 
 # ============================================================
 include 'include/arr_status_pasien.php';
@@ -21,6 +30,7 @@ $s = "SELECT
 a.date_created as tanggal_daftar,
 a.id as id_pasien,
 a.nama,
+a.username,
 a.jenis ,
 a.order_no,
 a.id_harga_perusahaan,
@@ -109,6 +119,7 @@ if (mysqli_num_rows($q)) {
         || $key == 'tanggal_bayar_corporate_mandiri'
         || $key == 'perusahaan'
         || $key == 'whatsapp'
+        || $key == 'username'
       ) continue;
       if ($i == 1) {
         $kolom = key2kolom($key);
@@ -117,19 +128,41 @@ if (mysqli_num_rows($q)) {
 
       if ($key == 'nama') {
         $img_wa_disabled = img_icon('wa_disabled');
-        $link_wa = "<span onclick='alert(`pasien belum punya wa`)'>$img_wa_disabled</span>";
+        $link_wa = "<span class=btn_aksi id=form_set_wa$id_pasien" . "__toggle>$img_wa_disabled</span>
+        <form method=post class='mt2 hideit wadah gradasi-kuning' id=form_set_wa$id_pasien>
+          <div class=flexy>
+            <div>+62</div>
+            <div>
+              <input required type=number min=8000000000 max=899999999999 name=update_wa />
+            </div>
+            <div>
+              <button class='btn btn-primary btn-sm' value=$id_pasien name=id_pasien>Update-WA</button>
+            </div>
+          </div>
+
+        </form>
+        ";
         if ($d['whatsapp']) {
-          $link_login = urlencode("https://mmc-clinic.com/?login&as=pasien&username=mcu$id_pasien");
-          $text_wa = "Selamat $waktu $d[nama]!%0a%0aSilahkan Anda login untuk mengisi Riwayat Penyakit dan melihat hasil MCU dengan akun:%0a%0a- user: mcu$id_pasien%0a- password: mcu$id_pasien%0a- link login: $link_login%0a%0a[ Mutiara Medical System, $now ]";
+          $username = "mcu$id_pasien";
+
+          if (!$d['username']) {
+            $s3 = "UPDATE tb_pasien SET username = '$username' WHERE id=$id_pasien";
+            $q3 = mysqli_query($cn, $s3) or die(mysqli_error($cn));
+          } else {
+            $username = $d['username'];
+          }
+
+          $link_login = urlencode("https://mmc-clinic.com/?login&as=pasien&username=$username");
+          $text_wa = "Selamat $waktu $d[nama]!%0a%0aSilahkan Anda login untuk mengisi Riwayat Penyakit dan melihat hasil MCU dengan akun:%0a%0a- user: $username%0a- password: $username%0a- link login: $link_login%0a%0a[ Mutiara Medical System, $now ]";
           $href_wa = "https://api.whatsapp.com/send?phone=$d[whatsapp]&text=$text_wa";
-          $link_wa = "<a target=_blank href='$href_wa'>$img_wa</a>";
+          $link_wa .= " <a target=_blank href='$href_wa'>$img_wa</a>";
         }
 
         $value = "
           $value
           <div class='mt1 f14 miring abu'>
             $d[jenis_pasien]
-            <a style='display:inline-block;margin-left:10px' href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]&mode=edit_pasien' onclick='return confirm(`Edit pasien ini?`)'>$img_edit</a>
+            <a target=_blank style='display:inline-block;margin-left:10px' href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]&mode=edit_pasien' onclick='return confirm(`Edit pasien ini?`)'>$img_edit</a>
             <a href='?super_delete_pasien&id_pasien=$d[id_pasien]' onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
             $link_wa
           </div>
@@ -170,7 +203,11 @@ if (mysqli_num_rows($q)) {
           if ($d['id_harga_perusahaan']) {
             $value = "<span class='f12 green'>CORPORATE MANDIRI $img_check</span>";
           } else {
-            $value = "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
+            if ($d['order_no']) {
+              $value = "<span class='f12 green'>pasien corporate baru</span> $img_check";
+            } else {
+              $value = "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
+            }
           }
         } elseif ($d['status'] == 10) {
           $value =  "<span class='f12 green'>$d[status] ~ $value $img_check</span>";

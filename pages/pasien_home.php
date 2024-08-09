@@ -139,7 +139,7 @@ if ($order_no) {
 } elseif ($id_paket_custom) {
   die(div_alert('danger', "Belum ada handler untuk pasien custom [id_paket_custom: $id_paket_custom]"));
 } else {
-  die(div_alert('danger', "Jenis pasien tidak ditemukan."));
+  die(div_alert('danger', "Belum melakukan pembayaran atau belum ada handler untuk Jenis pasien invalid.<hr>Silahkan tanyakan kepada Petugas tentang Status Pembayaran Anda."));
 }
 
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
