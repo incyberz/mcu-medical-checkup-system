@@ -105,6 +105,11 @@ if ($username and ($role == 'admin' || $role == 'marketing')) {
     <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_order'>Manage Order</a></li>
     <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_pemeriksaan'>Manage Pemeriksaan</a></li>
   ";
+  if ($role == 'admin') {
+    $li_admin .= "
+      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?import'>Import</a></li>
+    ";
+  }
 }
 
 

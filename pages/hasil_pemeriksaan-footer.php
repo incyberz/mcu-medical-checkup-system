@@ -3,7 +3,7 @@
 # FOOTER
 # ============================================================
 $tanggal_cetak = hari_tanggal($now, 1, 0, 1, 1);
-$dokter_pj = $arr_user[$hasil_at_db['approv_by']];
+$dokter_pj = $arr_user[$hasil_at_db['approv_by']] ?? 'dr. Mutiara Putri Camelia';
 
 $http = $online_version ? 'https' : 'http';
 $rlink = explode('?', $http . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);

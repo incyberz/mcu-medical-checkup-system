@@ -163,7 +163,7 @@ if (mysqli_num_rows($q)) {
           <div class='mt1 f14 miring abu'>
             $d[jenis_pasien]
             <a target=_blank style='display:inline-block;margin-left:10px' href='?tampil_pasien&id_pasien=$d[id_pasien]&jenis=$d[jenis]&mode=edit_pasien' onclick='return confirm(`Edit pasien ini?`)'>$img_edit</a>
-            <a href='?super_delete_pasien&id_pasien=$d[id_pasien]' onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
+            <a href='?delete_pasien&id_pasien=$d[id_pasien]' onclick='return confirm(`Hapus pasien ini?`)'>$img_delete</a>
             $link_wa
           </div>
         ";
@@ -204,7 +204,13 @@ if (mysqli_num_rows($q)) {
             $value = "<span class='f12 green'>CORPORATE MANDIRI $img_check</span>";
           } else {
             if ($d['order_no']) {
-              $value = "<span class='f12 green'>pasien corporate baru</span> $img_check";
+              $atau = !$d['username'] ? '' : "atau Anda dapat <a target=_blank href='?login_as&role=pasien&username=$d[username]'>Login as Pasien</a> untuk melengkapi datanya";
+              $value = "
+                <span class='f12 red bold'>pasien corporate baru</span>
+                <div class='f12 abu miring' style='max-width: 300px'>
+                  rekomendasikan pasien untuk login dan mengisi kuesioner $atau 
+                </div>
+              ";
             } else {
               $value = "<span class='f12 red bold'>pasien baru</span> <a href='?manage_paket_custom&id_pasien=$id_pasien'>$img_next</a>";
             }

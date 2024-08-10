@@ -6,7 +6,7 @@ if ($unlog !== false) {
   unset($_SESSION['mmc_username_master']);
   unset($_SESSION['mmc_role_master']);
   echo div_alert('success', 'Unlog as sukses.');
-  jsurl('?', 3000);
+  jsurl('?', 1000);
   exit;
 }
 
@@ -39,11 +39,6 @@ if (!mysqli_num_rows($q)) die(div_alert('danger', "Username $username role $role
 
 
 
-echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-// exit;
-
 // set master
 $_SESSION['mmc_username_master'] = $_SESSION['mmc_username'];
 $_SESSION['mmc_role_master'] = $_SESSION['mmc_role'];
@@ -54,8 +49,4 @@ $_SESSION['mmc_username'] = $username;
 $_SESSION['mmc_role'] = $role;
 
 
-echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-
-jsurl('?', 2000);
+jsurl('?', 1000);

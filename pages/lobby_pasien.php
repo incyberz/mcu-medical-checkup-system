@@ -1,5 +1,6 @@
 <?php
 $mode = $_GET['mode'] ?? 'detail';
+$at_id_pemeriksaan = $_GET['at_id_pemeriksaan'] ?? '';
 set_title('Lobby Pasien');
 
 # ============================================================
@@ -39,7 +40,10 @@ b.nama as jenis_pasien,
   ) status_bayar_corporate_mandiri, 
 (
   SELECT arr_tanggal_by FROM tb_hasil_pemeriksaan p WHERE p.id_pasien=a.id
-  ) arr_tanggal_by
+  ) arr_tanggal_by,
+(
+  SELECT awal_periksa FROM tb_hasil_pemeriksaan p WHERE p.id_pasien=a.id
+  ) awal_periksa
 
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
@@ -62,6 +66,7 @@ $nav = div_alert('info', "
   <a href='?monitoring_pasien'>Monitoring Pasien Corporate</a>
 ");
 $jumlah_lobby = 0;
+$jumlah_lobby_filtered = 0;
 if (mysqli_num_rows($q)) {
   while ($d = mysqli_fetch_assoc($q)) {
     $jenis = strtolower($d['jenis']);
@@ -101,36 +106,43 @@ if (mysqli_num_rows($q)) {
     # ARR TANGGAL BY HANDLER
     # ============================================================
     $r = explode('||', $d['arr_tanggal_by']);
+    $id_pemeriksaan_yang_sudah = [];
     foreach ($r as $v) {
       if ($v) {
         $r2 = explode('=', $v);
         $id_pemeriksaan = $r2[0];
+        array_push($id_pemeriksaan_yang_sudah, $id_pemeriksaan);
         $count_pemeriksaan[$id_pemeriksaan]++;
       }
     }
 
-    if ($mode == 'detail') {
-      $div .= "
-        <div class='mb4'>
-          <a class='upper tebal ' href='$href'>$jumlah_lobby. $d[nama_pasien] $img_next</a>
-        </div>
-      ";
-    } else {
-      $div .= "
-        <div>
-          <div class='f14 abu'>$jumlah_lobby</div>
-          <div>
-            <a href='$href'>
-              <img src='$src' class='foto_profil border_status_$status ' />
-            </a>
+    if (!$at_id_pemeriksaan || !in_array($at_id_pemeriksaan, $id_pemeriksaan_yang_sudah)) {
+      $jumlah_lobby_filtered++;
+      $nama = !$d['awal_periksa'] ? "<span class='red bold'>$d[nama_pasien]</span>" : $d['nama_pasien'];
+
+      if ($mode == 'detail') {
+        $div .= "
+          <div class='mb4'>
+            <a target=_blank class='upper tebal ' href='$href'>$jumlah_lobby_filtered. $nama $img_next</a>
           </div>
+        ";
+      } else {
+        $div .= "
           <div>
-            <div><a class=upper href='$href'>$d[nama_pasien]</a></div>
-            <div class=f12>$info_paket</div>
-            <div class=f12>$status_show</div>
+            <div class='f14 abu'>$jumlah_lobby_filtered</div>
+            <div>
+              <a target=_blank href='$href'>
+                <img src='$src' class='foto_profil border_status_$status ' />
+              </a>
+            </div>
+            <div>
+              <div><a target=_blank class=upper href='$href'>$nama</a></div>
+              <div class=f12>$info_paket</div>
+              <div class=f12>$status_show</div>
+            </div>
           </div>
-        </div>
-      ";
+        ";
+      }
     }
   } // end while
 
@@ -149,13 +161,19 @@ if (mysqli_num_rows($q)) {
   // var_dump($count_pemeriksaan);
   // echo '</pre>';
 
-  $item = "<div><a class='btn btn-success btn-sm' href='?cari_pasien'>ALL <span class='f30'>$jumlah_lobby</span></a></div>";
+  $item = "<div><a class='btn btn-secondary btn-sm' href='?cari_pasien'>ALL <span class='f30'>$jumlah_lobby</span></a></div>";
   foreach ($count_pemeriksaan as $id_pemeriksaan => $count) {
     $sisa = $jumlah_lobby - $count;
 
-    $item .= !$sisa ? '' : "<div><a class='btn btn-success btn-sm' href='?cari_pasien&id_pemeriksaan=$id_pemeriksaan'>$arr_singkatan[$id_pemeriksaan] <span class='f30'>$sisa</span></a></div>";
+    $primary = $id_pemeriksaan == $at_id_pemeriksaan ? 'primary' : 'secondary';
+    $item .= !$sisa ? '' : "<div><a class='btn btn-$primary btn-sm' href='?cari_pasien&at_id_pemeriksaan=$id_pemeriksaan'>$arr_singkatan[$id_pemeriksaan] <span class='f30'>$sisa</span></a></div>";
   }
-  $nav = "<div class='flexy mb4'>$item</div>";
+  $nav = "
+    <div class='wadah gradasi-merah mb4'>
+      <div class='f12 darkred mb1'>Sisa Pemeriksaan pada:</div>
+      <div class='flexy'>$item</div>
+    </div>
+  ";
 }
 
 

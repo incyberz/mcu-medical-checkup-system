@@ -117,7 +117,7 @@ if ($get_jenis == 'uri') {
       $detail2
     </div>
   ";
-} elseif ($get_jenis == 'hem') {
+} elseif ($get_jenis == 'hem' || $get_jenis == 'gin') {
   $blok_detail = "
     <div 
       class='f12 left border-bottom pb2' 
@@ -126,16 +126,20 @@ if ($get_jenis == 'uri') {
       $detail_header
       $detail
     </div>
-
+  ";
+  if ($get_jenis == 'hem') {
+    $blok_detail .= "
     <h5 class='kiri f14 mt2 mb2 bold' style='letter-spacing: 2px; color: #4cc'>Hitung Jenis Leukosit</h5>
     <div 
       class='f12 left border-bottom pb2' 
       style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
     >
       $detail2
-    </div>
-
-  ";
+    </div>    
+    ";
+  }
+} else {
+  die(div_alert('danger', "get_jenis [$get_jenis] belum terdefinisi."));
 }
 
 echo "

@@ -59,7 +59,7 @@ $pdf->Cell(0, 2, ' ', '-', $ln1, 'L'); // spacer
 $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
 $pdf->Cell(0, LH, 'Printed at: Bekasi, ' . hari_tanggal('', 1, 0), '-', $ln1, 'L');
 $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
-$pdf->Cell(0, LH, 'Dokter Pemeriksa: dr. Mutiara Putri Camelia ', '-', $ln1, 'L');
+$pdf->Cell(0, LH, "Dokter Radiologi: $dokter_radiologi ", '-', $ln1, 'L');
 $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
 
 

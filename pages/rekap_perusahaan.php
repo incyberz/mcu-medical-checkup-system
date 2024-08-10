@@ -30,9 +30,6 @@ $batas_imt = [
 # PROCESSORS
 # ============================================================
 if (isset($_POST['btn_submit'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
   foreach ($_POST as $key => $value) {
     $t = explode('__', $key);
     if ($t[0] == 'hasil') {
@@ -387,6 +384,17 @@ if (mysqli_num_rows($qpasien)) {
           <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        
         </tr>
       ";
+
+      $rekomendasi_custom = $rekomendasi == 'Dapat bekerja sesuai bidangnya' ? 'NULL' : "'$rekomendasi'";
+
+      if (isset($_POST['btn_submit'])) {
+        echolog("Updating konsultasi + rekomendasi for [ $pasien[id_pasien] | $pasien[nama_pasien] ]");
+        $s = "UPDATE tb_hasil_pemeriksaan SET 
+        konsultasi = '$konsultasi',
+        rekomendasi = $rekomendasi_custom
+        WHERE id_pasien = $pasien[id_pasien] ";
+        $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      }
     } else {
 
       $buta_show = 'tidak buta warna';
@@ -427,6 +435,7 @@ if (mysqli_num_rows($qpasien)) {
       ";
     }
   } // end while
+  if (isset($_POST['btn_submit'])) jsurl(); // refresh if POST Processing
 }
 
 $arr_head = [

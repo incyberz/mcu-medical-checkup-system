@@ -37,17 +37,20 @@ $unfit_count = 0;
 
 if ($get_jenis == 'mcu') {
   $id_pemeriksaan = 8;
+} else {
+  $id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die(erid('[id_pemeriksaan]'));
 }
-// } else {
-//   $s = "SELECT id as id_pemeriksaan, nama FROM tb_pemeriksaan WHERE jenis='$get_jenis' ";
-//   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-//   while ($d = mysqli_fetch_assoc($q)) {
-//     echo "<br>$d[id_pemeriksaan] $d[nama]";
-//     // $id=$d['id'];
-//     $id_pemeriksaan = $d['id_pemeriksaan'];
-//   }
-// }
-// exit;
+
+$s = "SELECT * FROM tb_hasil_pemeriksaan WHERE id_pasien=$id_pasien";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$hasil = mysqli_fetch_assoc($q);
+$approv_labs = $hasil['approv_labs'];
+
+# ============================================================
+# LAB VERIFIED STATUS
+# ============================================================
+$verified_lab = strpos("salt||$approv_labs", "||$id_pemeriksaan=") ? 1 : 0;
+
 
 
 # ============================================================
@@ -61,7 +64,15 @@ if (isset($_POST['btn_approve'])) {
   WHERE id_pasien=$id_pasien";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   echo div_alert('success', 'Update hasil sukses.');
-  jsurl("?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis");
+  jsurl("?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&id_pemeriksaan=$id_pemeriksaan");
+}
+
+if (isset($_POST['btn_approve_lab'])) {
+  $approv_labs = "$id_pemeriksaan=1,$now,$id_user||$approv_labs";
+  $s = "UPDATE tb_hasil_pemeriksaan SET approv_labs = '$approv_labs' WHERE id_pasien=$id_pasien";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  echo div_alert('success', 'Update hasil lab sukses.');
+  jsurl("?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&id_pemeriksaan=$id_pemeriksaan", 1000);
 }
 
 # ============================================================
@@ -85,7 +96,7 @@ $arr_pemeriksaan_by = [];
 $arr_sampel_tanggal = [];
 $arr_sampel_by = [];
 include 'pemeriksaan-hasil_at_db.php';
-$dokter_pj = $arr_user[$arr_pemeriksaan_by[8]];
+$dokter_pj = 'dr. Mutiara Putri Camelia';
 
 
 
@@ -124,12 +135,6 @@ if (!mysqli_num_rows($q)) {
 }
 
 
-// if (!$gender) {
-//   echo '<pre>';
-//   var_dump($gender);
-//   echo '</pre>';
-//   die(div_alert('danger', "Membutuhkan gender untuk kalkulasi"));
-// }
 
 
 
@@ -190,12 +195,10 @@ if ($is_mcu) {
 # ============================================================
 # FOOTER
 # ============================================================
-$re_approv = $_GET['re_approv'] ?? '';
-$Re_ = $re_approv ? 'Re -' : '';
-if ($hasil_at_db['approv_date'] and !$re_approv) {
+if ($hasil_at_db['approv_date'] || $verified_lab) {
   include 'hasil_pemeriksaan-footer.php';
 } else {
-  if (!$re_approv) echo div_alert('danger tengah', 'BELUM DIVERIFIKASI');
+  echo div_alert('danger tengah', 'BELUM DIVERIFIKASI');
   if ($role == 'dokter-pj') {
 
     require_once 'include/radio_toolbar_functions.php';
@@ -256,13 +259,28 @@ if ($hasil_at_db['approv_date'] and !$re_approv) {
         </div>
         <div class=wadah>
           <div>Approve by <b>$nama_user</b> at <b>$hari</b> </div>
-          <button class='btn btn-primary mt4' name=btn_approve value=$re_approv>$Re_ Approve</button>
+          <button class='btn btn-primary mt4' name=btn_approve value=1>Approve</button>
         </div>
       ";
     } else {
-      $blok_approve = "
-        Silahkan Approve pada <a href='?hasil_pemeriksaan&id_pasien=1&jenis=mcu'>Hasil Pemeriksaan MCU</a>
-      ";
+      if ($role == 'dokter-pj') {
+        $blok_approve = "
+          <div class=kiri>
+            <label style='display:block' class='m2'>
+              <input type=checkbox required >
+              Saya menyatakan bahwa nilai pemeriksaan lab diatas sudah benar 
+            </label>
+          </div>
+          <div class=wadah>
+            <div>Approve by <b>$nama_user</b> at <b>$hari</b> </div>
+            <button class='btn btn-primary mt4' name=btn_approve_lab value=1>Approve Hasil Lab</button>
+          </div>
+        ";
+      } else {
+        $blok_approve = "
+          Mohon tunggu Approve dari Dokter Penanggung Jawab
+        ";
+      }
     }
 
     echo "
@@ -274,12 +292,10 @@ if ($hasil_at_db['approv_date'] and !$re_approv) {
   }
 }
 $btn = "<div class='mt3 red f12'>Belum bisa Print Hasil karena belum diverifikasi oleh Dokter Penanggung jawab.</div>";
-if ($hasil_at_db['approv_date']) {
+if ($hasil_at_db['approv_date'] || $verified_lab) {
   $nama_file = "hasil-$get_jenis-$no_mcu-$nama_pasien.pdf";
   $nama_file = str_replace(' ', '_', $nama_file);
   $nama_file = strtolower($nama_file);
-  $btn_re_approv = $role != 'dokter-pj' ? '' : "<div><a class='btn btn-danger' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&re_approv=1'>Re-Approve</a></div>";
-  $btn_re_approv = ''; // aborted
   $btn = "
       <div class='flexy flex-center mt3'>
         <div class=admin_only>Filename:</div>
@@ -292,7 +308,6 @@ if ($hasil_at_db['approv_date']) {
         <div>
           <button class='btn btn-primary' onclick=window.print()>Print</button>
         </div>
-        $btn_re_approv
       </div>
   ";
 }

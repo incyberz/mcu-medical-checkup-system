@@ -9,6 +9,7 @@ include '../include/arr_penanda_gigi.php';
 include '../include/arr_kesimpulan.php';
 
 $tidak_ada = '--tidak ada--';
+$no_data = '--no data--';
 $total_page = 4;
 $border_debug = 0;
 $ln1 = 1;
@@ -17,10 +18,11 @@ $ln0 = 0;
 # ============================================================
 # DEBUG 
 # ============================================================
-$id_pasien = 31; // urine abnor
-$id_pasien = 9; // hema abnor
-$id_pasien = 21; // abnor gigi & gizi
-
+$get_id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', 'Page ini tidak bisa diakses secara langsung. <hr>Silahkan hubungi developer!'));
+$where_id_pasien = "id_pasien = $get_id_pasien";
+// $where_id_pasien = "id_pasien <= 37";
+$nama_file = 'hasil-mcu1-mcu37-pt-yasunli.pdf';
+$dokter_radiologi = 'dr. Yuliawati H, Sp.Rad';
 
 # ===========================================
 # CONSTANT SETTINGS
@@ -131,9 +133,7 @@ $s = "SELECT
 * 
 FROM tb_hasil_pemeriksaan a 
 JOIN tb_pasien b ON a.id_pasien=b.id 
-WHERE 
-1 -- id_pasien =$id_pasien 
-AND id_pasien <= 37 -- yasunli
+WHERE $where_id_pasien
 ";
 $q_pasien_pdf = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $pasien = [];
@@ -276,6 +276,10 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
     $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
     $total_page = count($arr_page_at);
+
+    // fix keluhan (strip)
+    if (strlen($pasien['keluhan']) < 5) $pasien['keluhan'] = null;
+
 
     # ============================================================
     # MAIN LOOPING
@@ -473,5 +477,6 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
 $nama = str_replace(' ', '-', strtolower($nama_pasien));
-$pdf->Output('D', "hasil-mcu$id_pasien-$nama.pdf");
+// $pdf->Output('D', "hasil-mcu$id_pasien-$nama.pdf");
+$pdf->Output('D', "$nama_file");
 ob_end_flush();

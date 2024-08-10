@@ -329,7 +329,8 @@ if (!$pasien['id_paket_custom'] and !$id_harga_perusahaan) {
   } else {
     $s = "SELECT 
     b.nama as nama_pemeriksaan,
-    b.biaya  
+    b.biaya,  
+    b.biaya as harga 
     FROM tb_paket_custom_detail a 
     JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id 
     WHERE a.id_paket_custom=$pasien[id_paket_custom]";

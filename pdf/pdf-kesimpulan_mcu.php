@@ -1,6 +1,30 @@
 <?php
+# ============================================================
+# KONSULTASI
+# ============================================================
+if ($pasien['konsultasi']) {
+  $pdf->Cell(0, LHB, "KONSULTASI: ", 'TLRB', 1, 'L');
+  // $pdf->SetFont(FF, 'B', 16);
+  $pdf->Cell(0, LHB,  $pasien['konsultasi'], 'TLRB', 1, 'L');
+  $pdf->Cell(0, LH, ' ', '-', $ln1, 'L'); // spacer
+
+  $pdf->Cell(0, LHB, "REKOMENDASI: ", 'TLRB', 1, 'L');
+  // $pdf->SetFont(FF, 'B', 16);
+  $rekomendasi = $pasien['rekomendasi'] ?? 'Dapat bekerja sesuai bidangnya';
+  $pdf->Cell(0, LHB,  $rekomendasi, 'TLRB', 1, 'L');
+} else {
+  $pdf->SetTextColor(255, 0, 0);
+  $pdf->Cell(0, LHB, "KONSULTASI: --belum ada data konsultasi--", 'TLRB', 1);
+}
+$pdf->Cell(0, LH, ' ', '-', $ln1, 'L'); // spacer
+
+
+# ============================================================
+# KESIMPULAN
+# ============================================================
 if ($pasien['hasil']) {
-  $pdf->Cell(0, LHB, "KESIMPULAN: ", 'TLRB', 1, 'C');
+  $pdf->SetFillColor(100, 255, 255);
+  $pdf->Cell(0, LHB, "KESIMPULAN: ", 'TLRB', 1, 'C', true);
   $pdf->SetFont(FF, 'B', 16);
   $pdf->SetTextColor(0, 150, 0);
   $pdf->Cell(0, LHB * 2,  $arr_kesimpulan[$pasien['hasil']], 'TLRB', 1, 'C');
