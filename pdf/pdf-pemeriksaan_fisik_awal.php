@@ -71,6 +71,7 @@ $arr = [
 foreach ($arr as $key_info_tensi => $arr_value) {
   if ($sistol < $arr_value['sistol'] && $diastol < $arr_value['distol']) {
     $tensi .= " ($key_info_tensi)";
+    $info_tensi = $key_info_tensi;
     break;
   }
 }
@@ -99,3 +100,8 @@ $pasien['pemeriksaan_fisik_awal'] = [
     'Pakai Kacamata' => "$arr_id_detail[13] " . $arr_pemeriksaan_detail[13]['satuan'],
   ],
 ];
+
+$pasien['kesimpulan_pemeriksaan_fisik']['STATUS GIZI'] = $status_gizi;
+$pasien['kesimpulan_pemeriksaan_fisik']['RESIKO LINGKAR PERUT'] = $resiko_lingkar_perut;
+$pasien['kesimpulan_pemeriksaan_fisik']['TES BUTA WARNA'] = $tes_buta_warna;
+$pasien['kesimpulan_pemeriksaan_fisik']['TEKANAN DARAH'] = $info_tensi;

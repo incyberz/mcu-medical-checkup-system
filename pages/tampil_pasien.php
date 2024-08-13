@@ -5,6 +5,11 @@ $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', "Page ini membutuhkan
 $s = "SELECT order_no,jenis FROM tb_pasien WHERE id=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
+$id_pemeriksaan_glu_pu = 44; // glu_pu
+$id_pemeriksaan_glu_se = 46; // glu_se
+$id_pemeriksaan_dl = 3; // glu_se
+
+
 $order_no = '';
 if (!mysqli_num_rows($q)) {
   die(div_alert('danger', 'Data pasien tidak ditemukan'));
@@ -180,9 +185,30 @@ if (!mysqli_num_rows($q_pemeriksaan)) {
 }
 $arr_csampel = [];
 $link_hasil_penunjang = '';
+$jumlah_pemeriksaan_with_gula = 0;
+$ada_glu_pu = 0;
+$ada_glu_se = 0;
 while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   $no++;
   $id_pemeriksaan = $pemeriksaan['id_pemeriksaan'];
+
+  # ============================================================
+  # EXCEPTION PEMERIKSAAN GULA
+  # ============================================================
+  $jumlah_pemeriksaan_with_gula++;
+  if ($id_pemeriksaan == $id_pemeriksaan_glu_pu) {
+    $ada_glu_pu = 1;
+  }
+  if ($id_pemeriksaan == $id_pemeriksaan_glu_se) {
+    $ada_glu_se = 1;
+  }
+  if ($ada_glu_pu and $ada_glu_se) {
+    $jumlah_pemeriksaan_with_gula--;
+    $ada_glu_pu = 0;
+    $ada_glu_se = 0;
+  }
+
+
   $nama_pemeriksaan = $pemeriksaan['nama_pemeriksaan'];
   $jenis_pemeriksaan = $pemeriksaan['jenis_pemeriksaan'];
   $count_pemeriksaan_detail = $pemeriksaan['count_pemeriksaan_detail'];
@@ -291,11 +317,13 @@ if ($arr_csampel) {
   }
 }
 
+// echo "<hr>jumlah_pemeriksaan_selesai$jumlah_pemeriksaan_selesai == jumlah_pemeriksaan$jumlah_pemeriksaan == jumlah_pemeriksaan_with_gula$jumlah_pemeriksaan_with_gula";
+
 # ============================================================
 # INFO SELESAI PEMERIKSAAN
 # ============================================================
 $info_selesai = '';
-if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan and $jumlah_sampel_selesai == $jumlah_sampel and $jumlah_pemeriksaan) {
+if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan_with_gula and $jumlah_sampel_selesai == $jumlah_sampel and $jumlah_pemeriksaan_with_gula) {
   if ($status == 7 || $status == 8 || $status == 9 || $status == '') {
     //update status pasien menjadi 10 (pasien selesai)
     $s2 = "UPDATE tb_pasien SET status=10 WHERE id='$id_pasien'";

@@ -69,7 +69,7 @@ if (mysqli_num_rows($q)) {
   $NIK = $pasien['NIK'];
   $data_pemeriksaan = $pasien['data_pemeriksaan'];
 
-  $gender = $pasien['gender'];
+  $gender = strtolower($pasien['gender']);
   $gender_icon = $gender ? "<img src='$lokasi_icon/gender-$gender.png' height=20px>" : $img_warning;
   $gender_show = gender($gender);
 

@@ -216,12 +216,12 @@ $opsi['kebiasaan_nginum'] = [
 ];
 
 $opsi['kebiasaan_nginum_count'] = [
-  1 => 'Berhenti nginum sekitar seminggu yang lalu',
-  2 => 'Berhenti nginum sekitar sebulan yang lalu',
-  3 => 'Berhenti nginum sekitar enam bulan yang lalu',
-  4 => 'Berhenti nginum sekitar setahun yang lalu',
-  5 => 'Berhenti nginum sekitar 5 tahun yang lalu',
-  6 => 'Berhenti nginum sekitar 10 tahun yang lalu',
+  1 => 'Berhenti minum alkohol sekitar seminggu yang lalu',
+  2 => 'Berhenti minum alkohol sekitar sebulan yang lalu',
+  3 => 'Berhenti minum alkohol sekitar enam bulan yang lalu',
+  4 => 'Berhenti minum alkohol sekitar setahun yang lalu',
+  5 => 'Berhenti minum alkohol sekitar 5 tahun yang lalu',
+  6 => 'Berhenti minum alkohol sekitar 10 tahun yang lalu',
 ];
 
 

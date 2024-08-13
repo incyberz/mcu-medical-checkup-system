@@ -1,6 +1,6 @@
 <?php
 $id_detail = 134;
-$hasil = $arr_id_detail[134];
+$hasil = $arr_id_detail[134] ?? ''; // atau kosong jika blm ada
 if ($hasil) {
   $red = $hasil == 'dalam batas normal' ? 'green' : 'red';
   $hasil = str_replace(', ', '<br>', $hasil);

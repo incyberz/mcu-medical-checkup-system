@@ -84,6 +84,7 @@ if (isset($_SESSION['mmc_username'])) {
 # KONEKSI KE MYSQL SERVER
 # ================================================
 include 'conn.php';
+if ($dm_db) echo "<div style='position:fixed; top:60px; left:0; font-weight:bold; z-index:9999; background:red; padding:5px'>DB-ONLINE MODE</div>";
 
 # ================================================
 # DATA PAGES AT

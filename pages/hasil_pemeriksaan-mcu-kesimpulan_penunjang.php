@@ -3,6 +3,18 @@
 # PEMERIKSAAN
 # ============================================================
 $kelainan = [];
+$ARR_JENIS = [
+  3 => 'HEM',
+  20 => 'URI',
+  9 => 'RON',
+];
+$arr_lab = [
+  20 => 'URINE',
+  3 => 'HEMA',
+  9 => 'RONTGEN'
+];
+$hasil_lab = [];
+
 $li = '';
 foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
 
@@ -22,6 +34,7 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
   } else {
     while ($d = mysqli_fetch_assoc($q)) {
       $id_detail = $d['id_detail'];
+      if ($id_detail == 106) continue; // laju endap darah
       $option_default = $d['option_default'];
       $hasil = $arr_id_detail[$id_detail] ?? 0;
 
@@ -37,6 +50,24 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
             $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil</span></li>";
           }
         }
+      } else { // by range
+
+        $normal_hi = $d['normal_hi_l'];
+        $normal_lo = $d['normal_lo_l'];
+        if ($gender == 'p' and $d['normal_hi_p']) {
+          $normal_hi = $d['normal_hi_p'];
+          $normal_lo = $d['normal_lo_p'];
+        }
+
+        $hl = '';
+        if ($hasil < $normal_lo) { // LOW
+          $hl = "<span class='red bold'>LOW</span>";
+        } elseif ($hasil > $normal_hi) {
+          $hl = "<span class='red bold'>HIGH</span>";
+        }
+
+
+        $sub_li .= $hl ? "<li><span class=column>$d[label]:</span> <a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$ARR_JENIS[$id_pemeriksaan]&id_pemeriksaan=$id_pemeriksaan'>$hl</a></li>" : '';
       }
     }
   }
@@ -44,6 +75,7 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
   $sub_ul = $sub_li ? "<ul>$sub_li</ul>" : "<span class='consolas'>dalam batas normal</span>";
 
   $li .= "<li><span class=column>$arr_pemeriksaan[$id_pemeriksaan]:</span> $sub_ul</li>";
+  $hasil_lab[$arr_lab[$id_pemeriksaan]] = $sub_li ? "<ul>$sub_li</ul>" : 'normal';
 }
 
 

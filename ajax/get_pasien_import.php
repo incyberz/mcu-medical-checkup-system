@@ -1,9 +1,9 @@
 <?php
 include "../conn.php";
-$id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die("Error @ajax :: [id_pemeriksaan] belum terdefinisi.");;
-$id_perusahaan = $_GET['id_perusahaan'] ?? die("Error @ajax :: [id_perusahaan] belum terdefinisi.");;
-$id_import = $_GET['id_import'] ?? die("Error @ajax :: [id_import] belum terdefinisi.");;
-$keyword = $_GET['keyword'] ?? die("Error @ajax :: [keyword] belum terdefinisi.");;
+$id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die("Error @ajax :: [id_pemeriksaan] belum terdefinisi.");
+$id_perusahaan = $_GET['id_perusahaan'] ?? die("Error @ajax :: [id_perusahaan] belum terdefinisi.");
+$id_import = $_GET['id_import'] ?? die("Error @ajax :: [id_import] belum terdefinisi.");
+$keyword = $_GET['keyword'] ?? die("Error @ajax :: [keyword] belum terdefinisi.");
 $limit = 20;
 
 

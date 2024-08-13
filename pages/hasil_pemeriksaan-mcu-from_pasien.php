@@ -2,6 +2,7 @@
 # ============================================================
 # HASIL RIWAYAT PENYAKIT
 # ============================================================
+
 $dt = explode(',', $pasien['riwayat_penyakit']);
 $arr = [
   'RIWAYAT PENYAKIT' => 'riwayat',
@@ -19,10 +20,14 @@ foreach ($dt as $k2 => $v2) {
 
 foreach ($arr as $k1 => $v1) {
 
-  // if (!$riw[$v1]) continue;
-  $riw[$v1] = $riw[$v1] ? "<ul class='hasil m0'>$riw[$v1]</ul>" : $tidak_ada;
-  blok_hasil($k1, $riw[$v1]);
+  if ($pasien['tanggal_mengisi_riwayat_penyakit']) {
+    $riw[$v1] = $riw[$v1] ? "<ul class='hasil m0'>$riw[$v1]</ul>" : $tidak_ada;
+    blok_hasil($k1, $riw[$v1]);
+  } else {
+    blok_hasil($k1, $no_data);
+  }
 }
+
 
 
 # ============================================================
@@ -33,6 +38,7 @@ $str_hasil = '';
 foreach ($dt as $k => $v)  if ($v) $str_hasil .= "<li>$v</li>";
 
 $str_hasil = $str_hasil ? "<ul class='hasil m0'>$str_hasil</ul>" : $tidak_ada;
+$str_hasil = $pasien['tanggal_mengisi_gejala_penyakit'] ? $str_hasil : $no_data;
 blok_hasil('GEJALA PENYAKIT', $str_hasil);
 
 
@@ -45,6 +51,7 @@ $str_hasil = '';
 foreach ($dt as $k => $v)  if ($v) $str_hasil .= "<li>$v</li>";
 
 $str_hasil = $str_hasil ? "<ul class='hasil m0'>$str_hasil</ul>" : $tidak_ada;
+$str_hasil = $pasien['tanggal_mengisi_gaya_hidup'] ? $str_hasil : $no_data;
 blok_hasil('GAYA HIDUP', $str_hasil);
 
 
@@ -53,4 +60,5 @@ blok_hasil('GAYA HIDUP', $str_hasil);
 # HASIL KELUHAN
 # ============================================================
 $str_hasil = strlen($pasien['keluhan']) > 3 ? "<span class='hasil m0'>$pasien[keluhan]</span>" : $tidak_ada;
+$str_hasil = $pasien['tanggal_mengisi_keluhan'] ? $str_hasil : $no_data;
 blok_hasil('KELUHAN', $str_hasil);

@@ -45,18 +45,39 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
             array_push($kelainan_detail, strtoupper($detail['label']) . ": $hasil");
           }
         }
+      } else { // by range
+
+        $normal_hi = $detail['normal_hi_l'];
+        $normal_lo = $detail['normal_lo_l'];
+        if ($gender == 'p' and $detail['normal_hi_p']) {
+          $normal_hi = $detail['normal_hi_p'];
+          $normal_lo = $detail['normal_lo_p'];
+        }
+
+        // $hl = '';
+        if ($hasil < $normal_lo) { // LOW
+          // $hl = "<span class='red bold'>LOW</span>";
+          array_push($kelainan_detail, strtoupper($detail['label']) . ": $hasil (LOW)");
+        } elseif ($hasil > $normal_hi) {
+          // $hl = "<span class='red bold'>HIGH</span>";
+          array_push($kelainan_detail, strtoupper($detail['label']) . ": $hasil (HIGH)");
+        }
+
+
+        // $sub_li .= $hl ? "<li><span class=column>$detail[label]:</span> <a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$ARR_JENIS[$id_pemeriksaan]&id_pemeriksaan=$id_pemeriksaan'>$hl</a></li>" : '';
       }
     }
   }
 
-  $sub_ul = $sub_li ? "<ul>$sub_li</ul>" : "<span class='consolas'>dalam batas normal</span>";
+
+  // $sub_ul = $sub_li ? "<ul>$sub_li</ul>" : "<span class='consolas'>dalam batas normal</span>";
   if ($kelainan_detail) {
     $kelainan[$arr_pemeriksaan[$id_pemeriksaan]] = $kelainan_detail;
   } else {
     $kelainan[$arr_pemeriksaan[$id_pemeriksaan]] = 'dalam batas normal';
   }
 
-  $li .= "<li><span class=column>$arr_pemeriksaan[$id_pemeriksaan]:</span> $sub_ul</li>";
+  // $li .= "<li><span class=column>$arr_pemeriksaan[$id_pemeriksaan]:</span> $sub_ul</li>";
 }
 
 $pasien['pemeriksaan_penunjang'] = $kelainan;

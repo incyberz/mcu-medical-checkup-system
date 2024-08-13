@@ -32,6 +32,7 @@ $kesimpulan = [];
 $kesimpulan_penunjang = [];
 $dokter_pj = '<span class="tebal merah">UNKNOWN</span>';
 $tidak_ada = '<i class=hasil>--tidak ada--</i>';
+$no_data = '<i class=hasil>--no data--</i>';
 $abnormal_count = 0;
 $unfit_count = 0;
 
@@ -307,6 +308,9 @@ if ($hasil_at_db['approv_date'] || $verified_lab) {
         </div>
         <div>
           <button class='btn btn-primary' onclick=window.print()>Print</button>
+        </div>
+        <div>
+          <a target=_blank href='pdf/?id_pasien=$id_pasien' class='btn btn-success'>PDF</a>
         </div>
       </div>
   ";

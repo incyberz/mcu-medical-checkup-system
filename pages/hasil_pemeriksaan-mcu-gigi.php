@@ -84,4 +84,4 @@ $str_hasil = "
   </div>
 ";
 
-blok_hasil('PEMERIKSAAN GIGI', $str_hasil);
+// blok_hasil('PEMERIKSAAN GIGI', $str_hasil);

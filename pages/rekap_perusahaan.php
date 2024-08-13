@@ -1,5 +1,6 @@
 <?php
 $mode = $_GET['mode'] ?? 'detail';
+$get_tanggal_periksa = $_GET['tanggal_periksa'] ?? '';
 if ($mode == 'kirim_link') {
   include 'rekap_perusahaan-kirim_link.php';
   exit;
@@ -17,13 +18,12 @@ $batas_imt = [
   999 => 'Obese class 3',
 ];
 
+$id_pemeriksaan_ron = 9;
+$id_pemeriksaan_dl = 3;
+$id_pemeriksaan_ul = 20;
 
 
 
-
-
-// ZZZ VISUS MATA > 20/20 KONSUL KE DOKTER MATA
-// ZZZ URINE ERROR
 
 
 # ============================================================
@@ -133,7 +133,7 @@ $link_preview = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan'>Previe
 $link_hrd = "<div class='mt2'>
   <a class='btn btn-sm btn-success' href='?rekap_perusahaan&id_perusahaan=1&mode=kirim_link'>Kirim Link Pasien ke HRD</a>
 </div>
-<a href='https://youtu.be/AkDSnkaBMFc' target=_blank >Lihat Tutorial </a>";
+<a class='hideit ZZZ' href='https://youtu.be/AkDSnkaBMFc' target=_blank >Lihat Tutorial </a>";
 if ($mode == 'approv') {
   $link = $link_preview;
   $sub_h = 'Mode Approv Kesimpulan';
@@ -149,6 +149,68 @@ set_h2('Rekap Pemeriksaan', "
   $sub_h | $link 
   $link_hrd
 ");
+# ============================================================
+# NAVIGASI TANGGAL
+# ============================================================
+$arr_mode_bayar_cor_man = [
+  1 => 'Yasunli'
+];
+
+$arr_tanggal_periksa = [];
+if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
+  $s = "SELECT date(a.awal_periksa) tanggal_periksa 
+  FROM tb_hasil_pemeriksaan a 
+  JOIN tb_pasien b ON a.id_pasien=b.id 
+  JOIN tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id 
+  WHERE c.id_perusahaan = $id_perusahaan
+  ";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+
+  while ($d = mysqli_fetch_assoc($q)) {
+    $tanggal_periksa = $d['tanggal_periksa'];
+    if (!in_array($tanggal_periksa, $arr_tanggal_periksa)) array_push($arr_tanggal_periksa, $tanggal_periksa);
+  }
+}
+
+$nav_tanggal = '';
+if (count($arr_tanggal_periksa) > 1) {
+  foreach ($arr_tanggal_periksa as  $tanggal_periksa) {
+    $primary = $tanggal_periksa == $get_tanggal_periksa ? 'primary' : 'secondary';
+    $nav_tanggal .= "
+      <div class='ml4 mr4'>
+        <a class='btn btn-$primary btn-sm' href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggal_periksa'>
+          $tanggal_periksa
+        </a>
+      </div>
+    ";
+  }
+  echo  "
+    <div class='mb4 tengah'>
+      <div class=mb2>Tanggal Pemeriksaan:</div>
+      <div class='flex flex-center'>
+        $nav_tanggal
+      </div>
+    </div>
+  ";
+  if (!$get_tanggal_periksa) exit;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -191,8 +253,12 @@ b.nama as jenis_pasien,
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
 JOIN tb_harga_perusahaan c ON a.id_harga_perusahaan=c.id 
+JOIN tb_hasil_pemeriksaan d ON d.id_pasien=a.id 
 WHERE (a.status = 10) -- SELESAI PEMERIKSAAN  
 AND c.id_perusahaan=$id_perusahaan 
+AND awal_periksa >= '$get_tanggal_periksa' 
+AND awal_periksa < '$get_tanggal_periksa 23:59:59' 
+
 ORDER BY a.nama 
 ";
 
@@ -205,8 +271,11 @@ $jumlah_verif = 0;
 $awal_periksa = '';
 $nav = div_alert('info', "Belum ada Pasien yang Selesai Pemeriksaan | <a href='?cari_pasien'>Lobby Pasien</a>");
 if (mysqli_num_rows($qpasien)) {
+  $no_urut = 0;
   while ($pasien = mysqli_fetch_assoc($qpasien)) {
     $i++;
+    $no_urut++;
+
     if ($pasien['approv_date']) $jumlah_verif++;
     $jenis = strtolower($pasien['jenis']);
     $status = $pasien['status'];
@@ -277,16 +346,8 @@ if (mysqli_num_rows($qpasien)) {
                 } elseif ($hasil > $hi) {
                   $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil HIGH</span></li>";
                 }
-                // $hl = '<span class="red bold">H</span>';
-                // $hl = '<span class="red bold">L</span>';
               } else {
                 die(div_alert('danger', "Invalid batasan nilai pada detail pemeriksaan. id_detail: $id_detail"));
-                // $link_edit = "<a href='?manage_pemeriksaan_detail&id_detail=$id_detail&mode=batasan' target=_blank>Manage</a>";
-                // $nilai_normal = '<span class="red bold">invalid</span> ';
-                // $hl = '<span class="red bold">???</span>';
-                // if (!$lo) $nilai_normal .= "<br><i class='red f10'>[Normal value] null atau [Nilai minimum] batas normal masih kosong</i> | $link_edit";
-                // if (!$hi) $nilai_normal .= "<br><i class='red f10'>[Normal value] null atau [Nilai maximum] batas normal masih kosong</i> | $link_edit";
-                // if ($lo < $hi) $nilai_normal .= "<br><i class='red f10'>Nilai minimum > nilai maksimum</i> | $link_edit";
               }
             }
           }
@@ -302,6 +363,10 @@ if (mysqli_num_rows($qpasien)) {
 
     $keluhan = $pasien['keluhan'] ?? 'tidak ada';
     $kesimpulan = $hasil_at_db['hasil'] ? $arr_kesimpulan[$hasil_at_db['hasil']] : $belum_ada;
+
+    # ============================================================
+    # KONSULTASI DAN REKOMENDASI
+    # ============================================================
     $konsultasi = $hasil_at_db['konsultasi'] ?? '-';
 
     if ($hasil_at_db['rekomendasi']) {
@@ -322,7 +387,7 @@ if (mysqli_num_rows($qpasien)) {
     if (strpos("salt$kesimpulan_fisik", 'obese') || strpos("salt$kesimpulan_fisik", 'underweight')) array_push($arr_konsultasi, 'dokter ahli gizi');
     if (strpos("salt$kesimpulan_fisik", 'gigi')) array_push($arr_konsultasi, 'dokter gigi');
     if ($hasil_lab['HEMA'] != 'normal' || $hasil_lab['URINE'] != 'normal') array_push($arr_konsultasi, 'dokter umum');
-    if ($hasil_lab['RONTGEN'] != 'normal') array_push($arr_konsultasi, 'dokter paru');
+    if (!strpos("salt$hasil_lab[RONTGEN]", 'normal')) array_push($arr_konsultasi, 'dokter paru');
     if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
 
 
@@ -338,6 +403,10 @@ if (mysqli_num_rows($qpasien)) {
 
 
 
+
+    # ============================================================
+    # APPROVE KOMPONEN
+    # ============================================================
     if ($mode == 'approv') {
 
 
@@ -365,12 +434,15 @@ if (mysqli_num_rows($qpasien)) {
         $is_haid_show = "<div class=red>$is_haid_show</div>";
       }
 
-      $hasil_hema = $hasil_lab['HEMA'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=HEM'>$hasil_lab[HEMA]</a>";
-      $hasil_urine = $hasil_lab['URINE'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=URI'>$hasil_lab[URINE]</a>";
-      $hasil_rontgen = $hasil_lab['RONTGEN'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'>$hasil_lab[RONTGEN]</a>";
+      $hasil_hema = $hasil_lab['HEMA'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=HEM&id_pemeriksaan=$id_pemeriksaan_dl'>$hasil_lab[HEMA]</a>";
+      $hasil_urine = $hasil_lab['URINE'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=URI&id_pemeriksaan=$id_pemeriksaan_ul'>$hasil_lab[URINE]</a>";
+      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON&id_pemeriksaan=$id_pemeriksaan_ron'>$hasil_lab[RONTGEN]</a>";
+
+
 
       $tr_approv .= "
         <tr>
+          <td>$no_urut</td>
           <td>MCU-$pasien[id_pasien]</td>
           <td>$pasien[nama_pasien]</td>
           <td>$gender$is_haid_show</td>
@@ -395,7 +467,7 @@ if (mysqli_num_rows($qpasien)) {
         WHERE id_pasien = $pasien[id_pasien] ";
         $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
       }
-    } else {
+    } else { // end if mode approv
 
       $buta_show = 'tidak buta warna';
       if ($arr_id_detail[11] < 7) $buta_show = "<span class=red>parsial</span>";
@@ -407,8 +479,11 @@ if (mysqli_num_rows($qpasien)) {
         if ($batas > $imt) break;
       }
 
+      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'>$hasil_lab[RONTGEN]</a>";
+
       $tr .= "
         <tr>
+          <td>$no_urut</td>
           <td>MCU-$pasien[id_pasien]</td>
           <td>$pasien[nama_pasien]</td>
           <td>$pasien[tanggal_lahir]</td>
@@ -427,7 +502,7 @@ if (mysqli_num_rows($qpasien)) {
           <td><span class=hideit>BUTA WARNA</span>$buta_show</td>
           <td><span class=hideit>LAB-HEMA</span>$hasil_lab[HEMA]</td>
           <td><span class=hideit>LAB-URINE</span>$hasil_lab[URINE]</td>
-          <td><span class=hideit>RONTGEN</span>$hasil_lab[RONTGEN]</td>
+          <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
           <td><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
           <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
           <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        
@@ -439,6 +514,7 @@ if (mysqli_num_rows($qpasien)) {
 }
 
 $arr_head = [
+  'NO',
   'NO. MCU',
   'NAMA',
   'TANGGAL LAHIR',
@@ -457,7 +533,7 @@ $arr_head = [
   'BUTA WARNA',
   'LAB-HEMA',
   'LAB-URINE',
-  'RONTGEN',
+  'RONTGEN THORAX',
   'KESIMPULAN',
   'KONSULTASI',
   'REKOMENDASI',
@@ -503,6 +579,7 @@ if ($mode == 'approv') {
   $tr = $tr_approv;
 
   $arr_head = [
+    'NO',
     'NO. MCU',
     'NAMA',
     'GENDER',

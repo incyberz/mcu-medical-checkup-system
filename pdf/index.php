@@ -185,7 +185,10 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     $no_mcu = "MCU-$id_pasien";
 
 
-
+    # ============================================================
+    # INISIALISASI KESIMPULAN PEMERIKSAAN FISIK
+    # ============================================================
+    $pasien['kesimpulan_pemeriksaan_fisik'] = [];
 
 
 
@@ -296,6 +299,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
       'pemeriksaan_fisik_dokter' => $pasien['pemeriksaan_fisik_dokter'],
       'visus_mata' => $pasien['visus_mata'],
       'pemeriksaan_gigi' => $pasien['array_gigi'],
+      'kesimpulan_pemeriksaan_fisik' => $pasien['kesimpulan_pemeriksaan_fisik'],
       'pemeriksaan_penunjang' => $pasien['pemeriksaan_penunjang'],
     ];
 
@@ -311,7 +315,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
       // exclusion pemeriksaan gigi
       if ($k == 'pemeriksaan_gigi') {
         include 'pdf-pemeriksaan_gigi.php';
-        $pdf->Cell(0, $shv, ' ', '', 1, ''); // spacer
+        // $pdf->Cell(0, $shv, ' ', '', 1, ''); // spacer
         continue;
       } elseif ($k == 'pemeriksaan_fisik_dokter') {
         include 'pdf-pemeriksaan_fisik_dokter.php';
@@ -387,8 +391,23 @@ if (mysqli_num_rows($q_pasien_pdf)) {
           }
         }
         $pdf->Cell(0, 1, ' ', 'LRB', 1);
-      } else {
-        $pdf->Cell(0, LHB, "$KOLOM: $tidak_ada", 1, 1);
+      } else { // tidak ada abnormal or no-data
+        $tidak_ada_or_nodata = $tidak_ada;
+        if ((
+          $k == 'riwayat_penyakit_pasien'
+          || $k == 'riwayat_pengobatan'
+          || $k == 'riwayat_penyakit_ayah'
+          || $k == 'riwayat_penyakit_ibu'
+        ) and !$pasien['tanggal_mengisi_riwayat_penyakit']) {
+          $tidak_ada_or_nodata = $no_data;
+        } elseif ($k == 'gejala_penyakit' and !$pasien['tanggal_mengisi_gejala_penyakit']) {
+          $tidak_ada_or_nodata = $no_data;
+        } elseif ($k == 'gaya_hidup' and !$pasien['tanggal_mengisi_gaya_hidup']) {
+          $tidak_ada_or_nodata = $no_data;
+        } elseif ($k == 'keluhan' and !$pasien['tanggal_mengisi_keluhan']) {
+          $tidak_ada_or_nodata = $no_data;
+        }
+        $pdf->Cell(0, LHB, "$KOLOM: $tidak_ada_or_nodata", 1, 1);
       }
       $pdf->Cell(0, $shv, ' ', '', 1, ''); // spacer
 
