@@ -188,8 +188,8 @@ if ($status_pasien === '') {
       }
 
       $link_verif = $d['approv_date'] ? $link_wa : " | 
-        <a class='upper tebal ' href='?hasil_pemeriksaan&id_pasien=$d[id]&jenis=mcu'>
-          <b class=red>Unverified</b> $img_next
+        <a class=' tebal ' href='?hasil_pemeriksaan&id_pasien=$d[id]&jenis=mcu'>
+          <b class=red>UNVERIFIED</b> $img_next
         </a>
       ";
 

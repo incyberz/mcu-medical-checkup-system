@@ -1,6 +1,6 @@
 <?php
 $thn = date('y');
-// $print = $_GET['print'] ?? '';
+$print = $_GET['print'] ?? '';
 // if ($print) {
 //   $id_klinik = 1; ///zzz debug
 //   include '../conn.php';

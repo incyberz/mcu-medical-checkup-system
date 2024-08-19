@@ -45,10 +45,6 @@ AND (
 )
 AND a.jenis = '$jenis'
 ";
-// die($s);
-// echo '<pre>';
-// var_dump($s);
-// echo '</pre>';
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $jumlah_pasien = mysqli_num_rows($q);
 

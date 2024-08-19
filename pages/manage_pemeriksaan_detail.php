@@ -1,5 +1,6 @@
 <?php
 $id_detail = $_GET['id_detail'] ?? '';
+$mode = $_GET['mode'] ?? '';
 if ($id_detail) {
   if (!$id_detail) die(kosong('id_detail'));
   $s = "SELECT b.nama,b.id 
@@ -12,7 +13,7 @@ if ($id_detail) {
   $nama_pemeriksaan = $d['nama'];
 
   $img_up = img_icon('up');
-  $link_up = "<a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan' >$img_up</a>";
+  $link_up = "<a href='?manage_pemeriksaan_detail&id_pemeriksaan=$id_pemeriksaan&mode=$mode' >$img_up</a>";
 } else {
   $link_up = '';
   $id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die(erid('id_pemeriksaan'));
@@ -26,7 +27,6 @@ if ($id_detail) {
   }
 }
 
-$mode = $_GET['mode'] ?? '';
 $DPem = !$mode ? 'Manage Detail Pemeriksaan' : '<div class="f30 blue">Batasan Hasil Pemeriksaan</div>';
 
 set_h2('Detail Pemeriksaan', "
@@ -60,10 +60,6 @@ only(
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_tambah_detail'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-
   $s = "INSERT INTO tb_pemeriksaan_detail (
     id_pemeriksaan,
     blok,

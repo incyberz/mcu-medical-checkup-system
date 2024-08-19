@@ -4,16 +4,19 @@
 # ============================================================
 $kelainan = [];
 $ARR_JENIS = [
+  2 => 'DK',
   3 => 'HEM',
   20 => 'URI',
   9 => 'RON',
 ];
 $arr_lab = [
   20 => 'URINE',
+  2 => 'DK',
   3 => 'HEMA',
   9 => 'RONTGEN'
 ];
 $hasil_lab = [];
+
 
 $li = '';
 foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
@@ -35,6 +38,7 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
     while ($d = mysqli_fetch_assoc($q)) {
       $id_detail = $d['id_detail'];
       if ($id_detail == 106) continue; // laju endap darah
+      if (!isset($arr_id_detail[$id_detail]) || $arr_id_detail[$id_detail] === null) continue;
       $option_default = $d['option_default'];
       $hasil = $arr_id_detail[$id_detail] ?? 0;
 
@@ -47,7 +51,14 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
         } else {
           if ($option_default != $hasil) {
             // echo "<br> $d[nama_pemeriksaan] $d[label] $hasil $d[option_default]";
-            $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil</span></li>";
+            $sub_li .= "
+              <li>
+                <span class=column>$d[label]:</span>
+                <a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$ARR_JENIS[$id_pemeriksaan]&id_pemeriksaan=$id_pemeriksaan'>
+                  <span class='consolas red'>$hasil</span>
+                </a>
+              </li>
+            ";
           }
         }
       } else { // by range

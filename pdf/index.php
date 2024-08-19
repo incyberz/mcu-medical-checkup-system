@@ -18,10 +18,62 @@ $ln0 = 0;
 # ============================================================
 # DEBUG 
 # ============================================================
-$get_id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', 'Page ini tidak bisa diakses secara langsung. <hr>Silahkan hubungi developer!'));
-$where_id_pasien = "id_pasien = $get_id_pasien";
-// $where_id_pasien = "id_pasien <= 37";
-$nama_file = 'hasil-mcu1-mcu37-pt-yasunli.pdf';
+$get_id_pasien = $_GET['id_pasien'] ?? '';
+$get_id_perusahaan = $_GET['id_perusahaan'] ?? '';
+$get_tanggal_periksa = $_GET['tanggal_periksa'] ?? '';
+$get_tanggal_periksa_akhir = $_GET['tanggal_periksa_akhir'] ?? '';
+
+if (!$get_id_pasien and !$get_id_perusahaan) {
+  die(div_alert('danger', 'Page ini tidak bisa diakses secara langsung. <hr>Silahkan hubungi developer!'));
+}
+
+if ($get_id_pasien) {
+  $s = "SELECT nama FROM tb_pasien WHERE id=$get_id_pasien";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data pasien tidak ditemukan'));
+  $d = mysqli_fetch_assoc($q);
+  $nama = strtolower(str_replace('-', '_', str_replace(' ', '_', $d['nama'])));
+  $where_id_pasien = "id_pasien = $get_id_pasien";
+  $nama_file = "hasil-mcu$get_id_pasien-$nama.pdf";
+  $sql_tanggal_periksa = '1';
+} elseif ($get_id_perusahaan) {
+  if ($get_id_perusahaan == 1 || $get_id_perusahaan == 28) { // yasunli or PT GI
+    $s = "SELECT a.id as id_pasien,
+    c.nama as nama_perusahaan 
+    FROM tb_pasien a 
+    JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id 
+    JOIN tb_perusahaan c ON b.id_perusahaan=c.id 
+    WHERE b.id_perusahaan=$get_id_perusahaan";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data List-Pasien-Corporate tidak ditemukan'));
+
+    $where_id_pasien = '';
+    $nama_perusahaan = '';
+    while ($d = mysqli_fetch_assoc($q)) {
+      $id_pasien = $d['id_pasien'];
+      $nama_perusahaan = $d['nama_perusahaan'];
+      $where_id_pasien .= $where_id_pasien ? " OR a.id=$id_pasien" : "a.id=$id_pasien";
+    }
+    $where_id_pasien = "( $where_id_pasien )";
+    $nama_perusahaan = strtolower(str_replace('-', '_', $nama_perusahaan));
+    $nama_perusahaan = strtolower(str_replace(' ', '_', $nama_perusahaan));
+    $nama_perusahaan = strtolower(str_replace('.', '_', $nama_perusahaan));
+    $nama_file = "rekap-mcu-$get_id_perusahaan-$get_tanggal_periksa-$nama_perusahaan.pdf";
+  } else {
+    echo div_alert('danger', 'Belum ada handler selain perusahaan yasunli || PT GI');
+  }
+
+  if (strtotime($get_tanggal_periksa)) {
+    if (strtotime($get_tanggal_periksa_akhir)) {
+      $tanggal_akhir = $get_tanggal_periksa_akhir;
+    } else {
+      $tanggal_akhir = "$get_tanggal_periksa 23:59:59";
+    }
+    $sql_tanggal_periksa = "b.awal_periksa >= '$get_tanggal_periksa' AND b.awal_periksa <= '$tanggal_akhir' ";
+  }
+}
+
+
 $dokter_radiologi = 'dr. Yuliawati H, Sp.Rad';
 
 # ===========================================
@@ -129,12 +181,16 @@ $arr_id_pemeriksaan_tanggal = [];
 $arr_pemeriksaan_tanggal = [];
 $arr_pemeriksaan_by = [];
 
+
+
 $s = "SELECT 
 * 
-FROM tb_hasil_pemeriksaan a 
-JOIN tb_pasien b ON a.id_pasien=b.id 
-WHERE $where_id_pasien
+FROM tb_pasien a 
+JOIN tb_hasil_pemeriksaan b ON b.id_pasien=a.id 
+WHERE $where_id_pasien 
+AND $sql_tanggal_periksa
 ";
+// echo $s;
 $q_pasien_pdf = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $pasien = [];
 if (mysqli_num_rows($q_pasien_pdf)) {

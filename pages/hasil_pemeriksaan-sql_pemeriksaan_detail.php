@@ -30,7 +30,7 @@ if ($JENIS == 'COR') {
     JOIN tb_paket_detail d ON d.id_paket=c.id 
     $joins
     ";
-  } elseif ($id_paket_custom) {
+  } elseif ($order_no) {
     $s = "SELECT 
     2 as status_bayar, -- status bayar 2 = corporate
     $fields
@@ -40,6 +40,8 @@ if ($JENIS == 'COR') {
     JOIN tb_paket_detail d ON d.id_paket=c.id 
     $joins
     ";
+  } else {
+    die(div_alert('danger', "JENIS [COR] tidak mempunyai [id_harga_perusahaan] ataupun [order_no]"));
   }
 } else { // pasien non COR
   $s = "SELECT 
@@ -55,19 +57,19 @@ $q_detail = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q_detail)) die('Belum ada data pemeriksaan untuk pasien ini');
 $jumlah_row = mysqli_num_rows($q_detail);
 while ($d_detail = mysqli_fetch_assoc($q_detail)) {
-  $id_pemeriksaan = $d_detail['id_pemeriksaan'];
-  $jenis_pemeriksaan = $d_detail['jenis_pemeriksaan'];
-  $nama_pemeriksaan = $d_detail['nama_pemeriksaan'];
+  // $id_pemeriksaan = $d_detail['id_pemeriksaan']; // untuk apa tujuan extract???
+  // $jenis_pemeriksaan = $d_detail['jenis_pemeriksaan']; // untuk apa tujuan extract???
+  // $nama_pemeriksaan = $d_detail['nama_pemeriksaan']; // untuk apa tujuan extract???
   // exit;
   if (strtolower($d_detail['jenis']) != 'mcu') {
     array_push($arr_id_pemeriksaan_penunjang, $d_detail['id_pemeriksaan']);
 
-    // jika sesuai yang diminta
+    // jika sesuai yang diminta | apap yg diminta ???
     if (strtolower($d_detail['jenis']) == $get_jenis) {
-      $is_mcu = 0;
-      break;
+      // $is_mcu = 0; // is_mcu sudah dihandle di page lain
+      // break;
     }
   } else {
-    $is_mcu = 1;
+    // $is_mcu = 1;
   }
 }

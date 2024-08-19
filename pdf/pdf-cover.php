@@ -14,7 +14,7 @@ if ($pasien['tanggal_lahir']) $ttl = hari_tanggal($pasien['tanggal_lahir'], 1, 0
 if ($pasien['tempat_lahir']) $ttl = "$pasien[tempat_lahir], $ttl";
 
 if (!$pasien['gender']) {
-  die('Gender pasien masih kosong');
+  die("Gender pasien masih kosong, nama [ $pasien[nama] ]");
 } else {
   $gender = ucwords($pasien['gender']);
 }

@@ -189,33 +189,20 @@ while ($pz = mysqli_fetch_assoc($q_pasienz)) {
   }
 
 
-  // echo "<hr>jumlah_pemeriksaan_selesai$jumlah_pemeriksaan_selesai == jumlah_pemeriksaan$jumlah_pemeriksaan == jumlah_pemeriksaan_with_gula$jumlah_pemeriksaan_with_gula";
-  echo "<hr>";
+  echo "<hr>jumlah_pemeriksaan_selesai$jumlah_pemeriksaan_selesai == jumlah_pemeriksaan$jumlah_pemeriksaan == jumlah_pemeriksaan_with_gula$jumlah_pemeriksaan_with_gula";
+  // echo "<hr>";
 
   # ============================================================
   # INFO SELESAI PEMERIKSAAN
   # ============================================================
   $info_selesai = '';
   if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan_with_gula and  $jumlah_pemeriksaan_with_gula) {
-    if ($status == 7 || $status == 8 || $status == 9 || $status == '') {
+    if ($status < 10 || $status == '') {
       //update status pasien menjadi 10 (pasien selesai)
       $s2 = "UPDATE tb_pasien SET status=10 WHERE id='$id_pasien'";
       echolog($s2);
       $q_pemeriksaan = mysqli_query($cn, $s2) or die(mysqli_error($cn));
       // jsurl();
     }
-    $info_selesai =  "
-      <div class='alert alert-success mt2'>
-        Pasien telah menjalani semua pemeriksaan $img_check
-  
-        <div class=mt2>
-          <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Kesimpulan MCU Fisik</a>
-        </div>
-        <div class='wadah mt2'>
-          <div class='mb2 mt1 abu'>Pemeriksaan Penunjang</div>
-          $link_hasil_penunjang 
-        </div>
-      </div>
-    ";
   }
 }

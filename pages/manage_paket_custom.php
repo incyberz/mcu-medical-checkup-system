@@ -491,10 +491,10 @@ if (mysqli_num_rows($q)) {
             <div class='wadah gradasi-kuning'>
               <h4 class='darkabu mb2'>Cetak Sticker Medis</h4>
               <form method=post target=_blank action='?cetak_sticker'>
-                <input type=hiddena name=id_paket_custom class='form-control mb2' value='$id_paket_custom' readonly>
-                <input type=hiddena name=id_pasien class='form-control mb2' value='$id_pasien' readonly>
-                <input type=hiddena name=nama_paket class='form-control mb2' value='$nama_paket' readonly>
-                <input type=hiddena name=id_pasien_corporate_mandiri class='form-control mb2' value='$id_pasien_corporate_mandiri' readonly>
+                <input type=hidden name=id_paket_custom class='form-control mb2' value='$id_paket_custom' readonly>
+                <input type=hidden name=id_pasien class='form-control mb2' value='$id_pasien' readonly>
+                <input type=hidden name=nama_paket class='form-control mb2' value='$nama_paket' readonly>
+                <input type=hidden name=id_pasien_corporate_mandiri class='form-control mb2' value='$id_pasien_corporate_mandiri' readonly>
                 <button class='btn btn-primary' name=btn_cetak_kwitansi>CETAK STICKER</button>
               </form>
             </div>

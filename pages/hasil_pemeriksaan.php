@@ -54,6 +54,35 @@ $verified_lab = strpos("salt||$approv_labs", "||$id_pemeriksaan=") ? 1 : 0;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ============================================================
 # PROCESSORS 
 # ============================================================
@@ -75,6 +104,21 @@ if (isset($_POST['btn_approve_lab'])) {
   echo div_alert('success', 'Update hasil lab sukses.');
   jsurl("?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$get_jenis&id_pemeriksaan=$id_pemeriksaan", 1000);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ============================================================
 # INCLUDES
@@ -149,8 +193,29 @@ if (!mysqli_num_rows($q)) {
 # ============================================================
 $arr_id_pemeriksaan_penunjang = [];
 $is_mcu = 0;
-$s = 'SELECT string (will be replaced)';
+// $s = 'SELECT string (will be replaced)';
 include 'hasil_pemeriksaan-sql_pemeriksaan_detail.php';
+
+
+$arr_id_pemeriksaan_mcu = [];
+$s = "SELECT id FROM tb_pemeriksaan WHERE jenis='mcu'";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+while ($d = mysqli_fetch_assoc($q)) {
+  if ($id_pemeriksaan == $d['id']) {
+    $is_mcu = 1;
+    $nama_pemeriksaan = "Medical Checkup";
+    $jenis_pemeriksaan = "MCU";
+    break;
+  }
+}
+if (!$is_mcu) {
+  $s = "SELECT a.*,b.nama as jenis_pemeriksaan FROM tb_pemeriksaan a JOIN tb_jenis_pemeriksaan b ON a.jenis=b.jenis WHERE a.id=$id_pemeriksaan";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data [pemeriksaan] tidak ditemukan'));
+  $pemeriksaan = mysqli_fetch_assoc($q);
+  $nama_pemeriksaan = $pemeriksaan['nama'];
+  $jenis_pemeriksaan = $pemeriksaan['jenis_pemeriksaan'];
+}
 
 
 # ============================================================

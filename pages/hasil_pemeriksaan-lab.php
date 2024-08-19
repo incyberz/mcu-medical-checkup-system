@@ -36,6 +36,9 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
   if (strtolower($d2['label']) == 'separator') continue;
   $id_detail = $d2['id'];
   if ($id_detail == 106) continue; // laju endap darah
+  if (!isset($arr_id_detail[$id_detail])) {
+    if ($get_jenis == 'kmd') continue;
+  }
   $id_pemeriksaan = $d2['id_pemeriksaan'];
   $hasil = $arr_id_detail[$id_detail] ?? 0;
 
@@ -47,7 +50,12 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
   $hl = '-';
   if ($normal_value) {
     $hl = $hasil == $normal_value ? '-' : '<b class=red>abnormal</b>';
-    $nilai_normal = $normal_value;
+    $nilai_normal = "<span class='black'>$normal_value</span>";
+    $nilai_normal = "
+        <a href='?manage_pemeriksaan_detail&id_detail=$id_detail&mode=batasan' target=_blank>
+          $nilai_normal
+        </a>
+      ";
   } else { // tidak ada normal value || based on batasan
     if ($lo and $hi and $lo < $hi) {
       if ($d2['normal_lo_p'] and $d2['normal_hi_p']) {
@@ -64,13 +72,15 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
       }
       if ($hasil < $lo) $hl = "<span class='red bold'>L</span>";
       if ($hasil > $hi) $hl = "<span class='red bold'>H</span>";
+
+      $nilai_normal = "
+        <a href='?manage_pemeriksaan_detail&id_detail=$id_detail&mode=batasan' target=_blank>
+          <span class='black'>$nilai_normal</span>
+        </a>
+      ";
     } else {
-      $link_edit = "<a href='?manage_pemeriksaan_detail&id_detail=$id_detail&mode=batasan' target=_blank>Manage</a>";
-      $nilai_normal = '<span class="red bold">invalid</span> ';
+      $nilai_normal = "<span class='red bold miring'>null</span> <a href='?manage_pemeriksaan_detail&id_detail=$id_detail&mode=batasan' target=_blank>Manage Rule <span style='display:inline-block; margin:10px'>$img_next</span></a>";
       $hl = '<span class="red bold">???</span>';
-      if (!$lo) $nilai_normal .= "<br><i class='red f10'>[Normal value] null atau [Nilai minimum] batas normal masih kosong</i> | $link_edit";
-      if (!$hi) $nilai_normal .= "<br><i class='red f10'>[Normal value] null atau [Nilai maximum] batas normal masih kosong</i> | $link_edit";
-      if ($lo < $hi) $nilai_normal .= "<br><i class='red f10'>Nilai minimum > nilai maksimum</i> | $link_edit";
     }
   }
 
@@ -98,7 +108,21 @@ while ($d2 = mysqli_fetch_assoc($q2)) {
   }
 }
 
-if ($get_jenis == 'uri') {
+# ============================================================
+# STRUKTUR KONTEN
+# ============================================================
+if ($get_jenis == 'wid') { // widal
+  $blok_detail = "
+    <h5 class='kiri f14 mt2 mb2 bold' style='letter-spacing: 2px; color: #4cc'>Widal Test</h5>
+    <div 
+      class='f12 left border-bottom pb2' 
+      style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
+    >
+      $detail_header
+      $detail
+    </div>
+  ";
+} elseif ($get_jenis == 'uri') {
   $blok_detail = "
     <h5 class='kiri f14 mt2 mb2 bold' style='letter-spacing: 2px; color: #4cc'>Makroskopik</h5>
     <div 
@@ -117,7 +141,7 @@ if ($get_jenis == 'uri') {
       $detail2
     </div>
   ";
-} elseif ($get_jenis == 'hem' || $get_jenis == 'gin') {
+} elseif ($get_jenis == 'hem' || $get_jenis == 'gin' || $get_jenis == 'kmd') {
   $blok_detail = "
     <div 
       class='f12 left border-bottom pb2' 
@@ -142,18 +166,32 @@ if ($get_jenis == 'uri') {
   die(div_alert('danger', "get_jenis [$get_jenis] belum terdefinisi."));
 }
 
+
+# ============================================================
+# BLOK CATATAN
+# ============================================================
+$blok_catatan = '';
+if ($get_jenis == 'hem' || $get_jenis == 'gin' || $get_jenis == 'uri') {
+  $blok_catatan = "
+    <div class='f12 left mt2 border-bottom pb2'>
+      <div>Catatan:</div>
+      <div>Hasil Ini harus di interpretasikan oleh dokter yang menangani untuk disesuaikan dengan klinisnya.</div>
+      <style>#tb_note td{padding-right:10px}</style>
+      <table class=mt2 id=tb_note>
+        <tr><td>Note:</td><td>- H</td><td> : High</td></tr>
+        <tr><td>&nbsp;</td><td>- L</td><td> : Low</td></tr>
+      </table>
+    </div>
+  ";
+}
+
+$title = "<h4 class='kiri biru f14 mt4 mb2 bold' style='letter-spacing: 2px; color: #4cc'>$jenis_pemeriksaan</h4>";
+
 echo "
-  <h4 class='kiri biru f14 mt4 mb2 bold' style='letter-spacing: 2px; color: #4cc'>$jenis_pemeriksaan</h4>
-
+  
+  $title
   $blok_detail
+  $blok_catatan
 
-  <div class='f12 left mt2 border-bottom pb2'>
-    <div>Catatan:</div>
-    <div>Hasil Ini harus di interpretasikan oleh dokter yang menangani untuk disesuaikan dengan klinisnya.</div>
-    <style>#tb_note td{padding-right:10px}</style>
-    <table class=mt2 id=tb_note>
-      <tr><td>Note:</td><td>- H</td><td> : High</td></tr>
-      <tr><td>&nbsp;</td><td>- L</td><td> : Low</td></tr>
-    </table>
-  </div>
+
 ";

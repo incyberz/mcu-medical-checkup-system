@@ -55,8 +55,16 @@ if (isset($_POST['btn_submit_data_pasien'])) {
       // echo '<pre>';
       // var_dump($_POST);
       // echo '</pre>';
-      $value = trim($_POST['catatan__KESAN']);
-      $value = $value ? $value : 'dalam batas normal';
+      $value = trim($_POST['catatan__by_system']);
+      if ($_POST['kesan__tambahan']) {
+        $kesan_tambahan = trim($_POST['kesan__tambahan']);
+        if (strpos($kesan_tambahan, 'normal')) {
+          die(div_alert('danger', "Mohon tidak ada kata-kata `normal` atau `abnormal` pada catatan tambahan karena telah dijadikan keyword dalam penentuan kesimpulan pemeriksaan. Anda dapat mengganti kata `abnormal` dengan kata `terdapat kelainan`"));
+        }
+        $value .= ", kesan_tambahan: $kesan_tambahan";
+      }
+
+      $value = $value ? $value : 'normal';
       $arr_id_detail[$id_detail] = $value;
       // exit;
     } else { // bukan rontgen

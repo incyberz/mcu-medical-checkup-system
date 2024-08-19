@@ -15,31 +15,108 @@ $pdf->SetFont(FF, '', FS);
 
 $widths = [15, 5, 170];
 
+$COR_STATUS = 'Jantung Tidak Membesar ( CTR < 50% )';
+$AORTA_STATUS = 'Normal';
+$PULMO_STATUS = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin. -- Sinus Kostoferenikus Kanan-Kiri Lancip. Tulang-Tulang Dan Soft Tissue Normal';
+$PULMO_STATUS = 'Normal'; // ambil cepat
+$PULMO_STATUS = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin.';
+$KESAN_STATUS = 'Dalam batas normal';
+
+# ============================================================
+# HASIL RONTGEN PROCESSOR
+# ============================================================
+$ID_DETAIL_RONTGEN = 134;
+$str_hasil = $arr_id_detail[$ID_DETAIL_RONTGEN];
+// $str_hasil = 'normal'; // ZZZ DEBUG
+
+$arr_default_rontgen['COR'] = 'Jantung Tidak Membesar ( CTR < 50% )';
+$arr_default_rontgen['AORTA'] = 'Normal';
+$arr_default_rontgen['PULMO'] = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin. -- Sinus Kostoferenikus Kanan-Kiri Lancip. Tulang-Tulang Dan Soft Tissue Normal';
+$arr_default_rontgen['PULMO'] = 'Normal'; // ambil cepat
+$arr_default_rontgen['PULMO'] = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin.';
+$arr_default_rontgen['KESAN'] = 'Dalam batas normal';
+
+$str = strtolower(trim($str_hasil));
+if ($str == 'dalam batas normal' || $str == 'normal') {
+  $red = 'green';
+} else {
+  $red = 'red';
+  $tmp = explode('kesan_tambahan: ', $str_hasil);
+  $kesan_tambahan = $tmp[1] ?? null;
+  $str_hasil2 = $tmp[0];
+
+  $arr = explode(', ', $str_hasil2);
+
+  $abnor['COR'] = '';
+  $abnor['AORTA'] = '';
+  $abnor['PULMO'] = [];
+  foreach ($arr as $key => $value) {
+    $awalan = strtolower(substr($value, 0, 5));
+    if ($awalan == 'jantu') {
+      $abnor['COR'] .= $value;
+    } elseif ($awalan == 'aorta') {
+      $abnor['AORTA'] .= $value;
+    } elseif ($awalan == 'pulmo') {
+      $tmp = explode(' > ', $value);
+      if ($tmp[1]) array_push($abnor['PULMO'], $tmp[1]);
+    }
+  }
+
+
+  $KESAN_STATUS = $kesan_tambahan ?? 'Terdapat Kelainan Paru';
+
+  $COR_STATUS = $abnor['COR'] ? $abnor['COR'] : $arr_default_rontgen['COR'];
+  $AORTA_STATUS = $abnor['AORTA'] ? $abnor['AORTA'] : $arr_default_rontgen['AORTA'];
+  $PULMO_STATUS = $abnor['PULMO'] ? $abnor['PULMO'] : $arr_default_rontgen['PULMO'];
+}
+
+
+
+# ============================================================
+# CREATE UI PDF
+# ============================================================
 $koloms = [
-  'COR' => [':', 'Jantung Tidak Membesar ( CTR < 50% )'],
-  'AORTA' => [':', 'Normal'],
-  'PULMO' => [':', 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin.'],
-  ' ' => [' ', 'Sinus Kostoferenikus Kanan-Kiri Lancip. Tulang-Tulang Dan Soft Tissue Normal'],
-  'KESAN' => [':', 'dalam batas normal'],
+  'COR' => $COR_STATUS,
+  'AORTA' => $AORTA_STATUS,
+  'PULMO' => $PULMO_STATUS,
+  'KESAN' => $KESAN_STATUS,
 ];
 $h = LH * 1.9;
 foreach ($koloms as $k => $v) {
-  if (strlen($k) >= 3) {
+  if (!is_array($v) >= 3) {
     $pdf->Cell($widths[0], $h, $k, 'T', $ln0, 'L');
-    $pdf->Cell($widths[1], $h, $v[0], 'T', $ln0, 'L');
-    if ($k == 'KESAN') {
-      $pdf->SetFont(FF, 'B', 10);
-      $pdf->SetTextColor(0, 200, 0);
+    $pdf->Cell($widths[1], $h, ':', 'T', $ln0, 'L');
+
+    if (strtolower(trim($v)) != strtolower(trim($arr_default_rontgen[$k]))) {
+      $pdf->SetTextColor(255, 0, 0); // red | abnormal
+      // echo " $v != $arr_default_rontgen[$k] ";
     }
-    $pdf->Cell($widths[2], $h, $v[1], 'T', $ln1, 'L');
+    $pdf->Cell($widths[2], $h, $v, 'T', $ln1, 'L');
+    $pdf->SetTextColor(0, 0, 0);
   } else {
-    $pdf->Cell($widths[0], LH, $k, '-', $ln0, 'L');
-    $pdf->Cell($widths[1], LH, $v[0], '-', $ln0, 'L');
-    $pdf->Cell($widths[2], LH, $v[1], '-', $ln1, 'L');
+    $i = 0;
+    foreach ($v as $k2 => $v2) {
+      $i++;
+      $titik_koma =  ' ';
+      $kolom =  ' ';
+      if ($i == 1) {
+        $titik_koma =  ':';
+        $kolom =  $k;
+        $pdf->Cell(0, 2, ' ', 'T', $ln1, 'L'); // border top + spacer
+      }
+      $pdf->Cell($widths[0], LH, $kolom, '-', $ln0, 'L');
+      $pdf->Cell($widths[1], LH, $titik_koma, '-', $ln0, 'L');
+      $pdf->SetTextColor(255, 0, 0); // bentuk array pasti abnormal
+      $pdf->Cell($widths[2], LH, " - $v2", '-', $ln1, 'L');
+      $pdf->SetTextColor(0, 0, 0); // reset color
+    }
     $pdf->Cell(0, 2, ' ', '-', $ln1, 'L'); // spacer
   }
 }
 
+// echo '<pre>';
+// var_dump($koloms);
+// echo '</pre>';
 $pdf->Cell(0, 9, ' ', '-', $ln1, 'L'); // spacer
 
 

@@ -1,3 +1,8 @@
+<style>
+  .black {
+    color: black;
+  }
+</style>
 <?php
 $mode = $_GET['mode'] ?? 'detail';
 $get_tanggal_periksa = $_GET['tanggal_periksa'] ?? '';
@@ -56,63 +61,7 @@ if (isset($_POST['btn_submit'])) {
 # ============================================================
 $id_perusahaan = $_GET['id_perusahaan'] ?? '';
 if (!$id_perusahaan) {
-  set_h2('Pilih Perusahaan');
-  $s = "SELECT 
-  a.id,
-  a.nama,
-  (
-    SELECT p.awal_periksa FROM tb_hasil_pemeriksaan p
-    JOIN tb_pasien q ON p.id_pasien = q.id 
-    JOIN tb_harga_perusahaan r ON q.id_harga_perusahaan=r.id 
-    WHERE r.id_perusahaan=a.id 
-    ORDER BY p.awal_periksa DESC LIMIT 1
-    ) last_active,
-  (
-    SELECT p.awal_periksa FROM tb_hasil_pemeriksaan p
-    JOIN tb_pasien q ON p.id_pasien = q.id 
-    JOIN tb_order r ON q.order_no=r.order_no  
-    WHERE r.id_perusahaan=a.id 
-    ORDER BY p.awal_periksa DESC LIMIT 1
-    ) last_active_corporate
-  FROM tb_perusahaan a 
-  ORDER BY last_active DESC, a.nama";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  $tr = '';
-  $i = 0;
-  while ($pasien = mysqli_fetch_assoc($q)) {
-    if ($pasien['last_active']) {
-      if (strtotime($pasien['last_active']) < strtotime('-1 years')) continue;
-      $last_active_show = hari_tanggal($pasien['last_active']) . ' | ' . eta2($pasien['last_active']);
-    }
-    if ($pasien['last_active_corporate']) {
-      if (strtotime($pasien['last_active_corporate']) < strtotime('-1 years')) continue;
-      $last_active_show = hari_tanggal($pasien['last_active_corporate']) . ' | ' . eta2($pasien['last_active_corporate']);
-    }
-    if (!$pasien['last_active'] && !$pasien['last_active_corporate']) continue;
-    $i++;
-
-    $tr .= "
-      <tr>
-        <td>$i</td>
-        <td>
-          <a href='?rekap_perusahaan&id_perusahaan=$pasien[id]&mode=$mode'>
-            $pasien[nama] $img_next
-          </a>  
-        </td>
-        <td>$last_active_show</td>
-      </tr>
-    ";
-  }
-  echo "
-    <table class='table th_toska'>
-      <thead>
-        <th>No</th>
-        <th>Perusahaan</th>
-        <th>Last Active $img_filter</th>
-      </thead>
-      $tr
-    </table>
-  ";
+  include 'rekap_perusahaan-pilih_perusahaan.php';
   exit;
 } else {
   $s = "SELECT * FROM tb_perusahaan WHERE id=$id_perusahaan";
@@ -128,12 +77,12 @@ if ($mode == 'monitoring_pasien') {
   exit;
 }
 
-$link_approv = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=approv'>Mode Approv Kesimpulan</a>";
-$link_preview = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan'>Preview untuk Perusahaan</a>";
+$link_approv = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=approv&tanggal_periksa=$get_tanggal_periksa'>Mode Approv Kesimpulan</a>";
+$link_preview = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&tanggal_periksa=$get_tanggal_periksa'>Preview untuk Perusahaan</a>";
 $link_hrd = "<div class='mt2'>
   <a class='btn btn-sm btn-success' href='?rekap_perusahaan&id_perusahaan=1&mode=kirim_link'>Kirim Link Pasien ke HRD</a>
 </div>
-<a class='hideit ZZZ' href='https://youtu.be/AkDSnkaBMFc' target=_blank >Lihat Tutorial </a>";
+<a class='' href='https://youtu.be/AAQdRTHI4PE' target=_blank >Lihat Tutorial Cara Verifikasi</a>";
 if ($mode == 'approv') {
   $link = $link_preview;
   $sub_h = 'Mode Approv Kesimpulan';
@@ -153,23 +102,28 @@ set_h2('Rekap Pemeriksaan', "
 # NAVIGASI TANGGAL
 # ============================================================
 $arr_mode_bayar_cor_man = [
-  1 => 'Yasunli'
+  1 => 'Yasunli',
+  28 => 'PT GI',
 ];
 
 $arr_tanggal_periksa = [];
 if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
-  $s = "SELECT date(a.awal_periksa) tanggal_periksa 
-  FROM tb_hasil_pemeriksaan a 
-  JOIN tb_pasien b ON a.id_pasien=b.id 
-  JOIN tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id 
-  WHERE c.id_perusahaan = $id_perusahaan
-  ";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  $tb_c = "tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id";
+} else {
+  $tb_c = "tb_order c ON b.order_no=c.order_no";
+}
 
-  while ($d = mysqli_fetch_assoc($q)) {
-    $tanggal_periksa = $d['tanggal_periksa'];
-    if (!in_array($tanggal_periksa, $arr_tanggal_periksa)) array_push($arr_tanggal_periksa, $tanggal_periksa);
-  }
+$s = "SELECT date(a.awal_periksa) tanggal_periksa 
+FROM tb_hasil_pemeriksaan a 
+JOIN tb_pasien b ON a.id_pasien=b.id 
+JOIN $tb_c 
+WHERE c.id_perusahaan = $id_perusahaan
+";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+
+while ($d = mysqli_fetch_assoc($q)) {
+  $tanggal_periksa = $d['tanggal_periksa'];
+  if (!in_array($tanggal_periksa, $arr_tanggal_periksa)) array_push($arr_tanggal_periksa, $tanggal_periksa);
 }
 
 $nav_tanggal = '';
@@ -224,8 +178,23 @@ if (count($arr_tanggal_periksa) > 1) {
 
 
 # ============================================================
-# MAIN SELECT
+# MAIN SELECT PASIEN
 # ============================================================
+if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
+  $tb_c = "tb_harga_perusahaan c ON a.id_harga_perusahaan=c.id";
+} else {
+  $tb_c = "tb_order c ON a.order_no=c.order_no";
+}
+
+$sql_tanggal_periksa = 1;
+if ($get_tanggal_periksa) {
+  $sql_tanggal_periksa = " (awal_periksa >= '$get_tanggal_periksa' 
+    AND awal_periksa < '$get_tanggal_periksa 23:59:59') 
+  ";
+}
+
+
+
 $s = "SELECT 
 a.*,
 a.id as id_pasien,
@@ -252,15 +221,16 @@ b.nama as jenis_pasien,
 
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
-JOIN tb_harga_perusahaan c ON a.id_harga_perusahaan=c.id 
+JOIN $tb_c 
 JOIN tb_hasil_pemeriksaan d ON d.id_pasien=a.id 
 WHERE (a.status = 10) -- SELESAI PEMERIKSAAN  
 AND c.id_perusahaan=$id_perusahaan 
-AND awal_periksa >= '$get_tanggal_periksa' 
-AND awal_periksa < '$get_tanggal_periksa 23:59:59' 
+AND $sql_tanggal_periksa
 
 ORDER BY a.nama 
 ";
+
+
 
 $qpasien = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $jumlah_rekap = mysqli_num_rows($qpasien);
@@ -293,6 +263,15 @@ if (mysqli_num_rows($qpasien)) {
       'HEMA' => 3,
       'RONTGEN' => 9
     ];
+
+    if ($id_perusahaan == 27) {
+      $id_labs = [
+        'URINE' => 20,
+        'HEMA' => 3,
+        'RONTGEN' => 9,
+        'KMD' => 2
+      ];
+    }
 
     $hasil_lab = [];
     foreach ($id_labs as $key => $id_pemeriksaan) {
@@ -362,54 +341,35 @@ if (mysqli_num_rows($qpasien)) {
     $imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
 
     $keluhan = $pasien['keluhan'] ?? 'tidak ada';
-    $kesimpulan = $hasil_at_db['hasil'] ? $arr_kesimpulan[$hasil_at_db['hasil']] : $belum_ada;
+
+    if ($hasil_at_db['hasil'] === '' || $hasil_at_db['hasil'] === null) {
+      $kesimpulan = $belum_ada;
+    } else {
+      $kesimpulan =  $arr_kesimpulan[$hasil_at_db['hasil']];
+    }
+
+    $kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? $belum_ada;
+    $kesimpulan_fisik = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$pasien[id_pasien]&jenis=mcu'><span class=black>$kesimpulan_fisik</span></a>";
 
     # ============================================================
     # KONSULTASI DAN REKOMENDASI
     # ============================================================
-    $konsultasi = $hasil_at_db['konsultasi'] ?? '-';
+    include 'rekap_perusahaan-konsultasi.php';
 
-    if ($hasil_at_db['rekomendasi']) {
-      $rekomendasi = $hasil_at_db['rekomendasi'];
-    } elseif (!$hasil_at_db['rekomendasi']) {
-      if ($hasil_at_db['hasil'] == 1 || $hasil_at_db['hasil'] == 2) {
-        $rekomendasi = 'Dapat bekerja sesuai bidangnya';
-      } else {
-        $rekomendasi = ($hasil_at_db['hasil'] === '0' || $hasil_at_db['hasil'] === 0) ? 'lakukan pemeriksaan kesehatan lanjutan' :
-          $hasil_at_db['rekomendasi'];
-      }
+
+    // sementara untuk SMK-TB
+    $td_kimia_darah = '';
+    if ($id_perusahaan == 27) {
+      $h = strpos(strtolower("salt$hasil_lab[KMD]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[KMD]";
+      $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=KMD&id_pemeriksaan=2'>$h</a>";
+      $td_kimia_darah = "<td><span class=hideit>KIMIA DARAH</span>$h</td>";
     }
-
-
-    $kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$pasien[id_pasien]&jenis=mcu'>$belum_ada</a>";
-
-    $arr_konsultasi = [];
-    if (strpos("salt$kesimpulan_fisik", 'obese') || strpos("salt$kesimpulan_fisik", 'underweight')) array_push($arr_konsultasi, 'dokter ahli gizi');
-    if (strpos("salt$kesimpulan_fisik", 'gigi')) array_push($arr_konsultasi, 'dokter gigi');
-    if ($hasil_lab['HEMA'] != 'normal' || $hasil_lab['URINE'] != 'normal') array_push($arr_konsultasi, 'dokter umum');
-    if (!strpos("salt$hasil_lab[RONTGEN]", 'normal')) array_push($arr_konsultasi, 'dokter paru');
-    if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
-
-
-    if (!$arr_konsultasi) {
-      $konsultasi = '-';
-    } elseif (count($arr_konsultasi) == 1) {
-      $konsultasi = 'konsultasi ke ' . $arr_konsultasi[0];
-    } elseif (count($arr_konsultasi) == 2) {
-      $konsultasi = 'konsultasi ke ' . $arr_konsultasi[0] . ' dan ' . $arr_konsultasi[1];
-    } else {
-      $konsultasi = 'konsultasi ke ' . implode(', ', $arr_konsultasi);
-    }
-
-
 
 
     # ============================================================
     # APPROVE KOMPONEN
     # ============================================================
     if ($mode == 'approv') {
-
-
       // auto checked kesimpulan
       $blok_radio = '';
       foreach ($arr_kesimpulan as $key => $value) {
@@ -436,7 +396,8 @@ if (mysqli_num_rows($qpasien)) {
 
       $hasil_hema = $hasil_lab['HEMA'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=HEM&id_pemeriksaan=$id_pemeriksaan_dl'>$hasil_lab[HEMA]</a>";
       $hasil_urine = $hasil_lab['URINE'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=URI&id_pemeriksaan=$id_pemeriksaan_ul'>$hasil_lab[URINE]</a>";
-      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON&id_pemeriksaan=$id_pemeriksaan_ron'>$hasil_lab[RONTGEN]</a>";
+      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[RONTGEN]";
+      $hasil_rontgen = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON&id_pemeriksaan=$id_pemeriksaan_ron'>$hasil_rontgen</a>";
 
 
 
@@ -448,8 +409,9 @@ if (mysqli_num_rows($qpasien)) {
           <td>$gender$is_haid_show</td>
           <td><span class=hideit>KELUHAN</span>$keluhan</td>
           <td id='kesFis'><span class=hideit>KESIMPULAN FISIK</span>$kesimpulan_fisik</td>
-          <td><span class=hideit>LAB-HEMA</span>$hasil_hema</td>
-          <td><span class=hideit>LAB-URINE</span>$hasil_urine</td>
+          $td_kimia_darah
+          <td><span class=hideit>DARAH LENGKAP</span>$hasil_hema</td>
+          <td><span class=hideit>URINE</span>$hasil_urine</td>
           <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
           <td class='$gradasi_merah'><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
           <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
@@ -481,7 +443,15 @@ if (mysqli_num_rows($qpasien)) {
 
       $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'>$hasil_lab[RONTGEN]</a>";
 
-      $tr .= "
+      // $td_kimia_darah = '';
+      // if ($id_perusahaan == 27) {
+      //   $td_kimia_darah = "<td><span class=hideit>KIMIA DARAH</span>$ kimia_darah</td>";
+      // }
+
+      # ============================================================
+      # FINAL TR PREVIEW UNTUK PERUSAHAAN
+      # ============================================================
+      $tr .= " 
         <tr>
           <td>$no_urut</td>
           <td>MCU-$pasien[id_pasien]</td>
@@ -500,8 +470,9 @@ if (mysqli_num_rows($qpasien)) {
           <td><span class=hideit>MATA KANAN</span>$arr_id_detail[14]/20</td>
           <td><span class=hideit>MATA KIRI</span>$arr_id_detail[142]/20</td>
           <td><span class=hideit>BUTA WARNA</span>$buta_show</td>
-          <td><span class=hideit>LAB-HEMA</span>$hasil_lab[HEMA]</td>
-          <td><span class=hideit>LAB-URINE</span>$hasil_lab[URINE]</td>
+          $td_kimia_darah
+          <td><span class=hideit>DARAH LENGKAP</span>$hasil_lab[HEMA]</td>
+          <td><span class=hideit>URINE</span>$hasil_lab[URINE]</td>
           <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
           <td><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
           <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
@@ -513,7 +484,7 @@ if (mysqli_num_rows($qpasien)) {
   if (isset($_POST['btn_submit'])) jsurl(); // refresh if POST Processing
 }
 
-$arr_head = [
+$arr_head = [ // header preview untuk perusahaan
   'NO',
   'NO. MCU',
   'NAMA',
@@ -531,13 +502,20 @@ $arr_head = [
   'MATA KANAN',
   'MATA KIRI',
   'BUTA WARNA',
-  'LAB-HEMA',
-  'LAB-URINE',
-  'RONTGEN THORAX',
-  'KESIMPULAN',
-  'KONSULTASI',
-  'REKOMENDASI',
 ];
+
+if ($id_perusahaan == 27) {
+  array_push($arr_head, 'KIMIA DARAH');
+}
+array_push($arr_head, 'DARAH LENGKAP');
+array_push($arr_head,   'URINE');
+array_push($arr_head,   'RONTGEN THORAX');
+
+array_push($arr_head,   'KESIMPULAN');
+array_push($arr_head,   'KONSULTASI');
+array_push($arr_head,   'REKOMENDASI');
+
+
 
 $th = '';
 foreach ($arr_head as $key => $value) {
@@ -571,6 +549,7 @@ foreach ($arr_head as $key => $value) {
 # FINAL ECHO REKAP
 # ============================================================
 $NAMA = strtoupper($perusahaan['nama']);
+$tanggal_periksa = date('Y-m-d', strtotime($awal_periksa));
 $tanggal = hari_tanggal($awal_periksa, 1, 0, 0);
 $h3 = "REKAPITULASI HASIL MEDICAL CHECKUP";
 if ($mode == 'approv') {
@@ -585,13 +564,32 @@ if ($mode == 'approv') {
     'GENDER',
     'KELUHAN',
     'KESIMPULAN FISIK',
-    'LAB-HEMA',
-    'LAB-URINE',
+    'DARAH LENGKAP',
+    'URINE',
     'RONTGEN',
     'KESIMPULAN',
     'KONSULTASI',
     'REKOMENDASI',
   ];
+
+  // sementara untuk SMK-TB
+  if ($id_perusahaan == 27) {
+    $arr_head = [
+      'NO',
+      'NO. MCU',
+      'NAMA',
+      'GENDER',
+      'KELUHAN',
+      'MCU FISIK',
+      'KIMIA DARAH',
+      'DARAH LENGKAP',
+      'URINE',
+      'RONTGEN',
+      'KESIMPULAN',
+      'KONSULTASI',
+      'REKOMENDASI',
+    ];
+  }
 
   $th = '';
   foreach ($arr_head as $key => $value) {
@@ -605,6 +603,7 @@ if ($mode == 'approv') {
 $form = '';
 $end_form = '';
 $btn_print = "<button class='btn btn-primary' onclick=window.print()>Print</button>";
+$btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF</a>";
 $btn_submit  = '';
 $sub_h = "<div class='tengah m2 abu f14'>Preview Rekap per Perusahaan</div>";
 if ($mode == 'approv') {
@@ -612,6 +611,7 @@ if ($mode == 'approv') {
   $form = '<form method=post>';
   $end_form = '</form>';
   $btn_print = '';
+  $btn_pdf = '';
   $btn_submit = "<button class='btn btn-primary w-100' type=submit name=btn_submit>Submit Kesimpulan</button>";
 }
 
@@ -664,6 +664,13 @@ echo "
     </div>
   </div>
   <div class='tengah m2'>
-    $btn_print
+    <div class='flex flex-center'>
+      <div class=ml4>
+        $btn_print
+      </div>
+      <div class=ml4>
+        $btn_pdf
+      </div>
+    </div>
   </div>
 ";

@@ -76,14 +76,13 @@ $hide_form_pemeriksaan = '';
 if ($tanggal_periksa) {
   include 'include/arr_user.php';
   $JENIS = strtoupper($pemeriksaan['jenis']);
-  $link_preview = $JENIS == 'MCU' ? '' : "<a class='btn btn-success' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$JENIS'>Preview</a>";
+  $link_preview = $JENIS == 'MCU' ? '' : "<a class='btn btn-success' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$JENIS&id_pemeriksaan=$id_pemeriksaan'>Preview</a>";
 
 
   $hari = hari_tanggal($tanggal_periksa);
   $info_tanggal_periksa = div_alert('info mt2', "Pemeriksaan ini telah diperiksa oleh <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>$link_prev $link_preview");
   $toggle_form_pemeriksaan = "<div class='tengah mb2'><span class='btn_aksi btn btn-secondary' id=form_pemeriksaan__toggle> <i class='bx bx-refresh f20'></i> Periksa Kembali</span></div>";
   $hide_form_pemeriksaan = 'hideit';
-  $hide_form_pemeriksaan = 'hideita'; // ZZZ DEBUg
 }
 
 
@@ -353,7 +352,7 @@ if (!$ambil_sampel) {
     // ALL RANGE CLICK
     // ============================================================
     $('.range').click(function() {
-      $('.range').change();
+      // $('.range').change();
     })
     $('.range').change(function() {
       let val = $(this).val();

@@ -74,13 +74,13 @@ if ($hasil_at_db['rekomendasi']) {
 }
 
 
-$kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$pasien[id_pasien]&jenis=mcu'>$belum_ada</a>";
+$kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>$belum_ada</a>";
 
 $arr_konsultasi = [];
 if (strpos("salt$kesimpulan_fisik", 'obese') || strpos("salt$kesimpulan_fisik", 'underweight')) array_push($arr_konsultasi, 'dokter ahli gizi');
 if (strpos("salt$kesimpulan_fisik", 'gigi')) array_push($arr_konsultasi, 'dokter gigi');
 if ($hasil_lab['HEMA'] != 'normal' || $hasil_lab['URINE'] != 'normal') array_push($arr_konsultasi, 'dokter umum');
-if ($hasil_lab['RONTGEN'] != 'normal') array_push($arr_konsultasi, "dokter paru [ $hasil_lab[RONTGEN] != 'normal' ] ");
+if ($hasil_lab['RONTGEN'] != 'normal') array_push($arr_konsultasi, 'dokter paru');
 if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
 
 

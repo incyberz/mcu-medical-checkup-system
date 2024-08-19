@@ -122,7 +122,7 @@ foreach ($arr_input as $key => $v) {
     include 'include/array_gigi_function2.php';
   } elseif ($v['blok'] == 'input') {
     $blok_sub_input = 'BLOK INPUT BELUM DITENTUKAN';
-    echo div_alert('danger', "Blok [input] belum ditentukan. | <a href='?manage_pemeriksaan_detail&id_detail=$id_detail'>Manage</a>");
+    echo div_alert('danger', "Blok [input] dari detail pemeriksaan belum ditentukan. | <a href='?manage_pemeriksaan_detail&id_detail=$id_detail'>Manage</a>");
     exit;
   } else {
     die(div_alert('danger', "Belum ada UI untuk v-blok: <b class=darkblue>$v[blok]</b>. Harap segera lapor developer!"));

@@ -5,10 +5,7 @@ $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', "Page ini membutuhkan
 $s = "SELECT order_no,jenis FROM tb_pasien WHERE id=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
-$id_pemeriksaan_glu_pu = 44; // glu_pu
-$id_pemeriksaan_glu_se = 46; // glu_se
-$id_pemeriksaan_dl = 3; // glu_se
-
+include 'include/arr_id_pemeriksaan.php';
 
 $order_no = '';
 if (!mysqli_num_rows($q)) {
@@ -174,6 +171,7 @@ $jenis_pemeriksaan = '';
 $no = 0;
 $jumlah_pemeriksaan_selesai = 0;
 $jumlah_sampel_selesai = 0;
+$is_mcu = 0;
 if (!mysqli_num_rows($q_pemeriksaan)) {
   $tr_progress = div_alert('danger', "
     Paket ini belum punya List Pemeriksaan | 
@@ -191,6 +189,7 @@ $ada_glu_se = 0;
 while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   $no++;
   $id_pemeriksaan = $pemeriksaan['id_pemeriksaan'];
+  if ($id_pemeriksaan == $id_pemeriksaan_mcu) $is_mcu = 1;
 
   # ============================================================
   # EXCEPTION PEMERIKSAAN GULA
@@ -220,9 +219,9 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
 
   if (strtolower($pemeriksaan['jenis']) != 'mcu') {
     $np_show = strtoupper($nama_pemeriksaan);
-    if ($np_show == 'URINE LENGKAP') $np_show = 'Hasil MCU Urine';
-    if ($np_show == 'DARAH LENGKAP') $np_show = 'Hasil MCU Darah';
-    if ($np_show == 'RONTGEN (DADA)') $np_show = 'Hasil Rontgen';
+    // if ($np_show == 'URINE LENGKAP') $np_show = 'Hasil MCU Urine';
+    // if ($np_show == 'DARAH LENGKAP') $np_show = 'Hasil MCU Darah';
+    // if ($np_show == 'RONTGEN (DADA)') $np_show = 'Hasil Rontgen';
 
     $link_hasil_penunjang .= " 
       <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$pemeriksaan[jenis]&id_pemeriksaan=$id_pemeriksaan'>
@@ -330,14 +329,31 @@ if ($jumlah_pemeriksaan_selesai == $jumlah_pemeriksaan_with_gula and $jumlah_sam
     $q_pemeriksaan = mysqli_query($cn, $s2) or die(mysqli_error($cn));
     jsurl();
   }
+
+  // $link_hasil_mcu = !$is_mcu ? '' : "
+  //   <div class=mt2>
+  //     <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Kesimpulan MCU Fisik</a>
+  //   </div>  
+  // ";
+
+  # ============================================================
+  # DILANGSUNGKAN KE PDF
+  # ============================================================
+  if ($is_mcu) {
+    $link_hasil_mcu = "
+      <div class=mt2>
+        <a target=_blank class='btn btn-primary' href='pdf/?id_pasien=$id_pasien'>PDF Hasil Medical Checkup</a>
+      </div>  
+    ";
+  } else {
+    $link_hasil_mcu = "<div class='wadah mt2'>$link_hasil_penunjang</div>";
+  }
   $info_selesai =  "
     <div class='alert alert-success mt2'>
       Pasien telah menjalani semua pemeriksaan $img_check
 
-      <div class=mt2>
-        <a class='btn btn-primary' href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>Kesimpulan MCU Fisik</a>
-      </div>
-      <div class='wadah mt2'>
+      $link_hasil_mcu
+      <div class='wadah mt2 hideit'>
         <div class='mb2 mt1 abu'>Pemeriksaan Penunjang</div>
         $link_hasil_penunjang 
       </div>

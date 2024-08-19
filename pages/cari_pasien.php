@@ -14,10 +14,6 @@ only(['admin', 'nakes', 'marketing', 'dokter', 'dokter-pj']);
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_add_paket'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-
   echo div_alert('success', "Delete Paket sukses.");
   jsurl('', 3000);
 }

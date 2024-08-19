@@ -25,7 +25,7 @@ $arr = [
   'AORTA' => [
     'label' => 'Aorta',
     'NORMAL' => 'Normal',
-    'ABNOR' => 'Meningkat',
+    'ABNOR' => 'Elongasi Aorta',
   ],
 
   'PULMO_LESI' => [
@@ -67,13 +67,19 @@ $arr = [
   'PULMO_TST' => [
     'label' => 'Tulang-tulang dan Soft Tisue',
     'NORMAL' => 'Normal',
-    'ABNOR' => 'Abnormal',
+    'ABNOR' => 'Ada Kelainan',
   ],
 
   'KESAN' => [
-    'label' => 'Kesan / Kesimpulan',
+    'label' => 'Kesimpulan (By System)',
     'NORMAL' => 'Dalam Batas Normal',
-    'ABNOR' => 'Abnormal',
+    'ABNOR' => 'FX',
+  ],
+
+  'KESAN_TAMBAHAN' => [
+    'label' => 'Kesan Tambahan (dari Dokter Radiologi)',
+    'NORMAL' => 'FX',
+    'ABNOR' => 'FX',
   ],
 
 ];
@@ -82,6 +88,35 @@ $zzz = '';
 
 foreach ($arr as $key => $value) {
   $label =  $value['label'];
+
+  # ============================================================
+  # EXCEPTION FOR KESAN_TAMBAHAN
+  # ============================================================
+  if ($key == 'KESAN_TAMBAHAN') {
+
+    $zzz .= "
+      <div class='wadah gradasi-toska mb4'>
+        <div class='f18 darkblue'>$label</div>
+        <div class='' id=blok_catatan_tambahan>
+          <textarea class='form-control mb4 catatan mt2' rows=5 name=kesan__tambahan id=kesan__tambahan></textarea>
+        </div>
+        <div class='f10 bg-red hideit mt2'>id/name: kesan__tambahan</div>
+      </div>
+    ";
+    continue;
+  } elseif ($key == 'KESAN') { // kesan by system
+    $zzz .= "
+      <div class='wadah gradasi-toska mb4'>
+        <div class='f18 darkblue'>$label</div>
+        <div class='' id=blok_catatan_tambahan>
+          <textarea class='form-control mb4 catatan mt2' rows=5 name=catatan__by_system id=catatan__by_system readonly style='background:#eee; color:red'></textarea>
+        </div>
+        <div class='f10 bg-red hideit mt2'>id/name: catatan__by_system</div>
+      </div>
+    ";
+    continue;
+  }
+
   $NORMAL =  $value['NORMAL'] ?? $value['KA'];
   $ABNOR =  $value['ABNOR'] ?? $value['KI'];
   if (substr($key, 0, 5) == 'PULMO') $label = "Pulmonary > $label";
@@ -148,7 +183,7 @@ foreach ($arr as $key => $value) {
       <div class='kelainan red bold hideita' id=kelainan_ka__$key></div>
       <div class='kelainan red bold hideita' id=kelainan_ki__$key></div>
     ";
-  } else { // no array
+  } else { // nilai normal bukan array
     $div_kelainan_kika = $key == 'KESAN' ? '' : "<div class='kelainan red bold hideita' id=kelainan__$key></div>";
     $option_values = $key . "__ABNOR,$key" . "__NORMAL";
     $option_labels = $key . "__ABNOR,$key" . "__NORMAL";
@@ -171,7 +206,7 @@ foreach ($arr as $key => $value) {
       false,
       false
     );
-  }
+  } // nilai normal bukan array
 
   $toggle_id = "blok_catatan$key" . '__toggle';
   $Catatan_hide = $key == 'KESAN' ? 'hideit' : '';
@@ -209,7 +244,7 @@ $form_pemeriksaan = "
     </div>
     <button class='btn btn-primary w-100' name=btn_submit_data_pasien value='$id_pasien'>Submit Data</button>
     <input type=hidden name=last_pemeriksaan value='$nama_pemeriksaan by $nama_user'>
-    <input type=hiddena name=id_pemeriksaan value='$id_pemeriksaan'>
+    <input type=hidden name=id_pemeriksaan value='$id_pemeriksaan'>
   </form>
 ";
 
@@ -239,22 +274,22 @@ $form_pemeriksaan = "
     if (r.length) {
       console.log('berisi');
       $('#blok_catatanKESAN').slideDown();
-      $('#catatan__KESAN').prop('required', true);
-      $('#catatan__KESAN').val(r.join(', '));
+      $('#catatan__by_system').prop('required', true);
+      $('#catatan__by_system').val(r.join(', '));
       $('#blok_option_radio__KESAN').slideUp();
       $('#KESAN__kesan__abnor').prop('checked', true);
     } else {
       $('#KESAN__kesan__normal').prop('checked', true);
       $('#blok_option_radio__KESAN').slideDown();
       $('#blok_catatanKESAN').slideUp();
-      $('#catatan__KESAN').val('');
-      $('#catatan__KESAN').prop('false', true);
+      $('#catatan__by_system').val('');
+      $('#catatan__by_system').prop('false', true);
     }
   }
 
   $(function() {
     $(".catatan").focusout(function() {
-      set_kelainan()
+      // set_kelainan();
     });
     $(".opsi_rontgen").click(function() {
       let tid = $(this).prop('id');

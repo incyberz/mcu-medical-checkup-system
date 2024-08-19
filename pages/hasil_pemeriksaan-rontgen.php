@@ -7,17 +7,22 @@ if ($str_hasil) {
   $hasil['COR'] = 'Jantung Tidak Membesar ( CTR < 50% )';
   $hasil['AORTA'] = 'Normal';
   $hasil['PULMO'] = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin. Sinus Kostoferenikus Kanan-Kiri Lancip. Tulang-Tulang Dan Soft Tissue Normal';
-  $hasil['KESAN'] = "<span class='bold green proper'>dalam batas normal</span>";
+  $hasil['KESAN'] = "<span class='bold green proper'>Dalam batas normal</span>";
 
   if ($str_hasil == 'dalam batas normal' || $str_hasil == 'normal') {
     $red = 'green';
   } else {
     $red = 'red';
-    // $str_hasil = str_replace(', ', '<br>', $str_hasil);
-    $arr = explode(', ', $str_hasil);
+    $tmp = explode('kesan_tambahan: ', $str_hasil);
+    $kesan_tambahan = $tmp[1] ?? null;
+    $str_hasil2 = $tmp[0];
+
+    $arr = explode(', ', $str_hasil2);
+
     $abnor['COR'] = '';
     $abnor['AORTA'] = '';
     $abnor['PULMO'] = '';
+    $abnor['KESAN'] = '';
     foreach ($arr as $key => $value) {
       $awalan = strtolower(substr($value, 0, 5));
       if ($awalan == 'jantu') {
@@ -29,7 +34,9 @@ if ($str_hasil) {
       }
     }
 
-    $hasil['KESAN'] = "<span class='red'>Abnormal<span>";
+    $hasil['KESAN'] = $kesan_tambahan ?? 'Terdapat Kelainan Paru';
+    $hasil['KESAN'] = "<span class=red>$hasil[KESAN]</span>"; // add style red
+
     $hasil['COR'] = $abnor['COR'] ? $abnor['COR'] : $hasil['COR'];
     $hasil['AORTA'] = $abnor['AORTA'] ? $abnor['AORTA'] : $hasil['AORTA'];
     $hasil['PULMO'] = $abnor['PULMO'] ? "<ul class='m0 pl2'>$abnor[PULMO]</ul>" : $hasil['PULMO'];

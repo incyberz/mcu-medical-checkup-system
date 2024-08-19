@@ -83,6 +83,7 @@ $nav = div_alert('info', "
   <a href='?rekap_pemeriksaan'>Rekap Hasil Pemeriksaan</a>
   <a href='?monitoring_pasien'>Monitoring Pasien Corporate</a>
 ");
+$total_sisa = 0;
 $jumlah_lobby = 0;
 $jumlah_lobby_filtered = 0;
 if (mysqli_num_rows($q)) {

@@ -31,10 +31,7 @@ function simbol_gigi($kode)
   ];
   if (!array_key_exists($kode, $arr)) {
     return '';
-    echo '<pre>';
-    var_dump($kode);
-    echo '</pre>';
-    die("<span class=red>Kode gigi: $kode tidak ada dalam arr_penanda_gigi</span>");
+    // die("<span class=red>Kode gigi: $kode tidak ada dalam arr_penanda_gigi</span>");
   }
   return $arr[$kode];
 }
