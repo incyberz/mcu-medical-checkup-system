@@ -15,6 +15,7 @@ for ($i = 0; $i < 32; $i++) {
   }
 }
 
+$kode_gigi_rusak = [2, 3, 4, 5, 6, 7, 8];
 $arr = ['atas', 'bawah'];
 $i = 0;
 $j = 1;
@@ -44,11 +45,12 @@ foreach ($arr as $posisi) {
     # ============================================================
     # PROCESSING KESIMPULAN GIGI
     # ============================================================
-    if ($value != 1) {
+    if (in_array($value, $kode_gigi_rusak)) {
       $nogi .= "
         <li><span class=column>Gigi  $NN-$pos:</span> <span class=hasil>" . arti_simbol_gigi($value) . "</span></li>
       ";
     }
+
 
     if ($i > 24) {
       $pos++;
@@ -83,5 +85,6 @@ $str_hasil = "
     </div>
   </div>
 ";
+
 
 // blok_hasil('PEMERIKSAAN GIGI', $str_hasil);

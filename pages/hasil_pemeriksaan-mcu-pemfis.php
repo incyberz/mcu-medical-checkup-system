@@ -45,11 +45,6 @@ foreach ($arr_id_detail_show as $key => $id_detail) {
     if ($ket != 'Normal') {
       $kesimpulan['Tekanan Darah'] = $ket;
     }
-
-    // echo '<pre>';
-    // var_dump($ket);
-    // echo '</pre>';
-    // exit;
   } elseif ($key == 'IMT') {
     $berat_badan = $arr_id_detail[1];
     $tinggi_badan = $arr_id_detail[2];

@@ -114,9 +114,6 @@ foreach ($koloms as $k => $v) {
   }
 }
 
-// echo '<pre>';
-// var_dump($koloms);
-// echo '</pre>';
 $pdf->Cell(0, 9, ' ', '-', $ln1, 'L'); // spacer
 
 

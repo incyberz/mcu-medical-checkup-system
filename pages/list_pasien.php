@@ -57,9 +57,6 @@ include 'include/arr_status_pasien.php';
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_add_pasien'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
 
   $order_no = $_POST['btn_add_pasien'];
 

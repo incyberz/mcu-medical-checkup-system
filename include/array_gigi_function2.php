@@ -7,10 +7,14 @@ $tmp = explode(',', $arr_id_detail[94] ?? $array_gigi_default);
 
 $rg = [];
 for ($i = 0; $i < 32; $i++) {
+
+  $kode = intval($tmp[$i]);
+  $kode = $kode ? $kode : 1; // fixed must integer
+
   if ($i < 16) {
-    $rg['atas'][$i] = $tmp[$i];
+    $rg['atas'][$i] = intval($tmp[$i]); // pastikan kode berupa integer
   } else {
-    $rg['bawah'][$i] = $tmp[$i];
+    $rg['bawah'][$i] = intval($tmp[$i]); // pastikan kode berupa integer
   }
 }
 
@@ -22,6 +26,7 @@ foreach ($arr_posisi as $posisi) {
   $nn[$posisi] = '';
   $pos = 8;
   $increment = -1;
+
   foreach ($rg[$posisi] as $key => $value) {
     $i++;
     $NN = 1;

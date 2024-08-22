@@ -5,10 +5,6 @@
 # PROCESSORS
 # ============================================================
 if (isset($_POST['btn_update_biodata'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-  // exit;
   $id_pasien = $_POST['btn_update_biodata'];
   $nikepeg_or_null = strlen($_POST['nikepeg']) > 2 ? "'$_POST[nikepeg]'" : 'NULL';
   $s = "UPDATE tb_pasien SET

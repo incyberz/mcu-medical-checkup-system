@@ -7,9 +7,6 @@ $apply_dari = $_POST['apply_dari'] ?? 'belum_terjadwal';
 $jumlah_pos = $_POST['jumlah_pos'] ?? '1';
 
 if (isset($_POST['btn_apply'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
 
   // validasi bentrok jadwal
   $awal = "$_POST[tanggal_jadwal] $_POST[jam_awal]";
@@ -38,9 +35,6 @@ if (isset($_POST['btn_apply'])) {
     WHERE a.order_no = '$_POST[btn_apply]' 
     AND $jadwal_is_null
     ";
-    // echo '<pre>';
-    // var_dump($s);
-    // echo '</pre>';
 
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     $jumlah_alokasi = $_POST['jumlah_alokasi'];

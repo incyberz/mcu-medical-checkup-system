@@ -39,10 +39,13 @@ if ($hasil_lab['HEMA'] != 'normal' || $hasil_lab['URINE'] != 'normal') array_pus
 # ============================================================
 # konsultasi paru atau jantung
 # ============================================================
-if (strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'cardiomega')) {
+$hasil_lab['RONTGEN'] = strip_tags(strtolower($hasil_lab['RONTGEN']));
+if (strpos("salt$hasil_lab[RONTGEN]", 'cardiomega') || strpos("salt$hasil_lab[RONTGEN]", 'elongasi')) {
   array_push($arr_konsultasi, 'dokter jantung');
 } else {
-  if (!strpos("salt$hasil_lab[RONTGEN]", 'normal')) array_push($arr_konsultasi, 'dokter paru');
+  if (!strpos("salt$hasil_lab[RONTGEN]", 'normal')) {
+    array_push($arr_konsultasi, 'dokter paru');
+  }
 }
 
 # ============================================================

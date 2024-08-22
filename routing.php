@@ -12,6 +12,7 @@ if (!$parameter and $role == 'pasien' and $parameter != 'pasien_home') jsurl('?p
 $arr = [
   '' => 'pages/home',
   'login' => 'pages/login/login',
+  'progres' => 'pages/progres/progres',
 ];
 
 if ($parameter) echo '<section><div class=container>';

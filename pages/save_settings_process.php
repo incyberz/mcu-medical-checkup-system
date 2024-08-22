@@ -2,9 +2,6 @@
 $pesan_save = '';
 if (isset($_POST['btn_save_settings'])) {
 
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
 
   echo "<section><div class=container>";
   $section = $_POST['btn_save_settings'];
@@ -39,9 +36,6 @@ if (isset($_POST['btn_save_settings'])) {
         // array value handler
         echo div_alert('info', "Manage array value: <span class='darkblue miring'>$key</span>");
         $arr2 = $value;
-        // echo '<pre>';
-        // var_dump($arr2);
-        // echo '</pre>';
 
         foreach ($arr2 as $key2 => $value2) {
           if (!$value2) continue; // jika sub-value null maka skip
@@ -52,10 +46,6 @@ if (isset($_POST['btn_save_settings'])) {
             $data_array[$key2] = "$value2~~~";
           }
         }
-
-        // echo '<pre>';
-        // var_dump($data_array);
-        // echo '</pre>';
       } else {
         // value normal || value non array
         $value = clean_sql($value);

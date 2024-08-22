@@ -9,9 +9,6 @@ only(['admin', 'marketing']);
 $id_paket = $_GET['id_paket'] ?? die(erid('id_paket'));
 
 if (isset($_POST['btn_upload'])) {
-  echo '<pre>';
-  var_dump($_POST);
-  echo '</pre>';
 
   include 'include/resize_img.php';
 

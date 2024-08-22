@@ -1,5 +1,10 @@
 <?php
 session_start();
+# ============================================================
+# SESSION HANDLER
+# ============================================================
+
+
 $id_klinik = 1;
 include "../conn.php";
 include '../include/insho_functions.php';
@@ -7,6 +12,7 @@ include '../include/arr_pemeriksaan.php';
 include '../include/arr_pemeriksaan_detail.php';
 include '../include/arr_penanda_gigi.php';
 include '../include/arr_kesimpulan.php';
+include '../include/arr_id_pemeriksaan.php';
 
 $tidak_ada = '--tidak ada--';
 $no_data = '--no data--';
@@ -330,10 +336,38 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
 
+    # ============================================================
+    # DATA PERUSAHAAN 
+    # ============================================================
+    $order_no = $pasien['order_no'];
+    $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
+    if ($order_no) {
+      $s = "SELECT id_perusahaan FROM tb_order WHERE order_no='$order_no'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+      $d = mysqli_fetch_assoc($q);
+      $id_perusahaan = $d['id_perusahaan'];
+    } elseif ($id_harga_perusahaan) {
+      $s = "SELECT id_perusahaan FROM tb_harga_perusahaan WHERE id='$id_harga_perusahaan'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+      $d = mysqli_fetch_assoc($q);
+      $id_perusahaan = $d['id_perusahaan'];
+    } else {
+      $id_perusahaan = null;
+    }
 
 
 
+    # ============================================================
+    # PAGE NUMBER AT
+    # ============================================================
     $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
+
+    if ($id_perusahaan == 27) { // SMK-TB
+      $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'kimia_darah', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
+    }
+
     $total_page = count($arr_page_at);
 
     // fix keluhan (strip)
@@ -428,7 +462,18 @@ if (mysqli_num_rows($q_pasien_pdf)) {
           } else { // DATA ARRAY TIDAK KIRI KANAN
             foreach ($arr2 as $k2 => $v2) {
               if (!is_array($v2)) {
-                $pdf->Cell(0, LHB, " - $k2: $v2", 'LR', 1);
+                if (strlen($v2) > 143) {
+                  // $pdf->MultiCell(0, LHB, " - $k2: $v2", 'LR', 1);
+                  $pdf->Cell(0, LH, " - $k2: ", 'LR', 1);
+                  $pdf->Cell(3, LH, ' ', 'L', 0); // spacer kolom at left no break
+                  $pdf->MultiCell(0, LH, "$v2", 'R', 'L');
+                  // MultiCell(float w, float h, string txt [, mixed border [, string align [, boolean fill]]])
+
+                } else {
+                  $pdf->Cell(0, LHB, " - $k2: $v2", 'LR', 1);
+                }
+                $len = strlen($v2);
+                // echo "<hr>$len $k";
               } else {
                 $pdf->Cell(0, LHB, " - $k2:", 'LR', 1);
                 foreach ($v2 as $k3 => $v3) {
@@ -483,32 +528,18 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     } // end foreach main looping
 
 
-    # ============================================================
-    # DATA PERUSAHAAN 
-    # ============================================================
-    $order_no = $pasien['order_no'];
-    $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
-    if ($order_no) {
-      $s = "SELECT id_perusahaan FROM tb_order WHERE order_no='$order_no'";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
-      $d = mysqli_fetch_assoc($q);
-      $id_perusahaan = $d['id_perusahaan'];
-    } elseif ($id_harga_perusahaan) {
-      $s = "SELECT id_perusahaan FROM tb_harga_perusahaan WHERE id='$id_harga_perusahaan'";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
-      $d = mysqli_fetch_assoc($q);
-      $id_perusahaan = $d['id_perusahaan'];
-    }
-
 
     # ============================================================
     # KESIMPULAN MCU
     # ============================================================
     include 'pdf-kesimpulan_mcu.php';
 
-
+    if ($id_perusahaan == 27) { // SMK-TB
+      # ============================================================
+      # PAGE KIMIA DARA
+      # ============================================================
+      include 'pdf-kimia_darah.php';
+    }
 
     # ============================================================
     # PAGE URINE LENGKAP

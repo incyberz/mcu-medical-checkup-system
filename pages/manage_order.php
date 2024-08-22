@@ -36,9 +36,6 @@ include 'include/arr_status_order.php';
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_add_paket'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
 
   $s = "SELECT 1 FROM tb_paket WHERE id_program=$_POST[id_program]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

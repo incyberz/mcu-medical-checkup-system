@@ -55,9 +55,6 @@ include 'include/arr_sampel.php';
 # PROCESSORS
 # ===========================================================
 if (isset($_POST['btn_add_pemeriksaan'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
   $jenis = $_POST['jenis'] ?? die('index [jenis] belum terdefinisi.');
   $nama = $_POST['nama'] ?? die('index [nama] belum terdefinisi.');
   $singkatan = substr($nama, 0, 10);

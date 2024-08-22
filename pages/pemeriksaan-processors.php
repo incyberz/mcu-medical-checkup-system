@@ -13,11 +13,7 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     # ARRAY SORT BY KEY
     # ============================================================
     // ksort($arr_sampel_tanggal_by);
-
-    // echo '<pre> at processors arr_sampel_tanggal_by ';
-
-    // var_dump($arr_sampel_tanggal_by);
-    // echo '</pre>';
+    // "1,1,1,1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,"
 
     # ============================================================
     # CONVERT TO STRING
@@ -37,11 +33,6 @@ if (isset($_POST['btn_submit_data_pasien'])) {
       last_update = CURRENT_TIMESTAMP,
       status = 2 -- status hasil sedang diinput
     WHERE id_pasien=$id_pasien";
-    // echolog($s);
-    // echo '<pre>';
-    // var_dump($s);
-    // echo '</pre>';
-    // exit;
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     echolog('sukses');
   } else {
@@ -52,9 +43,6 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     $id_pemeriksaan = $_POST['id_pemeriksaan'] ?? die('index [id_pemeriksaan] undefined');
     if ($id_pemeriksaan == 9) { // KHUSUS RONTGEN
       $id_detail = 134;
-      // echo '<pre>';
-      // var_dump($_POST);
-      // echo '</pre>';
       $value = trim($_POST['catatan__by_system']);
       if ($_POST['kesan__tambahan']) {
         $kesan_tambahan = trim($_POST['kesan__tambahan']);
@@ -92,9 +80,6 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     ksort($arr_id_detail);
     // ksort($arr_id_pemeriksaan_tanggal);
 
-    // echo '<pre>';
-    // var_dump($arr_id_pemeriksaan_tanggal);
-    // echo '</pre>';
 
     # ============================================================
     # CONVERT TO STRING
@@ -114,9 +99,6 @@ if (isset($_POST['btn_submit_data_pasien'])) {
     $pairs['arr_hasil'] = "arr_hasil='$str_hasil'";
     $pairs['arr_tanggal'] = "arr_tanggal_by='$str_tanggal_by'";
 
-    // echo '<pre>';
-    // var_dump($str);
-    // echo '</pre>';
 
 
     $str_pairs = join(',', $pairs);

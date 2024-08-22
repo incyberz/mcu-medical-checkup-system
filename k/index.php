@@ -13,6 +13,7 @@
 <body>
 
   <?php
+  include '../include/arr_id_pemeriksaan.php';
   $post_id_pasien = $_POST['id_pasien'] ?? '';
   $is_valid = 1;
   $day_expire = 7;
@@ -50,17 +51,32 @@
     if (mysqli_num_rows($q)) {
       $pasien = mysqli_fetch_assoc($q);
       $nama = strtoupper($pasien['nama']);
+      $order_no = $pasien['order_no'];
+      $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
     }
   }
 
-  // echo "$id_pasien_decrypt 
-  // <br>$zid_pasien 
-  // <br>$id_pasien_zdate_rand 
-  // <br>$crop 
-  // <br>$id_pasien_decrypt 
-  // <br>id: $id_pasien 
-  // <br>$idymhs 
-  // <br>$tgl";
+
+  # ============================================================
+  # DATA PERUSAHAAN 
+  # ============================================================
+  $order_no = $pasien['order_no'];
+  $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
+  if ($order_no) {
+    $s = "SELECT id_perusahaan FROM tb_order WHERE order_no='$order_no'";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+    $d = mysqli_fetch_assoc($q);
+    $id_perusahaan = $d['id_perusahaan'];
+  } elseif ($id_harga_perusahaan) {
+    $s = "SELECT id_perusahaan FROM tb_harga_perusahaan WHERE id='$id_harga_perusahaan'";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+    $d = mysqli_fetch_assoc($q);
+    $id_perusahaan = $d['id_perusahaan'];
+  } else {
+    $id_perusahaan = null;
+  }
 
   if (($is_valid && $nama) || $post_id_pasien) {
     $hijau  = 'hijau';
@@ -71,15 +87,36 @@
       include '../include/insho_functions.php';
       $eta = eta($selisih);
       $expire_info = "<div class='mb2 f12 abu'>link expire dalam $eta</div>";
+      $expire_info = '';
     }
 
+    $link_kimia_darah = '';
+    if ($id_perusahaan == 27) {
+      $link_kimia_darah = "
+        <a href='../?hasil_pemeriksaan&jenis=kmd&id_pemeriksaan=$id_pemeriksaan_kd' target=_blank class='btn btn-primary w-100 mb2'>
+          Hasil Kimia Darah
+        </a>
+      ";
+    }
+
+    // $valid_show = "
+    //   <div>$nama</div>
+    //   <div class='mb2 f12 abu'>MCU-$id_pasien</div>
+    //   <a href='../?hasil_pemeriksaan&jenis=mcu' target=_blank class='btn btn-primary w-100 mb2'>Kesimpulan Fisik MCU</a>
+    //   $link_kimia_darah
+    //   <a href='../?hasil_pemeriksaan&jenis=uri&id_pemeriksaan=$id_pemeriksaan_uri' target=_blank class='btn btn-primary w-100 mb2'>Hasil MCU Urine</a>
+    //   <a href='../?hasil_pemeriksaan&jenis=hem&id_pemeriksaan=$id_pemeriksaan_dl' target=_blank class='btn btn-primary w-100 mb2'>Hasil Darah Lengkap</a>
+    //   <a href='../?hasil_pemeriksaan&jenis=ron&id_pemeriksaan=$id_pemeriksaan_ron' target=_blank class='btn btn-primary w-100 mb2'>Hasil Rontgen</a>
+    //   $expire_info
+    // ";
+
+    # ============================================================
+    # LINK OUTPUT TO PDF
+    # ============================================================
     $valid_show = "
       <div>$nama</div>
       <div class='mb2 f12 abu'>MCU-$id_pasien</div>
-      <a href='../?hasil_pemeriksaan&jenis=mcu' target=_blank class='btn btn-primary w-100 mb2'>Kesimpulan Fisik MCU</a>
-      <a href='../?hasil_pemeriksaan&jenis=uri' target=_blank class='btn btn-primary w-100 mb2'>Hasil MCU Urine</a>
-      <a href='../?hasil_pemeriksaan&jenis=hem' target=_blank class='btn btn-primary w-100 mb2'>Hasil MCU Darah</a>
-      <a href='../?hasil_pemeriksaan&jenis=ron' target=_blank class='btn btn-primary w-100 mb2'>Hasil Rontgen</a>
+      <a href='../pdf/?id_pasien=$id_pasien' target=_blank class='btn btn-primary w-100 mb2'>Download PDF Hasil Medical Checkup</a>
       $expire_info
     ";
   } else {

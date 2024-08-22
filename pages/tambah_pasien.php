@@ -7,9 +7,6 @@ $bm = '<b class=red>*</b>';
 # ============================================================
 if (isset($_POST['btn_tambah_pasien'])) {
   unset($_POST['btn_tambah_pasien']);
-  echo '<pre>';
-  var_dump($_POST);
-  echo '</pre>';
   $koloms = '__';
   $isis = '__';
 

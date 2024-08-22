@@ -33,9 +33,6 @@ $arr = [
   'ALAMAT' => "$alamat",
 ];
 
-// echo '<pre>';
-// var_dump($arr);
-// echo '</pre>';
 
 $h = LH * 1.3;
 $pdf->SetFont(FF, 'B', 10);

@@ -14,9 +14,6 @@
 $pesan_insert = '';
 if (isset($_POST['btn_batalkan_order'])) {
 
-  echo '<pre>';
-  var_dump($_POST);
-  echo '</pre>';
 
   // echo div_alert('success', "Pastikan Anda membuka Whatsapp-Web atau sudah terinstall Aplikasi Whatsapp. Pesan Order akan diteruskan melalui whatsapp ke Marketing PT.MMC.");
   // jsurl($href, 2000);

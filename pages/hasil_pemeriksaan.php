@@ -310,7 +310,7 @@ if ($hasil_at_db['approv_date'] || $verified_lab) {
 
     $hari = hari_tanggal();
 
-    if ($get_jenis == 'mcu') {
+    if ($get_jenis == 'mcu ZZZ Fitur Approv per pasien aborted pada MCU Corporate') {
       $blok_approve = "
         $radios
         <div class=kiri>
@@ -328,7 +328,7 @@ if ($hasil_at_db['approv_date'] || $verified_lab) {
           <button class='btn btn-primary mt4' name=btn_approve value=1>Approve</button>
         </div>
       ";
-    } else {
+    } elseif ($get_jenis != 'mcu') {
       if ($role == 'dokter-pj') {
         $blok_approve = "
           <div class=kiri>
@@ -364,18 +364,23 @@ if ($hasil_at_db['approv_date'] || $verified_lab) {
   $nama_file = strtolower($nama_file);
   $btn = "
       <div class='flexy flex-center mt3'>
-        <div class=admin_only>Filename:</div>
-        <div class=admin_only>
+        <div class='admin_only hideit'>Filename:</div>
+        <div class='admin_only hideit'>
           <input class='form-control js-copytextarea' value='$nama_file' />
         </div>
-        <div class=admin_only>
+        <div class='admin_only hideit'>
           <button class='btn btn-success js-textareacopybtn' id=btn_copy>Copy</button>
         </div>
-        <div>
+        <div class='hideit'>
           <button class='btn btn-primary' onclick=window.print()>Print</button>
         </div>
-        <div>
+        <div class='hideit'>
           <a target=_blank href='pdf/?id_pasien=$id_pasien' class='btn btn-success'>PDF</a>
+        </div>
+        <div class=''>
+          Kesimpulan Pemeriksaan Fisik telah tersimpan. Anda boleh kembali ke Rekap Pemeriksaan.
+          <hr> 
+          <span onclick='window.close()' class='btn btn-secondary'>Close Window</span>
         </div>
       </div>
   ";

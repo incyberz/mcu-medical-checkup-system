@@ -27,12 +27,6 @@ $lebar = 150; // lebar gambar logo berjalan
 
 if (isset($_POST['btn_add_perusahaan'])) {
   echolog('processing image upload');
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-  // echo '<pre>';
-  // var_dump($_FILES);
-  // echo '</pre>';
   $new_image = "perusahaan-$_POST[new_nomor]-$detik.png";
 
   $telepon_or_null = $_POST['telepon'] ? "'$_POST[telepon]'" : 'NULL';

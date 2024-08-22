@@ -25,11 +25,6 @@ include 'isi-kuesioner-styles.php';
 $id_program = $_GET['id_program'] ?? die('id_program belum didefinisikan.');
 $kolom = $_GET['kolom'] ?? 'riwayat';
 if (isset($_POST['btn_submit_jawaban'])) {
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
-
-
   // field target
   if ($kolom == 'riwayat') {
     $field_target = 'riwayat_penyakit';

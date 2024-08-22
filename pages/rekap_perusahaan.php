@@ -12,6 +12,8 @@ if ($mode == 'kirim_link') {
 }
 include 'pages/hasil_pemeriksaan-styles.php';
 include 'include/arr_kesimpulan.php';
+include 'include/arr_id_pemeriksaan.php';
+$judul = 'Rekap Pemeriksaan';
 $belum_ada = '<span class="red bold miring">belum ada</span>';
 $img_filter = img_icon('filter');
 $batas_imt = [
@@ -23,9 +25,6 @@ $batas_imt = [
   999 => 'Obese class 3',
 ];
 
-$id_pemeriksaan_ron = 9;
-$id_pemeriksaan_dl = 3;
-$id_pemeriksaan_ul = 20;
 
 
 
@@ -84,6 +83,7 @@ $link_hrd = "<div class='mt2'>
 </div>
 <a class='' href='https://youtu.be/AAQdRTHI4PE' target=_blank >Lihat Tutorial Cara Verifikasi</a>";
 if ($mode == 'approv') {
+  $judul = 'Approv Corporate';
   $link = $link_preview;
   $sub_h = 'Mode Approv Kesimpulan';
 } elseif ($mode == 'monitoring_pasien') {
@@ -94,60 +94,16 @@ if ($mode == 'approv') {
   $link = $link_approv;
   $sub_h = 'Preview untuk Perusahaan';
 }
-set_h2('Rekap Pemeriksaan', "
+set_h2($judul, "
   $sub_h | $link 
   $link_hrd
 ");
+
+
 # ============================================================
 # NAVIGASI TANGGAL
 # ============================================================
-$arr_mode_bayar_cor_man = [
-  1 => 'Yasunli',
-  28 => 'PT GI',
-];
-
-$arr_tanggal_periksa = [];
-if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
-  $tb_c = "tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id";
-} else {
-  $tb_c = "tb_order c ON b.order_no=c.order_no";
-}
-
-$s = "SELECT date(a.awal_periksa) tanggal_periksa 
-FROM tb_hasil_pemeriksaan a 
-JOIN tb_pasien b ON a.id_pasien=b.id 
-JOIN $tb_c 
-WHERE c.id_perusahaan = $id_perusahaan
-";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-
-while ($d = mysqli_fetch_assoc($q)) {
-  $tanggal_periksa = $d['tanggal_periksa'];
-  if (!in_array($tanggal_periksa, $arr_tanggal_periksa)) array_push($arr_tanggal_periksa, $tanggal_periksa);
-}
-
-$nav_tanggal = '';
-if (count($arr_tanggal_periksa) > 1) {
-  foreach ($arr_tanggal_periksa as  $tanggal_periksa) {
-    $primary = $tanggal_periksa == $get_tanggal_periksa ? 'primary' : 'secondary';
-    $nav_tanggal .= "
-      <div class='ml4 mr4'>
-        <a class='btn btn-$primary btn-sm' href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggal_periksa'>
-          $tanggal_periksa
-        </a>
-      </div>
-    ";
-  }
-  echo  "
-    <div class='mb4 tengah'>
-      <div class=mb2>Tanggal Pemeriksaan:</div>
-      <div class='flex flex-center'>
-        $nav_tanggal
-      </div>
-    </div>
-  ";
-  if (!$get_tanggal_periksa) exit;
-}
+include 'rekap_perusahaan-navigasi_tanggal.php';
 
 
 
@@ -178,7 +134,7 @@ if (count($arr_tanggal_periksa) > 1) {
 
 
 # ============================================================
-# MAIN SELECT PASIEN
+# SELECT PASIEN PRE-SQL COMMAND
 # ============================================================
 if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
   $tb_c = "tb_harga_perusahaan c ON a.id_harga_perusahaan=c.id";
@@ -187,14 +143,31 @@ if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
 }
 
 $sql_tanggal_periksa = 1;
+$tanggal_periksa_header = null;
 if ($get_tanggal_periksa) {
-  $sql_tanggal_periksa = " (awal_periksa >= '$get_tanggal_periksa' 
-    AND awal_periksa < '$get_tanggal_periksa 23:59:59') 
-  ";
+  $sql_tanggal_periksa = '';
+  $arr = explode(',', $get_tanggal_periksa);
+  foreach ($arr as $tgl) {
+    if (strtotime($tgl)) {
+      $koma_spasi = $sql_tanggal_periksa ? ', ' : '';
+      $Tgl = hari_tanggal($tgl, 0, 0, 0);
+      $tanggal_periksa_header .= "$koma_spasi$Tgl";
+      $OR = $sql_tanggal_periksa ? 'OR' : '';
+      $sql_tanggal_periksa .= " $OR
+        (
+          awal_periksa >= '$tgl' 
+          AND awal_periksa < '$tgl 23:59:59'
+        ) 
+      ";
+    }
+  }
+  $sql_tanggal_periksa = "($sql_tanggal_periksa)";
 }
 
 
-
+# ============================================================
+# MAIN SELECT PASIEN
+# ============================================================
 $s = "SELECT 
 a.*,
 a.id as id_pasien,
@@ -370,22 +343,45 @@ if (mysqli_num_rows($qpasien)) {
     # APPROVE KOMPONEN
     # ============================================================
     if ($mode == 'approv') {
-      // auto checked kesimpulan
+      # ============================================================
+      # RADIO FIT | UNFIT KESIMPULAN | PRINT PERORANGAN
+      # ============================================================
       $blok_radio = '';
+      $blok_print = '';
       foreach ($arr_kesimpulan as $key => $value) {
         $checked = ($key == 1 and !$arr_konsultasi and $kesimpulan_fisik == '-') ? 'checked' : '';
         $hide_radio = ($key == 1 and  $arr_konsultasi) ? 'hideit' : '';
         $blok_radio .= "<div class='$hide_radio'><label><input type=radio name=hasil__$id_pasien value=$key $checked> $value</label></div>";
       }
-      $gradasi_merah = $kesimpulan == $belum_ada ? 'gradasi-merah' : '';
-      $hideit = $kesimpulan == $belum_ada ? '' : 'hideit';
+      if ($kesimpulan == $belum_ada) {
+        $gradasi_merah = 'gradasi-merah';
+        $hideit = '';
+      } else { // sudah ada kesimpulan
+        $gradasi_merah = '';
+        $hideit = 'hideit';
+        $blok_print = "
+          <div class=mt1>
+            <a target=_blank href='pdf/?id_pasien=$id_pasien' class='btn btn-primary btn-sm'>Print</a>
+          </div>
+          <div class=mt1>
+            <a target=_blank class='btn btn-success btn-sm'>Send</a>
+          </div>
+        ";
+      }
       $blok_radio = "<div class='$hideit' id=blok_radio$id_pasien>$blok_radio</div>";
-      $kesimpulan = "<div class='mb1 bold '><span class=btn_aksi id=blok_radio$id_pasien" . "__toggle>$kesimpulan</span></div>$blok_radio";
+      $kesimpulan = "
+        <div class='mb1 bold '>
+          <span class=btn_aksi id=blok_radio$id_pasien" . "__toggle>
+            $kesimpulan
+          </span>
+        </div>
+        $blok_radio
+        $blok_print
+      ";
 
-
-      // $konsultasi = "<textarea name=konsultasi__$id_pasien rows=5>$konsultasi</textarea>";
-      // $rekomendasi = "<textarea name=rekomendasi__$id_pasien rows=5>$rekomendasi</textarea>";
-
+      # ============================================================
+      # IS HAIDH
+      # ============================================================
       $gender = strtoupper($pasien['gender']);
       if ($gender == 'L') {
         $is_haid_show = '';
@@ -395,12 +391,19 @@ if (mysqli_num_rows($qpasien)) {
       }
 
       $hasil_hema = $hasil_lab['HEMA'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=HEM&id_pemeriksaan=$id_pemeriksaan_dl'>$hasil_lab[HEMA]</a>";
-      $hasil_urine = $hasil_lab['URINE'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=URI&id_pemeriksaan=$id_pemeriksaan_ul'>$hasil_lab[URINE]</a>";
+      $hasil_urine = $hasil_lab['URINE'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=URI&id_pemeriksaan=$id_pemeriksaan_uri'>$hasil_lab[URINE]</a>";
       $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[RONTGEN]";
       $hasil_rontgen = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON&id_pemeriksaan=$id_pemeriksaan_ron'>$hasil_rontgen</a>";
 
+      # ============================================================
+      # PUBLISITAS
+      # ============================================================
+      $publish = "<span class='f10 abu miring'>belum bisa publish</span>";
 
 
+      # ============================================================
+      # TR APPROV
+      # ============================================================
       $tr_approv .= "
         <tr>
           <td>$no_urut</td>
@@ -416,11 +419,15 @@ if (mysqli_num_rows($qpasien)) {
           <td class='$gradasi_merah'><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
           <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
           <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        
+          <td><span class=hideit>PUBLISH</span>$publish</td>        
         </tr>
       ";
 
       $rekomendasi_custom = $rekomendasi == 'Dapat bekerja sesuai bidangnya' ? 'NULL' : "'$rekomendasi'";
 
+      # ============================================================
+      # UPDATE KONSULTASI WHEN SUBMIT
+      # ============================================================
       if (isset($_POST['btn_submit'])) {
         echolog("Updating konsultasi + rekomendasi for [ $pasien[id_pasien] | $pasien[nama_pasien] ]");
         $s = "UPDATE tb_hasil_pemeriksaan SET 
@@ -442,11 +449,6 @@ if (mysqli_num_rows($qpasien)) {
       }
 
       $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'>$hasil_lab[RONTGEN]</a>";
-
-      // $td_kimia_darah = '';
-      // if ($id_perusahaan == 27) {
-      //   $td_kimia_darah = "<td><span class=hideit>KIMIA DARAH</span>$ kimia_darah</td>";
-      // }
 
       # ============================================================
       # FINAL TR PREVIEW UNTUK PERUSAHAAN
@@ -550,7 +552,7 @@ foreach ($arr_head as $key => $value) {
 # ============================================================
 $NAMA = strtoupper($perusahaan['nama']);
 $tanggal_periksa = date('Y-m-d', strtotime($awal_periksa));
-$tanggal = hari_tanggal($awal_periksa, 1, 0, 0);
+$tanggal_periksa_header = $tanggal_periksa_header ?? hari_tanggal($awal_periksa, 1, 0, 0);
 $h3 = "REKAPITULASI HASIL MEDICAL CHECKUP";
 if ($mode == 'approv') {
   $h3 = "<div class='f18 biru'>APPROV KESIMPULAN</div>";
@@ -570,6 +572,7 @@ if ($mode == 'approv') {
     'KESIMPULAN',
     'KONSULTASI',
     'REKOMENDASI',
+    'PUBLISH',
   ];
 
   // sementara untuk SMK-TB
@@ -588,6 +591,7 @@ if ($mode == 'approv') {
       'KESIMPULAN',
       'KONSULTASI',
       'REKOMENDASI',
+      'PUBLISH',
     ];
   }
 
@@ -604,6 +608,7 @@ $form = '';
 $end_form = '';
 $btn_print = "<button class='btn btn-primary' onclick=window.print()>Print</button>";
 $btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF</a>";
+$btn_invoice = "<a target=_blank href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=invoice&tanggal_periksa=$get_tanggal_periksa' class='btn btn-success' onclick='return confirm(`Cetak Invoice`)'>Cetak Invoice</a>";
 $btn_submit  = '';
 $sub_h = "<div class='tengah m2 abu f14'>Preview Rekap per Perusahaan</div>";
 if ($mode == 'approv') {
@@ -612,6 +617,7 @@ if ($mode == 'approv') {
   $end_form = '</form>';
   $btn_print = '';
   $btn_pdf = '';
+  $btn_invoice = '';
   $btn_submit = "<button class='btn btn-primary w-100' type=submit name=btn_submit>Submit Kesimpulan</button>";
 }
 
@@ -634,7 +640,7 @@ echo "
         <div class='border-bottom mb2 pb2 f12 mt1'>Tambun Business Park Blok C12 Tambun - Bekasi<br>Telp.(021) 29487893</div>
 
         <h3 class='f14 bold'>$h3 $NAMA</h3>
-        <div class='f10 bold'>$tanggal</div>
+        <div class='f10 bold'>$tanggal_periksa_header</div>
       </div>
       $form
         <table class='table table-bordered f8'>
@@ -670,6 +676,9 @@ echo "
       </div>
       <div class=ml4>
         $btn_pdf
+      </div>
+      <div class=ml4>
+        $btn_invoice
       </div>
     </div>
   </div>

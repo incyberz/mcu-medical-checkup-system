@@ -11,9 +11,6 @@
     // if($id_role==1) die(erid('roles'));
     $judul = 'Login As';
 
-    echo '<pre>';
-    var_dump($_SESSION);
-    echo '</pre>';
 
     if ($id_role == 2) {
       $new_username = $_GET['username'];

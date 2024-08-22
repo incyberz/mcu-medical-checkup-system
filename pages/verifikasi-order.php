@@ -71,9 +71,6 @@ if (isset($_POST['btn_batalkan'])) {
   $username_baru = $_POST['username_pendaftar'];
   $username_sama = $_POST['username_sama'] ?? false;
   $password = substr($_POST['no_wa_pendaftar'], -4);
-  // echo '<pre>';
-  // var_dump($_POST);
-  // echo '</pre>';
 
   // check if username exists
   $s = "SELECT 1 FROM tb_pendaftar WHERE username = '$_POST[username_pendaftar]'";

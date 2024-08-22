@@ -177,7 +177,8 @@ foreach ($arr as $posisi) {
     # ============================================================
     # PUSH GIGI RUSAK
     # ============================================================
-    if ($value != 1) $gigi_rusak["$NN-$pos"] = arti_simbol_gigi($value);
+    $gr = arti_simbol_gigi($value);
+    if ($value != 1 and $gr) $gigi_rusak["$NN-$pos"] = $gr;
 
     if ($i > 24) {
       $pos++;
@@ -206,7 +207,7 @@ if ($gigi_rusak) {
   foreach ($gigi_rusak as $k => $v) {
     // $pdf->Cell($wg, LH, ' ', 'L', 0, 'C');
     // $pdf->Cell(183, LH, "Gigi $k: $v ", 'R', 1, 'L');
-    $info_gigi = $info_gigi ? ", Gigi $k: $v" : "Gigi $k: $v";
+    $info_gigi .= $info_gigi ? ", Gigi $k: $v" : "Gigi $k: $v";
   }
 }
 

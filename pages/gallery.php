@@ -22,12 +22,6 @@ require_once 'include/resize_img.php';
 # ===============================================================
 
 if (isset($_POST['btn_add_gallery'])) {
-  echo '<pre>';
-  var_dump($_POST);
-  echo '</pre>';
-  echo '<pre>';
-  var_dump($_FILES);
-  echo '</pre>';
   $new_image = "gallery-$_POST[new_nomor]-$detik.jpg";
   $new_image_thumb = "gallery-$_POST[new_nomor]-$detik-thumb.jpg";
   $s = "INSERT INTO tb_gallery (

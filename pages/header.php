@@ -108,6 +108,7 @@ if ($username and ($role == 'admin' || $role == 'marketing')) {
   if ($role == 'admin') {
     $li_admin .= "
       <li><a class='nav-link gradasi-hijau bold menu_admin' href='?import'>Import</a></li>
+      <li><a class='nav-link gradasi-hijau bold menu_admin' href='?progres'>Progres</a></li>
     ";
   }
 }

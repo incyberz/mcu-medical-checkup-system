@@ -6,13 +6,6 @@
 # ============================================================
 if (isset($_POST['btn_upload_foto_profil'])) {
   include 'include/resize_img.php';
-  echo '<pre>';
-  var_dump($_POST);
-  echo '</pre>';
-  echo '<pre>';
-  var_dump($_FILES);
-  echo '</pre>';
-  // exit;
   $id_pasien = $_POST['btn_upload_foto_profil'];
   $new_foto_profil = "pasien-$id_pasien-$detik.jpg";
   $new_foto_profil_thumb = "pasien-$id_pasien-$detik-thumb.jpg";
