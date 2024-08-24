@@ -362,7 +362,12 @@ if ($hasil_at_db['approv_date'] || $verified_lab) {
   $nama_file = "hasil-$get_jenis-$no_mcu-$nama_pasien.pdf";
   $nama_file = str_replace(' ', '_', $nama_file);
   $nama_file = strtolower($nama_file);
-  $btn = "
+  $btn = $verified_lab
+    ? "        
+        <div class='tengah mt2'>
+          <button class='btn btn-primary' onclick=window.print()>Print</button>
+        </div>"
+    : "
       <div class='flexy flex-center mt3'>
         <div class='admin_only hideit'>Filename:</div>
         <div class='admin_only hideit'>

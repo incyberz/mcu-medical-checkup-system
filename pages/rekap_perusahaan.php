@@ -1,8 +1,3 @@
-<style>
-  .black {
-    color: black;
-  }
-</style>
 <?php
 $mode = $_GET['mode'] ?? 'detail';
 $get_tanggal_periksa = $_GET['tanggal_periksa'] ?? '';
@@ -13,6 +8,7 @@ if ($mode == 'kirim_link') {
 include 'pages/hasil_pemeriksaan-styles.php';
 include 'include/arr_kesimpulan.php';
 include 'include/arr_id_pemeriksaan.php';
+include 'rekap_perusahaan-styles.php';
 $judul = 'Rekap Pemeriksaan';
 $belum_ada = '<span class="red bold miring">belum ada</span>';
 $img_filter = img_icon('filter');
@@ -69,35 +65,10 @@ if (!$id_perusahaan) {
 }
 
 # ============================================================
-# MODE MONITORING PASIEN
+# MODE CONTROLLER | ROUTING
 # ============================================================
-if ($mode == 'monitoring_pasien') {
-  include 'monitoring_pasien.php';
-  exit;
-}
-
-$link_approv = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=approv&tanggal_periksa=$get_tanggal_periksa'>Mode Approv Kesimpulan</a>";
-$link_preview = "<a href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&tanggal_periksa=$get_tanggal_periksa'>Preview untuk Perusahaan</a>";
-$link_hrd = "<div class='mt2'>
-  <a class='btn btn-sm btn-success' href='?rekap_perusahaan&id_perusahaan=1&mode=kirim_link'>Kirim Link Pasien ke HRD</a>
-</div>
-<a class='' href='https://youtu.be/AAQdRTHI4PE' target=_blank >Lihat Tutorial Cara Verifikasi</a>";
-if ($mode == 'approv') {
-  $judul = 'Approv Corporate';
-  $link = $link_preview;
-  $sub_h = 'Mode Approv Kesimpulan';
-} elseif ($mode == 'monitoring_pasien') {
-  $link = $link_approv;
-  $sub_h = 'Monitoring Pasien';
-  $link_hrd = '';
-} else {
-  $link = $link_approv;
-  $sub_h = 'Preview untuk Perusahaan';
-}
-set_h2($judul, "
-  $sub_h | $link 
-  $link_hrd
-");
+include 'rekap_perusahaan-mode_controller.php';
+set_h2($judul, $sub_judul);
 
 
 # ============================================================
@@ -146,8 +117,8 @@ $sql_tanggal_periksa = 1;
 $tanggal_periksa_header = null;
 if ($get_tanggal_periksa) {
   $sql_tanggal_periksa = '';
-  $arr = explode(',', $get_tanggal_periksa);
-  foreach ($arr as $tgl) {
+  $arr_tanggal_periksa = explode(',', $get_tanggal_periksa);
+  foreach ($arr_tanggal_periksa as $tgl) {
     if (strtotime($tgl)) {
       $koma_spasi = $sql_tanggal_periksa ? ', ' : '';
       $Tgl = hari_tanggal($tgl, 0, 0, 0);
@@ -525,38 +496,23 @@ foreach ($arr_head as $key => $value) {
 }
 
 
-?>
-<style>
-  .kertas {
-    width: 29.7cm;
-    /* height: 21cm; */
-    padding: 1cm;
-    font-size: 9px;
-    box-shadow: 0 0 5px gray;
-  }
 
-  .kertas td,
-  .kertas th {
-    padding: 5px;
-  }
 
-  th {
-    text-align: center;
-    background: #cff !important;
-    vertical-align: middle;
-  }
-</style>
-<?php
 # ============================================================
-# FINAL ECHO REKAP
+# DESAIN HEADER DOKUMEN
 # ============================================================
-$NAMA = strtoupper($perusahaan['nama']);
+$NAMA_PERUSAHAAN = strtoupper($perusahaan['nama']);
 $tanggal_periksa = date('Y-m-d', strtotime($awal_periksa));
 $tanggal_periksa_header = $tanggal_periksa_header ?? hari_tanggal($awal_periksa, 1, 0, 0);
-$h3 = "REKAPITULASI HASIL MEDICAL CHECKUP";
-if ($mode == 'approv') {
-  $h3 = "<div class='f18 biru'>APPROV KESIMPULAN</div>";
-
+$landscape = 'landscape';
+if ($mode == 'detail') {
+  $h3 = "REKAPITULASI HASIL MCU $NAMA_PERUSAHAAN";
+} elseif ($mode == 'invoice') {
+  $landscape = 'portrait';
+  $h3 = "<span class='f30' style='font-weight: normal; color:blue; letter-spacing: 5px'>INVOICE</span>";
+  $tanggal_periksa_header = '';
+} elseif ($mode == 'approv') {
+  $h3 = "<div class='f18 biru'>APPROV KESIMPULAN $NAMA_PERUSAHAAN</div>";
   $tr = $tr_approv;
 
   $arr_head = [
@@ -599,25 +555,26 @@ if ($mode == 'approv') {
   foreach ($arr_head as $key => $value) {
     $th .= "<th>$value</th>";
   }
+} else {
+  $h3 = 'BELUM ADA DESAIN JUDUL';
+  $NAMA_PERUSAHAAN = '';
 }
 
 
 
 
-$form = '';
+$tag_form = '';
 $end_form = '';
 $btn_print = "<button class='btn btn-primary' onclick=window.print()>Print</button>";
 $btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF</a>";
-$btn_invoice = "<a target=_blank href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=invoice&tanggal_periksa=$get_tanggal_periksa' class='btn btn-success' onclick='return confirm(`Cetak Invoice`)'>Cetak Invoice</a>";
 $btn_submit  = '';
 $sub_h = "<div class='tengah m2 abu f14'>Preview Rekap per Perusahaan</div>";
 if ($mode == 'approv') {
   $sub_h = '';
-  $form = '<form method=post>';
+  $tag_form = '<form method=post>';
   $end_form = '</form>';
   $btn_print = '';
   $btn_pdf = '';
-  $btn_invoice = '';
   $btn_submit = "<button class='btn btn-primary w-100' type=submit name=btn_submit>Submit Kesimpulan</button>";
 }
 
@@ -626,49 +583,154 @@ if ($mode == 'approv') {
 # ============================================================
 
 echo "
-  <style>
-    #kesFis ul{
-      padding-left:10px;
-      margin: 0;
-    }
-  </style>
   $sub_h
   <div class='flex flex-center'>
-    <div class='kertas bg-white'>
+    <div class='kertas $landscape bg-white'>
       <div class='tengah mb2'>
         <div>$img_header_logo</div>
         <div class='border-bottom mb2 pb2 f12 mt1'>Tambun Business Park Blok C12 Tambun - Bekasi<br>Telp.(021) 29487893</div>
 
-        <h3 class='f14 bold'>$h3 $NAMA</h3>
+        <h3 class='f14 bold'>$h3</h3>
         <div class='f10 bold'>$tanggal_periksa_header</div>
-      </div>
-      $form
-        <table class='table table-bordered f8'>
-          $th
+      </div>";
+
+if ($mode == 'detail' || $mode == 'approv') {
+  # ============================================================
+  # KONTEN INTI : FORM APPROV OR PREVIEW CORPORATE
+  # ============================================================      
+  echo "
+        $tag_form
+          <table class='table table-bordered f8'>
+            $th
+            $tr
+          </table>";
+  if ($mode != 'approv') {
+    echo "
+          <div style='margin-left: 20cm'>
+            <div class=mb1>Penanggung Jawab Klinik Mutiara 1</div>
+            <div class=mb1>";
+
+    include 'include/enkrip14.php';
+    $z = enkrip14($id_perusahaan);
+
+    require_once 'include/qrcode.php';
+    $qr = QRCode::getMinimumQRCode("https://mmc-clinic.com/qr?$z", QR_ERROR_CORRECT_LEVEL_L);
+    $qr->printHTML('3px');
+    echo "
+            </div>
+            <div>dr. Mutiara Putri Camelia</div>
+          </div>";
+  }
+  echo "
+          $btn_submit
+        $end_form";
+  # ============================================================
+  # END KONTEN INTI : FORM APPROV OR PREVIEW CORPORATE
+  # ============================================================
+
+} elseif ($mode == 'invoice') {
+  if ($perusahaan['cara_bayar'] == 'bc') { // by corporate
+
+    $s = "SELECT a.*,b.nama as nama_paket FROM tb_harga_perusahaan a 
+    JOIN tb_paket b ON a.id_paket=b.id 
+    WHERE a.id_perusahaan=$id_perusahaan";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    if (!mysqli_num_rows($q)) {
+      div_alert('danger', 'Data [harga_perusahaan] tidak ditemukan');
+    } else {
+      $harga_perusahaan = mysqli_fetch_assoc($q);
+      $harga = $harga_perusahaan['harga'];
+    }
+
+    $tr = '';
+    $total_bayar = 0;
+    $i = 0;
+    foreach ($arr_tanggal_periksa as $tanggal_periksa) {
+      $i++;
+      $s = "SELECT 1 FROM tb_pasien a
+      JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id
+      JOIN tb_hasil_pemeriksaan c ON a.id=c.id_pasien
+      WHERE b.id_perusahaan=$id_perusahaan
+      AND date(c.awal_periksa) = '$tanggal_periksa'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      $jumlah_pasien = mysqli_num_rows($q);
+
+      $tgl = hari_tanggal($tanggal_periksa, 1, 0, 0);
+
+      $jumlah_rp = $jumlah_pasien * $harga;
+      $total_bayar += $jumlah_rp;
+
+      $harga_show = number_format($harga);
+      $jumlah_rp_show = number_format($jumlah_rp);
+
+
+      $tr .= "
+        <tr>
+          <td>$i</td>
+          <td>$tgl</td>
+          <td>
+            Biaya Medical Checkup Karyawan
+            <div class='f14 miring mt1'>$harga_perusahaan[nama_paket]</div>
+          </td>
+          <td>$harga_show</td>
+          <td>$jumlah_pasien</td>
+          <td class=kanan>$jumlah_rp_show</td>
+        </tr>
+      ";
+    }
+
+
+    $hari = hari_tanggal($today, 1, 0, 0);
+    $total_bayar_show = number_format($total_bayar);
+
+    $fs = 'f14';
+
+    echo "
+      <div class='kiri border-top pt2 border-bottom pb2 $fs'>
+        <div class=kanan>Bekasi, $hari</div>
+        <div>Kepada Yth. <b>PIMPINAN $NAMA_PERUSAHAAN</b></div>
+        <div class=mb4>di Tempat</div>
+        <div class=mb2>Berikut adalah Invoice Medical Checkup dengan rincian:</div>
+        <table class='table th_toska th_kiri td_trans'>
+          <thead>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Uraian</th>
+            <th>Biaya</th>
+            <th>Jumlah Pasien</th>
+            <th class=kanan>Jumlah Rp</th>
+          </thead>
           $tr
-        </table>";
-if ($mode != 'approv') {
-  echo "
-        <div style='margin-left: 20cm'>
-          <div class=mb1>Penanggung Jawab Klinik Mutiara 1</div>
-          <div class=mb1>";
+          <tr style='background: #dff' class='bold'>
+            <td colspan=5 class=kanan>
+              TOTAL BAYAR
+            </td>
+            <td class=kanan>$total_bayar_show</td>
+          </tr>
+        </table>
+      </div>
+      <div style='margin-left: 12cm'>
+        <div class='mt2 mb1 $fs'>Admin Mutiara Medical Center</div>
+    ";
 
-  include 'include/enkrip14.php';
-  $z = enkrip14($id_perusahaan);
+    include 'include/enkrip14.php';
+    $z = enkrip14($id_perusahaan);
 
-  require_once 'include/qrcode.php';
-  $qr = QRCode::getMinimumQRCode("https://mmc-clinic.com/qr?$z", QR_ERROR_CORRECT_LEVEL_L);
-  $qr->printHTML('3px');
-  echo "
-          </div>
-          <div>dr. Mutiara Putri Camelia</div>
-        </div>";
+    require_once 'include/qrcode.php';
+    $qr = QRCode::getMinimumQRCode("https://mmc-clinic.com/qr?$z", QR_ERROR_CORRECT_LEVEL_L);
+    $qr->printHTML('3px');
+    echo '</div>'; // end margin left xxx cm
+  } else {
+    echo div_alert('danger', "BELUM ADA HANDLER INVOICE UNTUK CARA_BAYAR [$perusahaan[cara_bayar] ]");
+  }
+} else {
+  echo div_alert('danger', "KONTEN INTI UNTUK MODE [$mode] BELUM ADA");
 }
+
 echo "
-        $btn_submit
-      $end_form
-    </div>
-  </div>
+    </div> <!-- end kertas -->
+  </div> <!-- end div flex center -->
+
   <div class='tengah m2'>
     <div class='flex flex-center'>
       <div class=ml4>
@@ -676,9 +738,6 @@ echo "
       </div>
       <div class=ml4>
         $btn_pdf
-      </div>
-      <div class=ml4>
-        $btn_invoice
       </div>
     </div>
   </div>

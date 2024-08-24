@@ -38,7 +38,7 @@ $nav_tanggal = '';
 if (count($arr_tanggal_periksa) > 1) {
   foreach ($arr_tanggal_periksa as  $tanggal_periksa) {
     $primary = $tanggal_periksa == $get_tanggal_periksa ? 'primary' : 'secondary';
-    $TanggalPeriksa = hari_tanggal($tanggal_periksa, 1, 0, 0);
+    $TanggalPeriksa = hari_tanggal($tanggal_periksa, 0, 0, 0);
     $nav_tanggal .= "
       <div class='mr2 hideit'>
         <a class='btn btn-$primary btn-sm' href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggal_periksa'>

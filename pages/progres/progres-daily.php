@@ -19,7 +19,7 @@ a.*,
 b.arti as arti_status, 
 date(a.last_update) as tanggal_update 
 FROM tb_progres_sub a 
-JOIN tb_progres_sub_status b ON a.status=b.status 
+JOIN tb_progres_status b ON a.status=b.status 
 WHERE $sql_status
 ORDER BY a.last_update DESC";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

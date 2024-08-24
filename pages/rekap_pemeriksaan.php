@@ -105,6 +105,9 @@ if ($status_pasien === '') {
     SELECT approv_date FROM tb_hasil_pemeriksaan p WHERE p.id_pasien=a.id
     ) approv_date,
   (
+    SELECT approv_labs FROM tb_hasil_pemeriksaan p WHERE p.id_pasien=a.id
+    ) approv_labs,
+  (
     SELECT date(awal_periksa) FROM tb_hasil_pemeriksaan p WHERE p.id_pasien=a.id
     ) tanggal_periksa,
   (
@@ -129,13 +132,18 @@ if ($status_pasien === '') {
   $div_mobile = '';
   $i = 0;
   $jumlah_verif = 0;
+  $jumlah_verif_lab = 0;
   $nav = div_alert('info', "Belum ada Pasien yang Selesai Pemeriksaan | <a href='?cari_pasien'>Lobby Pasien</a>");
   if (mysqli_num_rows($q)) {
     $last_perusahaan = '';
     $last_tanggal_periksa = '';
     while ($d = mysqli_fetch_assoc($q)) {
       $i++;
-      if ($d['approv_date']) $jumlah_verif++;
+      if ($d['approv_date']) {
+        $jumlah_verif++;
+      } else {
+        if ($d['approv_labs']) $jumlah_verif_lab++;
+      }
       $jenis = strtolower($d['jenis']);
       $id_pasien = $d['id_pasien'];
       $status = $d['status'];
@@ -187,11 +195,20 @@ if ($status_pasien === '') {
         $link_wa = 'ISI WA DULU';
       }
 
-      $link_verif = $d['approv_date'] ? $link_wa : " | 
-        <a class=' tebal ' href='?hasil_pemeriksaan&id_pasien=$d[id]&jenis=mcu'>
-          <b class=red>UNVERIFIED</b> $img_next
-        </a>
-      ";
+      if ($jenis == 'cor') {
+        $link_verif = $d['approv_date'] ? $link_wa : " | 
+          <a class=' tebal ' href='?hasil_pemeriksaan&id_pasien=$d[id]&jenis=mcu'>
+            <b class=red>UNVERIFIED $jenis</b> $img_next
+          </a>
+        ";
+      } elseif ($jenis == 'idv') {
+        if ($d['approv_labs']) {
+          $link_verif = "IDV - Lab Approved";
+        } else {
+          $link_verif = strtoupper($jenis) . ' UNVERIFIED';
+        }
+      }
+
 
 
       # ============================================================
@@ -242,7 +259,7 @@ echo $role != 'admin' ? '' : "
 # AUTOSAVE HEADER
 # ============================================================
 if ($jumlah_rekap) {
-  $jumlah_unverif = $jumlah_rekap - $jumlah_verif;
+  $jumlah_unverif = $jumlah_rekap - $jumlah_verif - $jumlah_verif_lab;
   $s = "UPDATE tb_header SET 
   count_pasien_selesai = $jumlah_rekap, 
   count_pasien_unverif = $jumlah_unverif 
