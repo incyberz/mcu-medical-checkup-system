@@ -17,7 +17,8 @@ $select_h1 = "<select name=id_fitur class='form-control form-control-sm'>$opt</s
 $s = "SELECT 
 a.*,
 b.arti as arti_status, 
-date(a.last_update) as tanggal_update 
+date(a.last_update) as tanggal_update,
+(SELECT COUNT(1) FROM tb_progres_rev WHERE id_progres_sub=a.id) count_rev 
 FROM tb_progres_sub a 
 JOIN tb_progres_status b ON a.status=b.status 
 WHERE $sql_status
@@ -54,16 +55,122 @@ foreach ($rows as $k => $v) {
   $sub_tr = '';
   foreach ($v as $k2 => $v2) {
     $j++;
-    $id_subfitur = $v2['id'];
+    $id = $v2['id'];
+    $id_progres_sub = $id;
     $eta = eta2($v2['last_update']);
     $href_icon = !$v2['href'] ? '<span onclick="alert(`Tidak ada link akses untuk job ini.`)">' . $img_gray . '</span>' : "<a target=_blank href='$v2[href]'>$img_next</a>";
 
     $icon = $img_arti[$v2['status']] ?? $img_gray;
-    $form_delete_subfitur = $role != 'admin' ? '' :  "
-      <form method=post class='mt1' target=_blank>
-        <button onclick='return confirm(`Delete subfitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_subfitur value=$id_subfitur >Delete</button>
+
+    if ($v2['count_rev']) {
+
+      $tr_revs = '';
+      $s = "SELECT a.*, b.href as href_sub 
+      FROM tb_progres_rev a 
+      JOIN tb_progres_sub b ON a.id_progres_sub=b.id 
+      WHERE a.id_progres_sub=$id 
+      ORDER BY a.date_created DESC";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      while ($d = mysqli_fetch_assoc($q)) {
+        $id_rev = $d['id'];
+        $eta = eta2($d['date_created']);
+        $href = $d['href'] ?? $d['href_sub'];
+        $href_icon = !$href ? '<span onclick="alert(`Tidak ada link akses untuk revisi ini.`)">' . $img_gray . '</span>' : "<a target=_blank href='$href'>$img_next</a>";
+
+        $tr_revs .= "
+          <tr>
+            <td class='f10'>$d[date_created]</td>
+            <td>$img_delete</td>
+            <td><span class=darkblue>$d[nama]</span></td>
+            <td>$d[keterangan]</td>
+            <td>
+
+              <span class='btn_aksi pointer' id=keterangan_rev_$id_rev" . "__toggle>$img_loading</span> 
+              $href_icon
+              <div class='f10 abu mt1'>$v2[arti_status]</div>
+              <div class='f10 abu mt1'>$eta</div>
+
+              <div class='hideit f10 mt2' id=keterangan_rev_$id_rev>
+                <form method=post class='mt2 f10'>
+                  <div class=mb1>Set status:</div>
+                  <button class='btn btn-danger btn_sm' name=btn_set_status_rev value=0__$id_rev>0</button>
+                  <button class='btn btn-warning btn_sm' name=btn_set_status_rev value=1__$id_rev>1</button>
+                  <button class='btn btn-warning btn_sm' name=btn_set_status_rev value=2__$id_rev>2</button>
+                  <button class='btn btn-info btn_sm' name=btn_set_status_rev value=3__$id_rev>3</button>
+                  <button class='btn btn-success btn_sm' name=btn_set_status_rev value=4__$id_rev>4</button>
+                  <button class='btn btn-success btn_sm' name=btn_set_status_rev value=5__$id_rev>5</button>
+                </form>
+              </div>            
+            </td>
+          </tr>
+        ";
+      }
+
+      $form_delete_subfitur = "
+        <div class='f12 darkblue'>
+          <div class='mt2 mb1'>Revisions:</div>
+          <table class='table table-striped f12'>
+            $tr_revs
+          </table>
+        </div>
+      ";
+
+
+      $form_delete_subfitur .= $role != 'admin' ? '' :  "
+        <button onclick='alert(`delete semua revisi agar sub fitur ini bisa di delete.`)' class='btn btn-secondary btn-sm' >Delete</button>
+      ";
+      $td_progres_sub_status = '';
+    } else { // tidak ada revisions
+      $form_delete_subfitur = $role != 'admin' ? '' :  "
+        <form method=post class='mt1 m0' style='display: inline-block'>
+          <button onclick='return confirm(`Delete subfitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_subfitur value=$id_progres_sub >Delete</button>
+        </form>
+      ";
+      $td_progres_sub_status = "
+        <td width=30%>
+          <span class='btn_aksi pointer' id=keterangan_progres_sub_$id_progres_sub" . "__toggle>$icon</span> 
+          $href_icon
+          <div class='f10 abu mt1'>$v2[arti_status]</div>
+          <div class='f10 abu mt1'>$eta</div>
+
+          <div class='hideit f10 mt2' id=keterangan_progres_sub_$id_progres_sub>
+            <form method=post class='mt2 f10'>
+              <div class=mb1>Set status:</div>
+              <button class='btn btn-danger btn_sm' name=btn_set_status_progres_sub value=0__$id_progres_sub $dis[0]>0</button>
+              <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=1__$id_progres_sub $dis[1]>1</button>
+              <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=2__$id_progres_sub $dis[2]>2</button>
+              <button class='btn btn-info btn_sm' name=btn_set_status_progres_sub value=3__$id_progres_sub $dis[3]>3</button>
+              <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=4__$id_progres_sub $dis[4]>4</button>
+              <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=5__$id_progres_sub $dis[5]>5</button>
+            </form>
+            <form method=post class='mt2 f10 ' target=_blank>
+              <div class=mb1>Set:</div>
+              <button class='btn btn-success btn_sm btn_sedang_dikerjakan' name=btn_sedang_dikerjakan value=$id_progres_sub>Sedang dikerjakan</button>
+            </form>
+          </div>
+
+        </td>
+      ";
+    }
+
+    $form_add_rev = $role != 'admin' ? '' :  "
+      <form method=post class='mt1 hideit wadah gradasi-kuning' id=form_add_rev$id>
+        <input class='form-control mb2' required minlength=3 name=nama placeholder='Revision...'>
+        <textarea class='form-control mb2' required minlength=10 name=keterangan placeholder='Keterangan...'></textarea>
+        <button onclick='return confirm(`Add Revision?`)' class='btn btn-primary btn-sm' name=btn_add_rev value=$id_progres_sub >Add Rev</button>
       </form>
     ";
+
+    # ============================================================
+    # FORM EDIT SUBFITUR
+    # ============================================================
+    $form_edit_subfitur = $role != 'admin' ? '' :  "
+      <form method=post class='wadah gradasi-kuning hideit'>
+        ZZZ
+        <button onclick='return confirm(`Update subfitur?`)' class='btn btn-primary btn-sm' name=btn_update_subfitur value=$id_progres_sub >Update</button>
+      </form>
+    ";
+
 
     for ($k = 0; $k <= 5; $k++) $dis[$k] = '';
     $dis[$v2['status']] = 'disabled';
@@ -72,33 +179,14 @@ foreach ($rows as $k => $v) {
       <tr>
         <td width=50px>$j</td>
         <td>
-          $v2[nama]
+          $v2[nama] <span class=btn_aksi id=form_edit_sub$id" . "__toggle>$img_edit</span> 
           <div class='f12 abu mt1'>$v2[keterangan]</div>
+          $form_edit_subfitur
           $form_delete_subfitur
+          <button class='btn btn-info btn-sm btn_aksi' id=form_add_rev$id" . "__toggle>Add Rev</button>
+          $form_add_rev
         </td>
-        <td width=30%>
-          <span class='btn_aksi pointer' id=keterangan_subfitur_$id_subfitur" . "__toggle>$icon</span> 
-          $href_icon
-          <div class='f10 abu mt1'>$v2[arti_status]</div>
-          <div class='f10 abu mt1'>$eta</div>
-
-          <div class='hideit f10 mt2' id=keterangan_subfitur_$id_subfitur>
-            <form method=post class='mt2 f10'>
-              <div class=mb1>Set status:</div>
-              <button class='btn btn-danger btn_sm' name=btn_set_status value=0__$id_subfitur $dis[0]>0</button>
-              <button class='btn btn-warning btn_sm' name=btn_set_status value=1__$id_subfitur $dis[1]>1</button>
-              <button class='btn btn-warning btn_sm' name=btn_set_status value=2__$id_subfitur $dis[2]>2</button>
-              <button class='btn btn-info btn_sm' name=btn_set_status value=3__$id_subfitur $dis[3]>3</button>
-              <button class='btn btn-success btn_sm' name=btn_set_status value=4__$id_subfitur $dis[4]>4</button>
-              <button class='btn btn-success btn_sm' name=btn_set_status value=5__$id_subfitur $dis[5]>5</button>
-            </form>
-            <form method=post class='mt2 f10 ' target=_blank>
-              <div class=mb1>Set:</div>
-              <button class='btn btn-success btn_sm btn_sedang_dikerjakan' name=btn_sedang_dikerjakan value=$id_subfitur>Sedang dikerjakan</button>
-            </form>
-          </div>
-
-        </td>
+        $td_progres_sub_status
       </tr>
     ";
   }

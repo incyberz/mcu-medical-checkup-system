@@ -25,7 +25,7 @@ a.nomor,
 a.h1, 
 a.request_by 
 FROM tb_progres_h1 a 
-ORDER BY a.nomor,a.id,a.h1";
+ORDER BY a.nomor,a.h1";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (mysqli_num_rows($q)) {

@@ -5,6 +5,25 @@ if (isset($_POST['btn_delete_fitur'])) {
   jsurl();
 }
 
+if (isset($_POST['btn_add_rev'])) {
+  $nama = $_POST['nama'] ?? die(erid('nama'));
+  $keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
+
+  $s = "INSERT INTO tb_progres_rev (
+    id_progres_sub,
+    nama,
+    request_by,
+    keterangan
+  ) VALUES (
+    $_POST[btn_add_rev],
+    '$nama',
+    $id_user,
+    '$keterangan'
+  )";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  jsurl();
+}
+
 if (isset($_POST['btn_delete_subfitur'])) {
   $s = "DELETE FROM tb_progres_sub WHERE id=$_POST[btn_delete_subfitur]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -53,18 +72,18 @@ if (isset($_POST['btn_update_fitur'])) {
   jsurl();
 }
 
-if (isset($_POST['btn_set_status'])) {
+if (isset($_POST['btn_set_status_progres_sub'])) {
   // echo div_alert('danger','Maaf, saat ini hanya DEVELOPER yang bisa mengubah status development.');
-  $arr = explode('__', $_POST['btn_set_status']);
+  $arr = explode('__', $_POST['btn_set_status_progres_sub']);
   $status = $arr[0];
-  $id_subfitur = $arr[1];
+  $id_progres_sub = $arr[1];
 
-  $s = "SELECT id_fitur FROM tb_progres_sub WHERE id=$id_subfitur";
+  $s = "SELECT id_fitur FROM tb_progres_sub WHERE id=$id_progres_sub";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $d = mysqli_fetch_assoc($q);
   $id_fitur = $d['id_fitur'];
 
-  $s = "UPDATE tb_progres_sub SET status=$status,last_update=CURRENT_TIMESTAMP WHERE id=$id_subfitur";
+  $s = "UPDATE tb_progres_sub SET status=$status,last_update=CURRENT_TIMESTAMP WHERE id=$id_progres_sub";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   jsurl("?progres&id_fitur=$id_fitur&mode=$mode");
 }

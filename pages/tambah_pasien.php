@@ -91,7 +91,8 @@ $input_thn = '';
 $year = date('Y');
 for ($i = 1; $i <= 31; $i++) $input_tgl .= "<option>$i</option>";
 for ($i = $year; $i >= $year - 60; $i--) $input_thn .= "<option>$i</option>";
-foreach ($arr_nama_bulan as $key => $value) $input_bln .= "<option value='" . ($key + 1) . "'>$value</option>";
+// foreach ($arr_nama_bulan as $key => $value) $input_bln .= "<option value='" . ($key + 1) . "'>$value</option>";
+for ($i = 1; $i <= 12; $i++) $input_bln .= "<option>$i</option>";
 $input_tgl = "<select class='form-control input_tanggal_lahir' id=input_tgl>$input_tgl</select>";
 $input_bln = "<select class='form-control input_tanggal_lahir' id=input_bln>$input_bln</select>";
 $input_thn = "<select class='form-control input_tanggal_lahir' id=input_thn>$input_thn</select>";
@@ -131,7 +132,7 @@ $input_alamat = "
       <div class='kanan abu f14 miring pt2' style='min-width:100px'>Kecamatan $bm</div>
       <div>
       <input class='form-control ' id=input_kec placeholder='Kecamatan...' autocomplete=off >
-      <div class='hideita mb4 mt2' id=list_kec>
+      <div class='hideita mb4 mt2 flex f12' id=list_kec>
         <ul>
           <li>asd</li>
           <li>asd</li>
@@ -184,13 +185,19 @@ $arr_input = [
     'minlength' => '3',
     'maxlength' => '30',
   ],
-  'gender' => $radio_gender,
-  'tempat_lahir' => [
-    'kolom' => 'Tempat Lahir',
+  'nikepeg' => [
+    'kolom' => 'N.I.K atau KTP',
     'minlength' => '3',
-    'maxlength' => '30',
-    'required' => ''
+    'maxlength' => '16',
+    'required' => '',
   ],
+  'gender' => $radio_gender,
+  // 'tempat_lahir' => [
+  //   'kolom' => 'Tempat Lahir',
+  //   'minlength' => '3',
+  //   'maxlength' => '30',
+  //   'required' => ''
+  // ],
   'tanggal_lahir' => $input_tanggal_lahir,
   'jenis' => $radio_jenis,
   'no_bpjs' => [
@@ -201,12 +208,6 @@ $arr_input = [
   'no_ktp' => [
     'kolom' => 'No. KTP',
     'minlength' => '16',
-    'maxlength' => '16',
-    'required' => '',
-  ],
-  'nikepeg' => [
-    'kolom' => 'N.I.K atau KTP',
-    'minlength' => '3',
     'maxlength' => '16',
     'required' => '',
   ],

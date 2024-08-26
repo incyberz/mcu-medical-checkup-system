@@ -68,7 +68,7 @@ while ($d = mysqli_fetch_assoc($q)) {
   # SELECT SUB FITUR
   # ======================================================
   $s2 = "SELECT a.*,
-  a.id as id_subfitur,
+  a.id as id_progres_sub,
   (
     SELECT arti FROM tb_progres_status 
     WHERE status=a.status) arti_subfitur, 
@@ -88,7 +88,7 @@ while ($d = mysqli_fetch_assoc($q)) {
     $tr_sub = '';
     while ($d2 = mysqli_fetch_assoc($q2)) {
       $j++;
-      $id_subfitur = $d2['id_subfitur'];
+      $id_progres_sub = $d2['id_progres_sub'];
       $status_show = $d2['status'] ? $img_arti[$d2['status']] : $img_warning;
 
       $arti_subfitur = $d2['arti_subfitur'] ? $d2['arti_subfitur'] : 'Belum dikerjakan';
@@ -99,7 +99,7 @@ while ($d = mysqli_fetch_assoc($q)) {
 
       $form_delete_subfitur = $role != 'admin' ? '' :  "
         <form method=post class='mt1' target=_blank>
-          <button onclick='return confirm(`Delete subfitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_subfitur value=$id_subfitur >Delete</button>
+          <button onclick='return confirm(`Delete subfitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_subfitur value=$id_progres_sub >Delete</button>
         </form>
       ";
 
@@ -113,25 +113,25 @@ while ($d = mysqli_fetch_assoc($q)) {
 
           </td>
           <td class='td_status_subfitur'>
-            <div class='btn_aksi pointer' id=keterangan_subfitur_$id_subfitur" . "__toggle>
+            <div class='btn_aksi pointer' id=keterangan_progres_sub_$id_progres_sub" . "__toggle>
               $status_show
               <div class='abu f10 miring mt1'>$arti_subfitur</div>
               <div class='abu f10 miring mt1'>$last_update</div>
             </div>
-            <div class='hideit f10 mt2' id=keterangan_subfitur_$id_subfitur>
+            <div class='hideit f10 mt2' id=keterangan_progres_sub_$id_progres_sub>
               $d2[ket_status_subfitur]
               <form method=post class='mt2 f10'>
                 <div class=mb1>Set status:</div>
-                <button class='btn btn-danger btn_sm' name=btn_set_status value=0__$id_subfitur $dis[0]>0</button>
-                <button class='btn btn-warning btn_sm' name=btn_set_status value=1__$id_subfitur $dis[1]>1</button>
-                <button class='btn btn-warning btn_sm' name=btn_set_status value=2__$id_subfitur $dis[2]>2</button>
-                <button class='btn btn-info btn_sm' name=btn_set_status value=3__$id_subfitur $dis[3]>3</button>
-                <button class='btn btn-success btn_sm' name=btn_set_status value=4__$id_subfitur $dis[4]>4</button>
-                <button class='btn btn-success btn_sm' name=btn_set_status value=5__$id_subfitur $dis[5]>5</button>
+                <button class='btn btn-danger btn_sm' name=btn_set_status_progres_sub value=0__$id_progres_sub $dis[0]>0</button>
+                <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=1__$id_progres_sub $dis[1]>1</button>
+                <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=2__$id_progres_sub $dis[2]>2</button>
+                <button class='btn btn-info btn_sm' name=btn_set_status_progres_sub value=3__$id_progres_sub $dis[3]>3</button>
+                <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=4__$id_progres_sub $dis[4]>4</button>
+                <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=5__$id_progres_sub $dis[5]>5</button>
               </form>
               <form method=post class='mt2 f10' target=_blank>
                 <div class=mb1>Set:</div>
-                <button class='btn btn-success btn_sm btn_sedang_dikerjakan' name=btn_sedang_dikerjakan value=$id_subfitur>Sedang dikerjakan</button>
+                <button class='btn btn-success btn_sm btn_sedang_dikerjakan' name=btn_sedang_dikerjakan value=$id_progres_sub>Sedang dikerjakan</button>
               </form>
             </div>
           </td>

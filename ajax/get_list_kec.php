@@ -9,6 +9,6 @@ $s = "SELECT * FROM tb_kec WHERE $sql_like AND id_kab='$id_kab' ORDER BY nama_ke
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $li = '';
 while ($d = mysqli_fetch_assoc($q)) {
-  $li .= "<li class='item_kec pointer p1'>$d[nama_kec] - $d[id_kec]</li>";
+  $li .= "<div class='item_kec pointer p1'>$d[nama_kec] - $d[id_kec]</div>";
 }
 echo $li ? $li : "<div class='red f12 mt1 mb4'>Kecamatan dengan keyword <b>$keyword</b> tidak ditemukan</div>";

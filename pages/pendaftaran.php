@@ -98,7 +98,10 @@ $dashboard = "
 
 echo "
   $dashboard
-  <div class='tengah'><a class='btn btn-success' href='?tambah_pasien'> Tambah Pasien</a></div>
+  <div class='tengah'>
+    <a class='btn btn-success' href='?tambah_pasien'> $img_add Pasien Individu</a>
+    <a class='btn btn-success' href='?tambah_pasien_cor'> $img_add Pasien Corporate</a>
+  </div>
   <div class='tengah mt4 mb2'><span class=btn_aksi id=tb_pasien__toggle>$img_detail</span></div>
   <div class=hideita id=tb_pasien>$data_pasien</div>
 ";

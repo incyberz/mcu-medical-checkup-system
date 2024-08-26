@@ -31,7 +31,7 @@ JOIN $tb_b
 JOIN tb_paket c ON b.id_paket=c.id 
 
 WHERE b.id_perusahaan=$id_perusahaan 
-ORDER BY tanggal_periksa, a.nama 
+ORDER BY a.date_created DESC, a.nama 
 ";
 
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

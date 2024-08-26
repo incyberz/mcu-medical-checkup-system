@@ -116,7 +116,7 @@ if ($JENIS == 'COR') {
       $opt = '';
       while ($d2 = mysqli_fetch_assoc($q2)) {
         $harga_show = 'Rp ' . number_format($d2['harga']) . ',-';
-        $opt = "<option value=$d2[id]>$d2[nama_perusahaan] - $harga_show</option>";
+        $opt .= "<option value=$d2[id]>$d2[nama_perusahaan] - $harga_show</option>";
       }
       $belum_ada_harga = div_alert('danger mt2', "Belum ada harga khusus untuk Paket ini.");
       $select_harga = !$opt ? $belum_ada_harga : "<select class='form-control' name='id_harga_perusahaan'>$opt</select>";
