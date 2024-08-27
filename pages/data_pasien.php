@@ -234,6 +234,7 @@ if (mysqli_num_rows($q)) {
             $value = $arr_paket_corporate[$d4['id_paket']];
             $value = "<div class='f14 '>$value</div>";
             $value = "<a href='?manage_paket_custom&id_pasien=$id_pasien' >$value</a>";
+            $value = "$value<div class='f12 abu miring'><a href='?manage_harga_perusahaan&id_harga_perusahaan=$d[id_harga_perusahaan]'>$d[perusahaan]</a></div>";
           } else {
             // biarkan
             $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[perusahaan]</a></div>";

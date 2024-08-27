@@ -1,258 +1,83 @@
 <?php
 # ============================================================
-# SELECT H1
+# SELECT MODUL
 # ============================================================
 $opt = '';
-$s = "SELECT * FROM tb_progres_h1 ORDER BY nomor,date_created ";
+$s = "SELECT * FROM tb_progres_modul ORDER BY nomor,date_created ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 while ($d = mysqli_fetch_assoc($q)) {
-  $opt .= "<option value='$d[id]'>$d[h1]</option>";
+  $opt .= "<option value='$d[id]'>$d[modul]</option>";
 }
-$select_h1 = "<select name=id_fitur class='form-control form-control-sm'>$opt</select>";
+$select_modul = "<select name=id_modul class='form-control form-control-sm'>$opt</select>";
 
 
 # ============================================================
-# MAIN SELECT DAILY
+# MINIMUM DATE OF REVISIONS
 # ============================================================
-$s = "SELECT 
-a.*,
-b.arti as arti_status, 
-date(a.last_update) as tanggal_update,
-(SELECT COUNT(1) FROM tb_progres_rev WHERE id_progres_sub=a.id) count_rev 
-FROM tb_progres_sub a 
-JOIN tb_progres_status b ON a.status=b.status 
-WHERE $sql_status
-ORDER BY a.last_update DESC";
-$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$count_row = mysqli_num_rows($q);
-$tr_daily = '';
-$i = 0;
-$j = 0;
-$k = 0;
-$last_tanggal_update = '';
-$sub_tr = '';
-$rows = [];
-while ($d = mysqli_fetch_assoc($q)) {
-  if (isset($rows[$d['tanggal_update']])) {
-    array_push($rows[$d['tanggal_update']], $d);
-  } else {
-    $rows[$d['tanggal_update']][0] = $d;
-  }
-}
+// $s = "SELECT a.*,
+// (SELECT COUNT(1) FROM tb_progres_task WHERE id_fitur=a.id) count_rev  
+// FROM tb_progres_fitur a ORDER BY count_rev";
+// $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+// while ($d = mysqli_fetch_assoc($q)) {
+//   // $id=$d['id'];
+//   echo "<br>$d[id] - $d[count_rev]";
+//   if (!$d['count_rev']) {
+//     $s2 = "INSERT INTO tb_progres_task (
+//       id_fitur,
+//       nama,
+//       request_by,
+//       keterangan,
+//       last_update,
+//       date_created,
+//       href
+//     ) VALUES (
+//       '$d[id]',
+//       '$d[nama] - FirstRev',
+//       '$d[request_by]',
+//       '$d[keterangan]',
+//       '$d[last_update]',
+//       '$d[date_created]',
+//       '$d[href]'
 
-if (!key_exists($today, $rows)) $rows[$today] = []; // add today if not exists
+//     )";
+//     $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+//     // die($s2);
+//   }
+// }
+// exit;
 
-krsort($rows);
-
-$tr_daily = '';
-$i = 0;
-$dis = [];
-foreach ($rows as $k => $v) {
-  $i++;
-  $hari = hari_tanggal($k, 1, 1, 0);
-
-  $j = 0;
-  $sub_tr = '';
-  foreach ($v as $k2 => $v2) {
-    $j++;
-    $id = $v2['id'];
-    $id_progres_sub = $id;
-    $eta = eta2($v2['last_update']);
-    $href_icon = !$v2['href'] ? '<span onclick="alert(`Tidak ada link akses untuk job ini.`)">' . $img_gray . '</span>' : "<a target=_blank href='$v2[href]'>$img_next</a>";
-
-    $icon = $img_arti[$v2['status']] ?? $img_gray;
-
-    if ($v2['count_rev']) {
-
-      $tr_revs = '';
-      $s = "SELECT a.*, b.href as href_sub 
-      FROM tb_progres_rev a 
-      JOIN tb_progres_sub b ON a.id_progres_sub=b.id 
-      WHERE a.id_progres_sub=$id 
-      ORDER BY a.date_created DESC";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      while ($d = mysqli_fetch_assoc($q)) {
-        $id_rev = $d['id'];
-        $eta = eta2($d['date_created']);
-        $href = $d['href'] ?? $d['href_sub'];
-        $href_icon = !$href ? '<span onclick="alert(`Tidak ada link akses untuk revisi ini.`)">' . $img_gray . '</span>' : "<a target=_blank href='$href'>$img_next</a>";
-
-        $tr_revs .= "
-          <tr>
-            <td class='f10'>$d[date_created]</td>
-            <td>$img_delete</td>
-            <td><span class=darkblue>$d[nama]</span></td>
-            <td>$d[keterangan]</td>
-            <td>
-
-              <span class='btn_aksi pointer' id=keterangan_rev_$id_rev" . "__toggle>$img_loading</span> 
-              $href_icon
-              <div class='f10 abu mt1'>$v2[arti_status]</div>
-              <div class='f10 abu mt1'>$eta</div>
-
-              <div class='hideit f10 mt2' id=keterangan_rev_$id_rev>
-                <form method=post class='mt2 f10'>
-                  <div class=mb1>Set status:</div>
-                  <button class='btn btn-danger btn_sm' name=btn_set_status_rev value=0__$id_rev>0</button>
-                  <button class='btn btn-warning btn_sm' name=btn_set_status_rev value=1__$id_rev>1</button>
-                  <button class='btn btn-warning btn_sm' name=btn_set_status_rev value=2__$id_rev>2</button>
-                  <button class='btn btn-info btn_sm' name=btn_set_status_rev value=3__$id_rev>3</button>
-                  <button class='btn btn-success btn_sm' name=btn_set_status_rev value=4__$id_rev>4</button>
-                  <button class='btn btn-success btn_sm' name=btn_set_status_rev value=5__$id_rev>5</button>
-                </form>
-              </div>            
-            </td>
-          </tr>
-        ";
-      }
-
-      $form_delete_subfitur = "
-        <div class='f12 darkblue'>
-          <div class='mt2 mb1'>Revisions:</div>
-          <table class='table table-striped f12'>
-            $tr_revs
-          </table>
-        </div>
-      ";
-
-
-      $form_delete_subfitur .= $role != 'admin' ? '' :  "
-        <button onclick='alert(`delete semua revisi agar sub fitur ini bisa di delete.`)' class='btn btn-secondary btn-sm' >Delete</button>
-      ";
-      $td_progres_sub_status = '';
-    } else { // tidak ada revisions
-      $form_delete_subfitur = $role != 'admin' ? '' :  "
-        <form method=post class='mt1 m0' style='display: inline-block'>
-          <button onclick='return confirm(`Delete subfitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_subfitur value=$id_progres_sub >Delete</button>
-        </form>
-      ";
-      $td_progres_sub_status = "
-        <td width=30%>
-          <span class='btn_aksi pointer' id=keterangan_progres_sub_$id_progres_sub" . "__toggle>$icon</span> 
-          $href_icon
-          <div class='f10 abu mt1'>$v2[arti_status]</div>
-          <div class='f10 abu mt1'>$eta</div>
-
-          <div class='hideit f10 mt2' id=keterangan_progres_sub_$id_progres_sub>
-            <form method=post class='mt2 f10'>
-              <div class=mb1>Set status:</div>
-              <button class='btn btn-danger btn_sm' name=btn_set_status_progres_sub value=0__$id_progres_sub $dis[0]>0</button>
-              <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=1__$id_progres_sub $dis[1]>1</button>
-              <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=2__$id_progres_sub $dis[2]>2</button>
-              <button class='btn btn-info btn_sm' name=btn_set_status_progres_sub value=3__$id_progres_sub $dis[3]>3</button>
-              <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=4__$id_progres_sub $dis[4]>4</button>
-              <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=5__$id_progres_sub $dis[5]>5</button>
-            </form>
-            <form method=post class='mt2 f10 ' target=_blank>
-              <div class=mb1>Set:</div>
-              <button class='btn btn-success btn_sm btn_sedang_dikerjakan' name=btn_sedang_dikerjakan value=$id_progres_sub>Sedang dikerjakan</button>
-            </form>
-          </div>
-
-        </td>
-      ";
-    }
-
-    $form_add_rev = $role != 'admin' ? '' :  "
-      <form method=post class='mt1 hideit wadah gradasi-kuning' id=form_add_rev$id>
-        <input class='form-control mb2' required minlength=3 name=nama placeholder='Revision...'>
-        <textarea class='form-control mb2' required minlength=10 name=keterangan placeholder='Keterangan...'></textarea>
-        <button onclick='return confirm(`Add Revision?`)' class='btn btn-primary btn-sm' name=btn_add_rev value=$id_progres_sub >Add Rev</button>
-      </form>
-    ";
-
-    # ============================================================
-    # FORM EDIT SUBFITUR
-    # ============================================================
-    $form_edit_subfitur = $role != 'admin' ? '' :  "
-      <form method=post class='wadah gradasi-kuning hideit'>
-        ZZZ
-        <button onclick='return confirm(`Update subfitur?`)' class='btn btn-primary btn-sm' name=btn_update_subfitur value=$id_progres_sub >Update</button>
-      </form>
-    ";
-
-
-    for ($k = 0; $k <= 5; $k++) $dis[$k] = '';
-    $dis[$v2['status']] = 'disabled';
-
-    $sub_tr .= "
-      <tr>
-        <td width=50px>$j</td>
-        <td>
-          $v2[nama] <span class=btn_aksi id=form_edit_sub$id" . "__toggle>$img_edit</span> 
-          <div class='f12 abu mt1'>$v2[keterangan]</div>
-          $form_edit_subfitur
-          $form_delete_subfitur
-          <button class='btn btn-info btn-sm btn_aksi' id=form_add_rev$id" . "__toggle>Add Rev</button>
-          $form_add_rev
-        </td>
-        $td_progres_sub_status
-      </tr>
-    ";
-  }
-
-  # ======================================================
-  # TR ADD SUB FITUR AT TOP ROWS ONLY
-  # ======================================================
-  $tr_add_sub = '';
-  $tr_active = '';
-  if ($i == 1) {
-    $j++;
-    $tr_add_sub = "
-      <tr>
-        <td class='abu miring consolas f12 sub_number'>*$j</td>
-        <td colspan=100%>
-          <span class='consolas green f12 bold btn_aksi pointer' id=form_subfitur$id_fitur" . "__toggle>+ Add Subfitur Today</span>
-          <form method=post id=form_subfitur$id_fitur class='hideit mt1'>
-            <table width=100%>
-              <tr>
-                <td>
-                  $select_h1
-                </td>
-                <td>
-                  <button class='btn btn-success btn-sm ml1' name=btn_add_subfitur_daily value=$id_fitur>Add</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input class='form-control form-control-sm' name=new_subfitur required minlength=5 maxlength=30 placeholder='Subfitur Baru...'/>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <textarea class='form-control form-control-sm' name=keterangan required minlength=20 maxlength=1000 placeholder='Keterangan...'></textarea>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input class='form-control form-control-sm' name=href minlength=2 maxlength=100 placeholder='Link akses...'/>
-                </td>
-              </tr>
-            </table>
-          </form>
-        </td>
-      </tr>
-    ";
-    $tr_active = 'tr_active';
-  }
-
-  $tr_daily .= "
-    <tr class='$tr_active'>
-      <td>$hari</td>
-      <td>
-        <table class='table table-hover td_trans'>
-          $sub_tr
-          $tr_add_sub
-        </table>
-      </td>
-    </tr>
-  ";
-}
-
-echo "
-  <div style='max-height:75vh; overflow-y:scroll; position:relative'>
-    <table class='table table-striped table-bordered'>
-      $tr_daily
-    </table>
-  </div>
+# ============================================================
+# MINIMUM DATE OF REVISIONS
+# ============================================================
+$s = "SELECT
+  (SELECT DATE(last_update) FROM tb_progres_task ORDER BY last_update LIMIT 1) awal_rev,
+  (SELECT DATE(last_update) FROM tb_progres_task ORDER BY last_update DESC LIMIT 1) akhir_rev
 ";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$d = mysqli_fetch_assoc($q);
+$awal_rev = $d['awal_rev'];
+$akhir_rev = $d['akhir_rev'];
+
+
+
+$d = intval(date('d'));
+$m = intval(date('m'));
+$y = date('Y');
+
+# ============================================================
+# MAIN LOOP FROM TODAY DATE
+# ============================================================
+$durasi_hari = durasi_hari($awal_rev, $akhir_rev);
+// die("$durasi_hari, $awal_rev, $akhir_rev");
+$kemarin = $today;
+$no = 0;
+for ($i = $durasi_hari; $i > 0; $i--) {
+  $s = "SELECT * FROM tb_progres_task WHERE last_update >= '$kemarin' AND last_update <= '$kemarin 23:59:59' ";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  if ($i == $durasi_hari || mysqli_num_rows($q)) {
+    $no++;
+    echo "<br>$no $kemarin ";
+  }
+
+  $kemarin = date('Y-m-d', strtotime("-1 day", strtotime($kemarin)));
+}

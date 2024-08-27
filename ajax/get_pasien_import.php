@@ -30,8 +30,10 @@ foreach ($arr_join as $join_b) {
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $nama = ucwords(strtolower($d['nama']));
-    $strip_id = strpos("salt||$d[arr_tanggal_by]", "||$id_pemeriksaan=") ? " (sudah)" : " - $d[id]";
-    $div .= "<div class='item_pasien pointer p1' id=item_pasien__$id_import>$nama$strip_id</div>";
+    // $strip_id = strpos("salt||$d[arr_tanggal_by]", "||$id_pemeriksaan=") ? " (sudah)" : " - $d[id]";
+    $info_sudah = strpos("salt||$d[arr_tanggal_by]", "||$id_pemeriksaan=") ? " (sudah) " : ''; // mode replace
+    $strip_id = " - $d[id]"; // mode insert OR replace
+    $div .= "<div class='item_pasien pointer p1' id=item_pasien__$id_import>$info_sudah$nama$strip_id</div>";
 
     if ($i == $limit) $div .= "<div style=color:red>Data limited di $limit item, silahkan perbarui keyword</div>";
   }

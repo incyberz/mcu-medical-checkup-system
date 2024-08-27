@@ -228,30 +228,6 @@ if (isset($_POST['btn_bayar'])) {
 
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     echo div_alert('success', 'Update Pembayaran sukses');
-    // pasien harus login add username
-
-
-    // echo '<br>ADD USERNAME';
-
-    $username_baru = strtolower(str_replace(' ', '', $pasien['nama']));
-    $s = "SELECT 1 FROM tb_pendaftar WHERE username like '$username_baru%'";
-    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-    $count = mysqli_num_rows($q);
-    if ($count) {
-      $count++;
-      $username_baru .= $count;
-    }
-
-    // echo "<br>$username_baru";
-
-
-
-
-
-    $s = "UPDATE tb_pasien SET username='$username_baru' WHERE id=$id_pasien";
-    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-    echo div_alert('success', 'Update Username pasien sukses');
-    // exit;
   } else {
     $s = "UPDATE tb_paket_custom SET $pairs WHERE id=$_POST[id_paket_custom]";
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

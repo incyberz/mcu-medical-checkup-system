@@ -1,5 +1,5 @@
 <?php
-$s = "DESCRIBE tb_progres_h1";
+$s = "DESCRIBE tb_progres_modul";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $colField = [];
 $colType = [];
@@ -36,7 +36,7 @@ while ($d = mysqli_fetch_assoc($q)) {
 }
 
 
-$s = "DESCRIBE tb_progres_sub";
+$s = "DESCRIBE tb_progres_fitur";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $subcolField = [];
 $subcolType = [];

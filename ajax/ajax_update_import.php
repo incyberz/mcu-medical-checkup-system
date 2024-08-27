@@ -16,12 +16,89 @@ $s = "SELECT arr_hasil, arr_tanggal_by FROM tb_hasil_pemeriksaan WHERE id_pasien
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data hasil tidak ditemukan'));
 $d = mysqli_fetch_assoc($q);
-$arr_hasil = "$arr_hasil$d[arr_hasil]";
-$arr_tanggal_by = "$arr_tanggal_by$d[arr_tanggal_by]";
 
+# ============================================================
+# MODE REPLACE :: NEW STRING HASIL
+# ============================================================
+$arr = explode('||', strip_tags($d['arr_hasil']));
+$arr_tmp_hasil = [];
+foreach ($arr as $serpihan) {
+  if ($serpihan) {
+    $arr2 = explode('=', $serpihan, 2);
+    $arr_tmp_hasil[$arr2[0]] = $arr2[1];
+  }
+}
+
+$arr = explode('||', strip_tags($arr_hasil));
+$arr_tmp_new_hasil = [];
+foreach ($arr as $serpihan) {
+  if ($serpihan) {
+    $arr2 = explode('=', $serpihan, 2);
+    $arr_tmp_new_hasil[$arr2[0]] = $arr2[1];
+  }
+}
+
+foreach ($arr_tmp_hasil as $key => $value) {
+  if (key_exists($key, $arr_tmp_new_hasil)) {
+    # ============================================================
+    # REPLACE DENGAN NILAI BARU
+    # ============================================================
+    // echo "\nZZZ $key : $arr_tmp_hasil[$key] >> $arr_tmp_new_hasil[$key]";
+    $arr_tmp_hasil[$key] = $arr_tmp_new_hasil[$key];
+  }
+}
+
+ksort($arr_tmp_hasil);
+$new_str_hasil = '';
+foreach ($arr_tmp_hasil as $key => $value) {
+  $new_str_hasil .= "$key=$value||";
+}
+
+# ============================================================
+# MODE REPLACE :: NEW TANGGAL BY
+# ============================================================
+$arr = explode('||', strip_tags($d['arr_tanggal_by']));
+$arr_tmp_tanggal_by = [];
+foreach ($arr as $serpihan) {
+  if ($serpihan) {
+    $arr2 = explode('=', $serpihan, 2);
+    $arr_tmp_tanggal_by[$arr2[0]] = $arr2[1];
+  }
+}
+
+$arr = explode('||', strip_tags($arr_tanggal_by));
+$arr_tmp_new_tanggal_by = [];
+foreach ($arr as $serpihan) {
+  if ($serpihan) {
+    $arr2 = explode('=', $serpihan, 2);
+    $arr_tmp_new_tanggal_by[$arr2[0]] = $arr2[1];
+  }
+}
+
+foreach ($arr_tmp_tanggal_by as $key => $value) {
+  if (key_exists($key, $arr_tmp_new_tanggal_by)) {
+    # ============================================================
+    # REPLACE DENGAN NILAI BARU
+    # ============================================================
+    // echo "\nZZZ $key : $arr_tmp_tanggal_by[$key] >> $arr_tmp_new_tanggal_by[$key]";
+    $arr_tmp_tanggal_by[$key] = $arr_tmp_new_tanggal_by[$key];
+  }
+}
+
+ksort($arr_tmp_tanggal_by);
+$new_str_tanggal_by = '';
+foreach ($arr_tmp_tanggal_by as $key => $value) {
+  $new_str_tanggal_by .= "$key=$value||";
+}
+
+
+
+# ============================================================
+# UPDATING
+# ============================================================
 $s = "UPDATE tb_hasil_pemeriksaan SET 
-arr_hasil='$arr_hasil',
-arr_tanggal_by='$arr_tanggal_by'
+arr_hasil='$new_str_hasil',
+arr_tanggal_by='$new_str_tanggal_by'
  
 WHERE id_pasien=$id_pasien";
 // die($s);

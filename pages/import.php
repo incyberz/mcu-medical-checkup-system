@@ -58,9 +58,9 @@ $blok_yang_belum = "
 set_h2("Import $nama_pemeriksaan", "
   <a href='?import'>$img_prev</a> 
   Import <b class=darkblue>$nama_pemeriksaan</b> untuk <b class=darkblue>$perusahaan[nama]</b> 
-  <i class=hideita>id_perusahaan:<b class='bg-red' id=id_perusahaan>$id_perusahaan</b></i>
-  <i class=hideita>id_pemeriksaan:<b class='bg-red' id=id_pemeriksaan>$id_pemeriksaan</b></i>
-  <i class=hideita>tb:<b class='bg-red' id=tb>$tb</b></i>
+  <i class=hideit>id_perusahaan:<b class='bg-red' id=id_perusahaan>$id_perusahaan</b></i>
+  <i class=hideit>id_pemeriksaan:<b class='bg-red' id=id_pemeriksaan>$id_pemeriksaan</b></i>
+  <i class=hideit>tb:<b class='bg-red' id=tb>$tb</b></i>
 
   $blok_yang_belum
   
@@ -109,9 +109,11 @@ if (isset($_POST['btn_import'])) {
 
 
   $s = "TRUNCATE tb_import_$tb";
+  echolog($s);
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
   $s = "DESCRIBE tb_import_$tb";
+  echolog($s);
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $arr_field = [];
   while ($d = mysqli_fetch_assoc($q)) {
@@ -121,6 +123,7 @@ if (isset($_POST['btn_import'])) {
 
   $src = "tmp_$id_pemeriksaan.csv";
   if (move_uploaded_file($_FILES['csv_file']['tmp_name'], $src)) {
+    echolog("move_uploaded_file $src");
     $arr_csv = baca_csv($src);
 
     $arr_id_det = [
@@ -164,11 +167,14 @@ if (isset($_POST['btn_import'])) {
           }
 
           $s = "INSERT INTO tb_import_$tb VALUES ($values) ";
-          echo $s;
+          echolog($s);
           $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
         }
       } // end if $arr
     } // foreach $arr_csv
+    if (!$begin) {
+      die(div_alert('danger', "Index [begin] is false, nothing to INSERT. Check your CSV header name!"));
+    }
   } // end if move_uploaded_file
   jsurl();
   exit;
@@ -274,19 +280,17 @@ if ($id_pemeriksaan == $id_pemeriksaan_kd || $id_pemeriksaan == $id_pemeriksaan_
         }
 
         if ($k == 'Name') {
-          $toggle_id = "form$id" . '__toggle';
           $v = "
             $v
             <div style='min-width: 300px'>
               <div>
-                <button class='btn btn-sm btn-success btn_aksi mt1' id=$toggle_id>Import ke pasien:</button> 
                 <button class='btn btn-sm btn-danger mt1 btn_delete_import' id=btn_delete_import__$id>Delete</button> 
               </div>
-              <div class='wadah gradasi-kuning mt2 hideita' id=form$id>
+              <div class='wadah gradasi-kuning mt2'>
                 <input class='form-control mb2 nama_pasien' id=nama_pasien__$id placeholder='enter nama pasien...'>
-                <div id=hasil_ajax__$id>hasil_ajax</div>
-                <button class='btn btn-primary btn-sm w-100 hideita btn_import' id=btn_import__$id>Import</button>
-                <div class='hideita target_id_pasien bg-red tengah mt1' id=target_id_pasien__$id>???</div>
+                <div id=hasil_ajax__$id></div>
+                <button class='btn btn-primary btn-sm w-100 hideit btn_import' id=btn_import__$id>Import</button>
+                <div class='hideit target_id_pasien bg-red tengah mt1' id=target_id_pasien__$id>???</div>
               </div>
             </div>
           ";
@@ -295,13 +299,13 @@ if ($id_pemeriksaan == $id_pemeriksaan_kd || $id_pemeriksaan == $id_pemeriksaan_
         if ($i == 1) $th .= "<th>$kolom</th>";
         $td .= "<td>$v</td>";
       }
-      if ($i == 1) $th .= "<th class='hideita'>arr_hasil</th><th class='hideita'>arr_tanggal_by</th>";
+      if ($i == 1) $th .= "<th class='hideit'>arr_hasil</th><th class='hideit'>arr_tanggal_by</th>";
 
       $tr .= "
         <tr id=tr__$id>
           $td
-          <td class='hideita' id=arr_hasil__$id>$arr_hasil</td>
-          <td class='hideita' id=arr_tanggal_by__$id>$arr_tanggal_by</td>
+          <td class='hideit' id=arr_hasil__$id>$arr_hasil</td>
+          <td class='hideit' id=arr_tanggal_by__$id>$arr_tanggal_by</td>
         </tr>
       ";
     }

@@ -2,11 +2,11 @@
 if (isset($_POST['btn_save_order'])) {
   foreach ($_POST['nomor'] as $k => $v) {
     if ($v !== '') {
-      $h1 = $_POST['h1'][$k];
+      $modul = $_POST['modul'][$k];
       $request_by = $_POST['request_by'][$k];
-      $s = "UPDATE tb_progres_h1 SET 
+      $s = "UPDATE tb_progres_modul SET 
       nomor = $v,
-      h1 = '$h1',
+      modul = '$modul',
       request_by = $request_by 
       WHERE id=$k
       ";
@@ -22,10 +22,10 @@ include 'include/arr_user.php';
 $s = "SELECT 
 a.id, 
 a.nomor, 
-a.h1, 
+a.modul, 
 a.request_by 
-FROM tb_progres_h1 a 
-ORDER BY a.nomor,a.h1";
+FROM tb_progres_modul a 
+ORDER BY a.nomor,a.modul";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (mysqli_num_rows($q)) {
@@ -86,4 +86,4 @@ echo $tr ? "
     </table>
     <button class='btn btn-primary w-100' name=btn_save_order>Save Order</button>
   </form>
-" : div_alert('danger', "Data progres_h1 tidak ditemukan.");
+" : div_alert('danger', "Data progres_modul tidak ditemukan.");

@@ -4,7 +4,7 @@
     text-align: center
   }
 
-  .td_status_subfitur {
+  .td_status_fitur {
     width: 110px
   }
 

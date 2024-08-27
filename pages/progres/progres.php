@@ -2,14 +2,14 @@
 $judul = "Progress dan Request Fitur";
 include 'progres-styles.php';
 $arr_mode = [
-  'daily' => 'Project Daily',
+  'daily' => 'Project Daily Task',
   'hirarki' => 'Hirarki Fitur System',
-  'sort' => 'Sort Penomoran Fitur',
-  'progres' => 'Progres Percentage',
+  'sort' => 'Sort Penomoran Modul',
+  'progres' => 'Task Progres Percentage',
 ];
 $mode = $_GET['mode'] ?? 'daily';
 $status = $_GET['status'] ?? 'all';
-$id_fitur = $_GET['id_fitur'] ?? null;
+$id_modul = $_GET['id_modul'] ?? null;
 set_title("Progres - $mode mode");
 $nav_mode = '';
 foreach ($arr_mode as $k => $v) {
@@ -19,37 +19,37 @@ foreach ($arr_mode as $k => $v) {
       $nav_mode .= "$slash<span class='abu '>$k</span>";
       $judul = $v;
     } else {
-      $nav_mode .= "$slash<a href='?progres&id_fitur=$id_fitur&mode=$k' class=''>$k</a>";
+      $nav_mode .= "$slash<a href='?progres&id_modul=$id_modul&mode=$k' class=''>$k</a>";
     }
   }
 }
 
 # ============================================================
-# TOTAL SUBFITUR 
+# TOTAL TASK 
 # ============================================================
-$s = "SELECT status FROM tb_progres_sub";
+$s = "SELECT status FROM tb_progres_task";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$total_subfitur = mysqli_num_rows($q);
+$total_task = mysqli_num_rows($q);
 
 # ============================================================
 # STATUS & COUNT STATUS
 # ============================================================
 $arti_status = [];
 $count_status = [];
-$percent_subfitur = [];
+$percent_task = [];
 $s = "SELECT a.*,
-  (SELECT count(1) FROM tb_progres_sub WHERE status=a.status) count_status 
+  (SELECT count(1) FROM tb_progres_task WHERE status=a.status) count_status 
   FROM tb_progres_status a";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 while ($d = mysqli_fetch_assoc($q)) {
   $arti_status[$d['status']] = $d['arti'];
   $count_status[$d['status']] = $d['count_status'];
-  $percent_subfitur[$d['status']] = $d['count_status']
-    ? round($d['count_status'] / $total_subfitur * 100, 2)
+  $percent_task[$d['status']] = $d['count_status']
+    ? round($d['count_status'] / $total_task * 100, 2)
     : 0;
 }
 $arti_status['all'] = 'All';
-$count_status['all'] = $total_subfitur;
+$count_status['all'] = $total_task;
 
 
 # ============================================================
@@ -65,7 +65,7 @@ if ($mode == 'daily') {
     } elseif (!$v) {
       // $nav_status .= "$slash<span class='abu miring f10'>$arti_status[$k]</span>";
     } else {
-      $nav_status .= "$slash<a href='?progres&id_fitur=$id_fitur&mode=$mode&status=$k'>$arti_status[$k] ($v)</a>";
+      $nav_status .= "$slash<a href='?progres&id_modul=$id_modul&mode=$mode&status=$k'>$arti_status[$k] ($v)</a>";
     }
   }
 
@@ -144,9 +144,9 @@ if ($mode == 'daily') {
   include 'progres-hirarki.php';
 } elseif ($mode == 'sort') {
   # ============================================================
-  # SORTING FITUR
+  # SORTING MODUL
   # ============================================================
-  include 'progres-sort_fitur.php';
+  include 'progres-sort_modul.php';
 } else { // undefined mode
   die(div_alert('danger', "belum ada handler untuk mode [$mode]"));
 }

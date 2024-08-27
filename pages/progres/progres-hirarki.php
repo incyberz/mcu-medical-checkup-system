@@ -1,23 +1,23 @@
 <?php
-$get_id_fitur = $_GET['id_fitur'] ?? '';
+$get_id_fitur = $_GET['id_modul'] ?? '';
 $get_no = $_GET['no'] ?? '';
 $sql_id_fitur = $get_id_fitur ? "a.id=$get_id_fitur" : '1';
 
 # ======================================================
 # NAV BY SUB PROGRES
 # ======================================================
-$s = "SELECT a.id, a.h1
-FROM tb_progres_h1 a ORDER BY a.nomor";
+$s = "SELECT a.id, a.modul
+FROM tb_progres_modul a ORDER BY a.nomor";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-$nav = "<a class='btn btn-sm btn-info f12' href='?progres' >All Fitur</a> ";
+$nav = "<a class='btn btn-sm btn-info f12' href='?progres&mode=$mode' >All Modul</a> ";
 $i = 0;
 $no_next_fitur = mysqli_num_rows($q) + 1;
 while ($d = mysqli_fetch_assoc($q)) {
   $i++;
-  $btn = $d['id'] == $get_id_fitur ? "<span class='btn btn-sm btn-primary' style='display:inline-block;margin:0 10px 0 5px'>$i</span>" : "<a class='btn btn-sm btn-info f10 miring' href='?progres&id_fitur=$d[id]&no=$i' >$i</a> ";
+  $btn = $d['id'] == $get_id_fitur ? "<span class='btn btn-sm btn-primary' style='display:inline-block;margin:0 10px 0 5px'>$i</span>" : "<a class='btn btn-sm btn-info f10 miring' href='?progres&id_modul=$d[id]&no=$i&mode=$mode' >$i</a> ";
   $nav .= $btn;
 }
-$total_subfitur_show = "";
+$total_task_show = "";
 
 
 
@@ -26,8 +26,8 @@ echo "<div class='mb2 tengah'>$nav</div>";
 # ======================================================
 # MAIN SELECT FITUR
 # ======================================================
-$s = "SELECT a.id as id_fitur, a.* 
-FROM tb_progres_h1 a 
+$s = "SELECT a.id as id_modul, a.* 
+FROM tb_progres_modul a 
 WHERE $sql_id_fitur 
 ORDER BY nomor";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -35,8 +35,8 @@ $tr = '';
 $i = $get_no ? ($get_no - 1) : 0;
 while ($d = mysqli_fetch_assoc($q)) {
   $i++;
-  $id_fitur = $d['id_fitur'];
-  $id_toggle = "fitur$id_fitur" . '__toggle';
+  $id_modul = $d['id_modul'];
+  $id_toggle = "fitur$id_modul" . '__toggle';
 
   # ======================================================
   # FOREACH FITUR KOLOM FOR EDITING FORM
@@ -65,22 +65,16 @@ while ($d = mysqli_fetch_assoc($q)) {
   }
 
   # ======================================================
-  # SELECT SUB FITUR
+  # SELECT FITUR
   # ======================================================
   $s2 = "SELECT a.*,
-  a.id as id_progres_sub,
-  (
-    SELECT arti FROM tb_progres_status 
-    WHERE status=a.status) arti_subfitur, 
-  (
-    SELECT keterangan FROM tb_progres_status 
-    WHERE status=a.status) ket_status_subfitur 
-  FROM tb_progres_sub a 
-  WHERE a.id_fitur=$id_fitur 
+  a.id as id_fitur 
+  FROM tb_progres_fitur a 
+  WHERE a.id_modul=$id_modul 
   ";
 
   $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
-  $tr_sub = '<tr><td colspan=100% class="consolas f12 miring red">Belum ada subfitur</td></tr>';
+  $tr_sub = '<tr><td colspan=100% class="consolas f12 miring red">Belum ada fitur</td></tr>';
   $j = 0;
 
 
@@ -88,18 +82,12 @@ while ($d = mysqli_fetch_assoc($q)) {
     $tr_sub = '';
     while ($d2 = mysqli_fetch_assoc($q2)) {
       $j++;
-      $id_progres_sub = $d2['id_progres_sub'];
-      $status_show = $d2['status'] ? $img_arti[$d2['status']] : $img_warning;
-
-      $arti_subfitur = $d2['arti_subfitur'] ? $d2['arti_subfitur'] : 'Belum dikerjakan';
+      $id_fitur = $d2['id_fitur'];
       $last_update = $d2['last_update'];
 
-      for ($k = 0; $k <= 5; $k++) $dis[$k] = '';
-      $dis[$d2['status']] = 'disabled';
-
-      $form_delete_subfitur = $role != 'admin' ? '' :  "
+      $form_delete_fitur = $role != 'admin' ? '' :  "
         <form method=post class='mt1' target=_blank>
-          <button onclick='return confirm(`Delete subfitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_subfitur value=$id_progres_sub >Delete</button>
+          <button onclick='return confirm(`Delete fitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_fitur value=$id_fitur >Delete</button>
         </form>
       ";
 
@@ -109,31 +97,11 @@ while ($d = mysqli_fetch_assoc($q)) {
           <td>
             $d2[nama]
             <div class='abu f12 mt1'>$d2[keterangan]</div>
-            $form_delete_subfitur
+            $form_delete_fitur
 
           </td>
-          <td class='td_status_subfitur'>
-            <div class='btn_aksi pointer' id=keterangan_progres_sub_$id_progres_sub" . "__toggle>
-              $status_show
-              <div class='abu f10 miring mt1'>$arti_subfitur</div>
-              <div class='abu f10 miring mt1'>$last_update</div>
-            </div>
-            <div class='hideit f10 mt2' id=keterangan_progres_sub_$id_progres_sub>
-              $d2[ket_status_subfitur]
-              <form method=post class='mt2 f10'>
-                <div class=mb1>Set status:</div>
-                <button class='btn btn-danger btn_sm' name=btn_set_status_progres_sub value=0__$id_progres_sub $dis[0]>0</button>
-                <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=1__$id_progres_sub $dis[1]>1</button>
-                <button class='btn btn-warning btn_sm' name=btn_set_status_progres_sub value=2__$id_progres_sub $dis[2]>2</button>
-                <button class='btn btn-info btn_sm' name=btn_set_status_progres_sub value=3__$id_progres_sub $dis[3]>3</button>
-                <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=4__$id_progres_sub $dis[4]>4</button>
-                <button class='btn btn-success btn_sm' name=btn_set_status_progres_sub value=5__$id_progres_sub $dis[5]>5</button>
-              </form>
-              <form method=post class='mt2 f10' target=_blank>
-                <div class=mb1>Set:</div>
-                <button class='btn btn-success btn_sm btn_sedang_dikerjakan' name=btn_sedang_dikerjakan value=$id_progres_sub>Sedang dikerjakan</button>
-              </form>
-            </div>
+          <td class='td_status_fitur'>
+            EMPTY TD
           </td>
         </tr>
       ";
@@ -148,15 +116,15 @@ while ($d = mysqli_fetch_assoc($q)) {
     <tr>
       <td class='abu miring consolas f12 sub_number'>*$i.$j</td>
       <td colspan=100%>
-        <span class='consolas green f12 bold btn_aksi pointer' id=form_subfitur$id_fitur" . "__toggle>+ Add Subfitur</span>
-        <form method=post id=form_subfitur$id_fitur class='hideit mt1'>
+        <span class='consolas green f12 bold btn_aksi pointer' id=form_fitur$id_modul" . "__toggle>+ Add Subfitur</span>
+        <form method=post id=form_fitur$id_modul class='hideit mt1'>
           <table width=100%>
             <tr>
               <td>
-                <input class='form-control form-control-sm' name=new_subfitur required minlength=5 maxlength=30 placeholder='Subfitur Baru...'/>
+                <input class='form-control form-control-sm' name=new_fitur required minlength=5 maxlength=30 placeholder='Subfitur Baru...'/>
               </td>
               <td>
-                <button class='btn btn-success btn-sm ml1' name=btn_add_subfitur value=$id_fitur>Add</button>
+                <button class='btn btn-success btn-sm ml1' name=btn_add_fitur value=$id_modul>Add</button>
               </td>
             </tr>
             <tr>
@@ -187,7 +155,7 @@ while ($d = mysqli_fetch_assoc($q)) {
 
   $form_delete_fitur = $role != 'admin' ? '' :  "
     <form method=post class='mt1'>
-      <button onclick='return confirm(`Delete fitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_fitur value=$id_fitur >Delete</button>
+      <button onclick='return confirm(`Delete fitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_fitur value=$id_modul >Delete</button>
     </form>
   ";
 
@@ -200,12 +168,12 @@ while ($d = mysqli_fetch_assoc($q)) {
     <tr>
       <td>$i</td>
       <td>
-        $d[h1] <span class=btn_aksi id=$id_toggle>$img_detail</span>
-        <form method=post class='hideit wadah gradasi-kuning mt2' id=fitur$id_fitur>
+        $d[modul] <span class=btn_aksi id=$id_toggle>$img_detail</span>
+        <form method=post class='hideit wadah gradasi-kuning mt2' id=fitur$id_modul>
           <div class='f10 abu consolas mb2'>FORM EDIT FITUR</div>
           <table>
             $tr_form
-            <tr><td>&nbsp;</td><td colspan=100%><button class='btn btn-info btn-sm' name=btn_update_fitur value=$id_fitur>Update</button></td></tr>
+            <tr><td>&nbsp;</td><td colspan=100%><button class='btn btn-info btn-sm' name=btn_update_fitur value=$id_modul>Update</button></td></tr>
           </table>
         </form>
         $form_delete_fitur 
@@ -242,13 +210,15 @@ $tr_add = "
 # FINAL TABLE OUTPUT
 # ======================================================
 echo "
-  <table class='table'>
-    <thead>
+<div style='position:relative;max-height:65vh;overflow-y:scroll' class='gradasi-hijau br10 pl1 pr1'>
+  <table class='table th_toska td_trans'>
+    <thead style='position:sticky;top:0'>
       <th>No</th>
-      <th>Sub Divisi / Fitur</th>
-      <th>Subfitur dan Status</th>
+      <th>Modul System</th>
+      <th>Fitur dan Task</th>
     </thead>
     $tr
     $tr_add
   </table>  
+</div>
 ";
