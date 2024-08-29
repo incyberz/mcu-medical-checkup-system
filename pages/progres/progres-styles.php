@@ -21,4 +21,8 @@
     border: solid 1px blue;
     background: #faf
   }
+
+  .inline {
+    display: inline;
+  }
 </style>

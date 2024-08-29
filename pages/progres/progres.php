@@ -10,6 +10,8 @@ $arr_mode = [
 $mode = $_GET['mode'] ?? 'daily';
 $status = $_GET['status'] ?? 'all';
 $id_modul = $_GET['id_modul'] ?? null;
+$post_task = $_POST['task'] ?? null;
+$post_keterangan = $_POST['keterangan'] ?? null;
 set_title("Progres - $mode mode");
 $nav_mode = '';
 foreach ($arr_mode as $k => $v) {

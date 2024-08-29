@@ -55,7 +55,7 @@ if (!mysqli_num_rows($q)) {
       $nilai_normal = "$normal_lo_l-$normal_hi_l";
       if ($normal_hi_p and $normal_lo_p) {
         $beda_by_gender = 1;
-        $nilai_normal = "L($nilai_normal), P($normal_hi_p-$normal_lo_p)";
+        $nilai_normal = "L($nilai_normal), P($normal_lo_p-$normal_hi_p)";
       }
       // kalkulasi H/L RANGE
       $normal_hi = $normal_hi_l;

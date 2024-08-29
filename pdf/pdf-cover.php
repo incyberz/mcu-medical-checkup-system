@@ -30,7 +30,7 @@ $arr = [
   'DEPARTEMEN' => "$departemen",
   'TTL' => $ttl,
   'TGL PERIKSA' => "$tanggal_periksa",
-  'ALAMAT' => "$alamat",
+  'ALAMAT' => "$alamat_trim",
 ];
 
 

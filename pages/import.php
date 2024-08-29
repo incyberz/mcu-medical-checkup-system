@@ -145,7 +145,7 @@ if (isset($_POST['btn_import'])) {
     $arr_index_csv = [];
     foreach ($arr_csv as $row => $arr) {
       if ($arr) {
-        if ($arr[1] == 'Sample_ID') {
+        if ($arr[1] == 'Sample_ID' || $arr[1] == 'Sample ID') {
           $begin = 1;
 
           foreach ($arr as $key => $value) {
@@ -275,7 +275,7 @@ if ($id_pemeriksaan == $id_pemeriksaan_kd || $id_pemeriksaan == $id_pemeriksaan_
           }
         }
 
-        if ($k == 'Sample_ID') {
+        if ($k == 'Sample_ID' || $k == 'Sample ID') {
           $v = "<span class='f8 abu'>$v<div>" . date('d-m-y', strtotime($d['Time'])) . '</div></span>';
         }
 

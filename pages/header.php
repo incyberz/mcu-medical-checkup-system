@@ -116,6 +116,7 @@ if ($username and ($role == 'admin' || $role == 'marketing')) {
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_paket'>Manage Paket</a></li>
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_order'>Manage Order</a></li>
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_pemeriksaan'>Manage Pemeriksaan</a></li>
+        <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_perusahaan'>Manage Perusahaan</a></li>
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?import'>Import Data</a></li>
       </ul>
     </li>

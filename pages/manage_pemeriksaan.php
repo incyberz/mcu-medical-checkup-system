@@ -262,7 +262,7 @@ if (!mysqli_num_rows($q)) {
       $value_id = "value__$key" . "__$id_pemeriksaan";
 
       $input_for_editing = '';
-      if ($key == 'nama'  || $key == 'singkatan') {
+      if ($key == 'nama' || $key == 'singkatan' || $key == 'biaya') {
         $input_for_editing = "<input class='form-control' value='$value' id=input__$value_id>";
       } elseif ($key == 'deskripsi') {
         $input_for_editing = "<textarea rows=10 class='form-control' id=input__$value_id>$value</textarea>";

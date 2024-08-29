@@ -95,7 +95,7 @@ while ($d = mysqli_fetch_assoc($q)) {
         <tr>
           <td class='sub_number'>$i.$j</td>
           <td>
-            $d2[nama]
+            $d2[fitur]
             <div class='abu f12 mt1'>$d2[keterangan]</div>
             $form_delete_fitur
 

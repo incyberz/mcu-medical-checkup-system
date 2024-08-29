@@ -1,33 +1,61 @@
 <?php
-if (isset($_POST['btn_delete_fitur'])) {
-  $s = "DELETE FROM tb_progres_modul WHERE id=$_POST[btn_delete_fitur]";
+if (isset($_POST['btn_delete_modul'])) {
+  $s = "DELETE FROM tb_progres_modul WHERE id=$_POST[btn_delete_modul]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   jsurl();
 }
-
-if (isset($_POST['btn_add_rev'])) {
-  $nama = $_POST['nama'] ?? die(erid('nama'));
-  $keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
-
-  $s = "INSERT INTO tb_progres_task (
-    id_fitur,
-    nama,
-    request_by,
-    keterangan
-  ) VALUES (
-    $_POST[btn_add_rev],
-    '$nama',
-    $id_user,
-    '$keterangan'
-  )";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  jsurl();
-}
-
 if (isset($_POST['btn_delete_fitur'])) {
   $s = "DELETE FROM tb_progres_fitur WHERE id=$_POST[btn_delete_fitur]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   jsurl();
+}
+if (isset($_POST['btn_delete_task'])) {
+  $s = "DELETE FROM tb_progres_task WHERE id=$_POST[btn_delete_task]";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  jsurl();
+}
+
+# ============================================================
+# TAKE TASK
+# ============================================================
+if (isset($_POST['btn_take_task'])) {
+  $s = "UPDATE tb_progres_task SET assign_by=$id_user WHERE id=$_POST[btn_take_task]";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  jsurl();
+}
+
+# ============================================================
+# DROP TASK
+# ============================================================
+if (isset($_POST['btn_drop_task'])) {
+  $s = "UPDATE tb_progres_task SET assign_by=NULL WHERE id=$_POST[btn_drop_task] AND assign_by=$id_user";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  jsurl();
+}
+
+
+if (isset($_POST['btn_add_task'])) {
+  $post_task = $_POST['task'] ?? die(erid('task'));
+  $post_keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
+  $post_id_fitur = $_POST['id_fitur'] ?? die(erid('id_fitur'));
+
+  if ($post_id_fitur) {
+    $s = "INSERT INTO tb_progres_task (
+      id_fitur,
+      task,
+      request_by,
+      keterangan
+    ) VALUES (
+      $post_id_fitur,
+      '$post_task',
+      $id_user,
+      '$post_keterangan'
+    )";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    jsurl();
+  } else {
+    echo div_alert('danger', "Anda belum memilih Fitur pada saat Add Task.");
+  }
 }
 
 if (isset($_POST['btn_add_fitur'])) {

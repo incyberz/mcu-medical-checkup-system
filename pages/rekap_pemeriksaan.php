@@ -119,7 +119,17 @@ if ($status_pasien === '') {
     SELECT p.nama FROM tb_perusahaan p 
     JOIN tb_harga_perusahaan q ON p.id=q.id_perusahaan 
     WHERE q.id=a.id_harga_perusahaan
-    ) perusahaan_corin  
+    ) perusahaan_corin,  
+  (
+    SELECT p.id FROM tb_perusahaan p 
+    JOIN tb_order q ON p.id=q.id_perusahaan 
+    WHERE q.order_no=a.order_no
+    ) id_perusahaan,
+  (
+    SELECT p.id FROM tb_perusahaan p 
+    JOIN tb_harga_perusahaan q ON p.id=q.id_perusahaan 
+    WHERE q.id=a.id_harga_perusahaan
+    ) id_perusahaan_corin  
   
   FROM tb_pasien a 
   JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
@@ -153,6 +163,7 @@ if ($status_pasien === '') {
       # SEPARATOR PERUSAHAAN
       # ============================================================
       $perusahaan = $d['perusahaan'] ?? $d['perusahaan_corin'];
+      $id_perusahaan = $d['id_perusahaan'] ?? $d['id_perusahaan_corin'];
       if (!$perusahaan) $perusahaan = "<b class=green>INDIVIDU (NON C0RPORATE) - $tanggal_periksa</b>";
       if ($last_perusahaan != $perusahaan || $last_tanggal_periksa != $tanggal_periksa) {
         $div_mobile .= "<div class='gradasi-kuning p2 border-bottom mt4 mb2 bold darkblue f20'>$perusahaan - $tanggal_periksa</div>";
@@ -178,22 +189,8 @@ if ($status_pasien === '') {
       }
       $status_show = $d['status_pasien'] ? "<span class='warna_status_$status'>$d[status_pasien]</span>" : '<i class="f14 abu">belum pemeriksaan</i>';
 
-      if ($d['whatsapp']) {
-
-        $zdatetime = date('idymhs');
-        $rand = rand(1, 999999);
-        $rand = str_replace('0', '9', $rand);
-        $rand2 = rand(10, 99);
-        $id_pasien2024 = ($id_pasien * 7) + 2024;
-        $zid_pasien = $rand . "0$id_pasien2024$zdatetime$rand2";
-
-        $Tn = strtoupper($d['gender']) == 'L' ? 'Tn' : 'Ny';
-        $link_akses = urlencode("https://mmc-clinic.com/k/?");
-        $text_wa = "Selamat $waktu $Tn. $d[nama],%0a%0aTerima kasih telah mengikuti Medical Checkup di Mutiara Medical Center. Semoga Anda selalu sehat.%0a%0aSilahkan buka hasil MCU Anda:%0a$link_akses$zid_pasien%0a%0a_Mutiara Medical System, $now _";
-        $link_wa = "<a target=_blank href='https://api.whatsapp.com/send?phone=$d[whatsapp]&text=$text_wa'>$img_wa</a>";
-      } else {
-        $link_wa = 'ISI WA DULU';
-      }
+      // redirect fitur send wa via rekap perusahaan
+      $link_wa = "<a onclick='return confirm(`Buka Rekap Perusahaan?\n\nUntuk pasien Corporate, fitur Send-WA via Rekap Perusahaan. Klik OK untuk membuka Rekap Perusahaan di Tab baru.`)' target=_blank href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=approv&tanggal_periksa=$d[tanggal_periksa]'>$img_wa</a>";
 
       if ($jenis == 'cor') {
         $link_verif = $d['approv_date'] ? $link_wa : " | 

@@ -107,7 +107,8 @@ include 'rekap_perusahaan-navigasi_tanggal.php';
 # ============================================================
 # SELECT PASIEN PRE-SQL COMMAND
 # ============================================================
-if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
+// if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
+if ($perusahaan['cara_bayar'] == 'ci' || $perusahaan['cara_bayar'] == 'bi') { // Cor-Idv
   $tb_c = "tb_harga_perusahaan c ON a.id_harga_perusahaan=c.id";
 } else {
   $tb_c = "tb_order c ON a.order_no=c.order_no";
@@ -217,7 +218,7 @@ if (mysqli_num_rows($qpasien)) {
       ];
     }
 
-    $hasil_lab = [];
+    $hasil_lab = []; // hasil lab untuk setiap pasien
     foreach ($id_labs as $key => $id_pemeriksaan) {
 
       $s = "SELECT
@@ -244,7 +245,7 @@ if (mysqli_num_rows($qpasien)) {
                 $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil</span></li>";
               }
             } elseif ($option_default) {
-              if ($option_default != $hasil) {
+              if ($option_default != $hasil and $id_detail != 129) { // exception eritrosit urine id = 129
                 $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil</span></li>";
               }
             } else { // by batasan
@@ -290,6 +291,7 @@ if (mysqli_num_rows($qpasien)) {
       $kesimpulan = $belum_ada;
     } else {
       $kesimpulan =  $arr_kesimpulan[$hasil_at_db['hasil']];
+      $kesimpulan = $hasil_at_db['hasil'] ? $kesimpulan : "<b class='red'>$kesimpulan</b>";
     }
 
     $kesimpulan_fisik = $hasil_at_db['kesimpulan_fisik'] ?? $belum_ada;
@@ -317,96 +319,7 @@ if (mysqli_num_rows($qpasien)) {
       # ============================================================
       # RADIO FIT | UNFIT KESIMPULAN | PRINT PERORANGAN
       # ============================================================
-      $blok_radio = '';
-      $blok_print = '';
-      foreach ($arr_kesimpulan as $key => $value) {
-        $checked = ($key == 1 and !$arr_konsultasi and $kesimpulan_fisik == '-') ? 'checked' : '';
-        $hide_radio = ($key == 1 and  $arr_konsultasi) ? 'hideit' : '';
-        $blok_radio .= "<div class='$hide_radio'><label><input type=radio name=hasil__$id_pasien value=$key $checked> $value</label></div>";
-      }
-      if ($kesimpulan == $belum_ada) {
-        $gradasi_merah = 'gradasi-merah';
-        $hideit = '';
-      } else { // sudah ada kesimpulan
-        $gradasi_merah = '';
-        $hideit = 'hideit';
-        $blok_print = "
-          <div class=mt1>
-            <a target=_blank href='pdf/?id_pasien=$id_pasien' class='btn btn-primary btn-sm'>Print</a>
-          </div>
-          <div class=mt1>
-            <a target=_blank class='btn btn-success btn-sm'>Send</a>
-          </div>
-        ";
-      }
-      $blok_radio = "<div class='$hideit' id=blok_radio$id_pasien>$blok_radio</div>";
-      $kesimpulan = "
-        <div class='mb1 bold '>
-          <span class=btn_aksi id=blok_radio$id_pasien" . "__toggle>
-            $kesimpulan
-          </span>
-        </div>
-        $blok_radio
-        $blok_print
-      ";
-
-      # ============================================================
-      # IS HAIDH
-      # ============================================================
-      $gender = strtoupper($pasien['gender']);
-      if ($gender == 'L') {
-        $is_haid_show = '';
-      } else {
-        $is_haid_show = $pasien['is_haid'] === null ? 'haidh: no-data' : 'sedang haidh';
-        $is_haid_show = "<div class=red>$is_haid_show</div>";
-      }
-
-      $hasil_hema = $hasil_lab['HEMA'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=HEM&id_pemeriksaan=$id_pemeriksaan_dl'>$hasil_lab[HEMA]</a>";
-      $hasil_urine = $hasil_lab['URINE'] == 'normal' ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=URI&id_pemeriksaan=$id_pemeriksaan_uri'>$hasil_lab[URINE]</a>";
-      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[RONTGEN]";
-      $hasil_rontgen = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON&id_pemeriksaan=$id_pemeriksaan_ron'>$hasil_rontgen</a>";
-
-      # ============================================================
-      # PUBLISITAS
-      # ============================================================
-      $publish = "<span class='f10 abu miring'>belum bisa publish</span>";
-
-
-      # ============================================================
-      # TR APPROV
-      # ============================================================
-      $tr_approv .= "
-        <tr>
-          <td>$no_urut</td>
-          <td>MCU-$pasien[id_pasien]</td>
-          <td>$pasien[nama_pasien]</td>
-          <td>$gender$is_haid_show</td>
-          <td><span class=hideit>KELUHAN</span>$keluhan</td>
-          <td id='kesFis'><span class=hideit>KESIMPULAN FISIK</span>$kesimpulan_fisik</td>
-          $td_kimia_darah
-          <td><span class=hideit>DARAH LENGKAP</span>$hasil_hema</td>
-          <td><span class=hideit>URINE</span>$hasil_urine</td>
-          <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
-          <td class='$gradasi_merah'><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
-          <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
-          <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        
-          <td><span class=hideit>PUBLISH</span>$publish</td>        
-        </tr>
-      ";
-
-      $rekomendasi_custom = $rekomendasi == 'Dapat bekerja sesuai bidangnya' ? 'NULL' : "'$rekomendasi'";
-
-      # ============================================================
-      # UPDATE KONSULTASI WHEN SUBMIT
-      # ============================================================
-      if (isset($_POST['btn_submit'])) {
-        echolog("Updating konsultasi + rekomendasi for [ $pasien[id_pasien] | $pasien[nama_pasien] ]");
-        $s = "UPDATE tb_hasil_pemeriksaan SET 
-        konsultasi = '$konsultasi',
-        rekomendasi = $rekomendasi_custom
-        WHERE id_pasien = $pasien[id_pasien] ";
-        $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      }
+      include 'rekap_perusahaan-mode_approv.php';
     } else { // end if mode approv
 
       $buta_show = 'tidak buta warna';
@@ -419,7 +332,7 @@ if (mysqli_num_rows($qpasien)) {
         if ($batas > $imt) break;
       }
 
-      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'>$hasil_lab[RONTGEN]</a>";
+      $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'><b class=red>$hasil_lab[RONTGEN]</b></a>";
 
       # ============================================================
       # FINAL TR PREVIEW UNTUK PERUSAHAAN
@@ -566,7 +479,7 @@ if ($mode == 'detail') {
 $tag_form = '';
 $end_form = '';
 $btn_print = "<button class='btn btn-primary' onclick=window.print()>Print</button>";
-$btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF</a>";
+$btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF Semua Pasien</a>";
 $btn_submit  = '';
 $sub_h = "<div class='tengah m2 abu f14'>Preview Rekap per Perusahaan</div>";
 if ($mode == 'approv') {
@@ -629,100 +542,7 @@ if ($mode == 'detail' || $mode == 'approv') {
   # ============================================================
 
 } elseif ($mode == 'invoice') {
-  if ($perusahaan['cara_bayar'] == 'bc') { // by corporate
-
-    $s = "SELECT a.*,b.nama as nama_paket FROM tb_harga_perusahaan a 
-    JOIN tb_paket b ON a.id_paket=b.id 
-    WHERE a.id_perusahaan=$id_perusahaan";
-    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-    if (!mysqli_num_rows($q)) {
-      div_alert('danger', 'Data [harga_perusahaan] tidak ditemukan');
-    } else {
-      $harga_perusahaan = mysqli_fetch_assoc($q);
-      $harga = $harga_perusahaan['harga'];
-    }
-
-    $tr = '';
-    $total_bayar = 0;
-    $i = 0;
-    foreach ($arr_tanggal_periksa as $tanggal_periksa) {
-      $i++;
-      $s = "SELECT 1 FROM tb_pasien a
-      JOIN tb_harga_perusahaan b ON a.id_harga_perusahaan=b.id
-      JOIN tb_hasil_pemeriksaan c ON a.id=c.id_pasien
-      WHERE b.id_perusahaan=$id_perusahaan
-      AND date(c.awal_periksa) = '$tanggal_periksa'";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      $jumlah_pasien = mysqli_num_rows($q);
-
-      $tgl = hari_tanggal($tanggal_periksa, 1, 0, 0);
-
-      $jumlah_rp = $jumlah_pasien * $harga;
-      $total_bayar += $jumlah_rp;
-
-      $harga_show = number_format($harga);
-      $jumlah_rp_show = number_format($jumlah_rp);
-
-
-      $tr .= "
-        <tr>
-          <td>$i</td>
-          <td>$tgl</td>
-          <td>
-            Biaya Medical Checkup Karyawan
-            <div class='f14 miring mt1'>$harga_perusahaan[nama_paket]</div>
-          </td>
-          <td>$harga_show</td>
-          <td>$jumlah_pasien</td>
-          <td class=kanan>$jumlah_rp_show</td>
-        </tr>
-      ";
-    }
-
-
-    $hari = hari_tanggal($today, 1, 0, 0);
-    $total_bayar_show = number_format($total_bayar);
-
-    $fs = 'f14';
-
-    echo "
-      <div class='kiri border-top pt2 border-bottom pb2 $fs'>
-        <div class=kanan>Bekasi, $hari</div>
-        <div>Kepada Yth. <b>PIMPINAN $NAMA_PERUSAHAAN</b></div>
-        <div class=mb4>di Tempat</div>
-        <div class=mb2>Berikut adalah Invoice Medical Checkup dengan rincian:</div>
-        <table class='table th_toska th_kiri td_trans'>
-          <thead>
-            <th>No</th>
-            <th>Tanggal</th>
-            <th>Uraian</th>
-            <th>Biaya</th>
-            <th>Jumlah Pasien</th>
-            <th class=kanan>Jumlah Rp</th>
-          </thead>
-          $tr
-          <tr style='background: #dff' class='bold'>
-            <td colspan=5 class=kanan>
-              TOTAL BAYAR
-            </td>
-            <td class=kanan>$total_bayar_show</td>
-          </tr>
-        </table>
-      </div>
-      <div style='margin-left: 12cm'>
-        <div class='mt2 mb1 $fs'>Admin Mutiara Medical Center</div>
-    ";
-
-    include 'include/enkrip14.php';
-    $z = enkrip14($id_perusahaan);
-
-    require_once 'include/qrcode.php';
-    $qr = QRCode::getMinimumQRCode("https://mmc-clinic.com/qr?$z", QR_ERROR_CORRECT_LEVEL_L);
-    $qr->printHTML('3px');
-    echo '</div>'; // end margin left xxx cm
-  } else {
-    echo div_alert('danger', "BELUM ADA HANDLER INVOICE UNTUK CARA_BAYAR [$perusahaan[cara_bayar] ]");
-  }
+  include 'rekap_perusahaan-invoice.php';
 } else {
   echo div_alert('danger', "KONTEN INTI UNTUK MODE [$mode] BELUM ADA");
 }

@@ -9,13 +9,12 @@ if (isset($_POST['btn_filter_tanggal'])) {
   if ($tanggals) jsurl("?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggals");
 }
 
-$arr_mode_bayar_cor_man = [
-  1 => 'Yasunli',
-  28 => 'PT GI',
-];
 
+# ============================================================
+# PENENTUAN CARA BAYAR PERUSAHAAN : CORMAN | BY-CORP
+# ============================================================
 $arr_tanggal_periksa = [];
-if (array_key_exists($id_perusahaan, $arr_mode_bayar_cor_man)) {
+if ($perusahaan['cara_bayar'] == 'ci' || $perusahaan['cara_bayar'] == 'bi') { // Cor-Idv
   $tb_c = "tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id";
 } else {
   $tb_c = "tb_order c ON b.order_no=c.order_no";

@@ -38,13 +38,17 @@ foreach ($arr as $serpihan) {
   }
 }
 
-foreach ($arr_tmp_hasil as $key => $value) {
-  if (key_exists($key, $arr_tmp_new_hasil)) {
+
+foreach ($arr_tmp_new_hasil as $key => $value) {
+  if (key_exists($key, $arr_tmp_hasil)) {
     # ============================================================
     # REPLACE DENGAN NILAI BARU
     # ============================================================
     // echo "\nZZZ $key : $arr_tmp_hasil[$key] >> $arr_tmp_new_hasil[$key]";
     $arr_tmp_hasil[$key] = $arr_tmp_new_hasil[$key];
+  } else {
+    // echo "\nZZZ key: $key | INSERTING NEW value: $value";
+    $arr_tmp_hasil[$key] = $value;
   }
 }
 
@@ -74,16 +78,34 @@ foreach ($arr as $serpihan) {
     $arr_tmp_new_tanggal_by[$arr2[0]] = $arr2[1];
   }
 }
+// echo '<pre>';
+// var_dump($arr);
+// echo '</pre>';
+// exit;
 
-foreach ($arr_tmp_tanggal_by as $key => $value) {
-  if (key_exists($key, $arr_tmp_new_tanggal_by)) {
+// foreach ($arr_tmp_tanggal_by as $key => $value) {
+//   if (key_exists($key, $arr_tmp_new_tanggal_by)) {
+//     # ============================================================
+//     # REPLACE DENGAN NILAI BARU
+//     # ============================================================
+//     // echo "\nZZZ $key : $arr_tmp_tanggal_by[$key] >> $arr_tmp_new_tanggal_by[$key]";
+//     $arr_tmp_tanggal_by[$key] = $arr_tmp_new_tanggal_by[$key];
+//   }
+// }
+
+foreach ($arr_tmp_new_tanggal_by as $key => $value) {
+  if (key_exists($key, $arr_tmp_tanggal_by)) {
     # ============================================================
     # REPLACE DENGAN NILAI BARU
     # ============================================================
     // echo "\nZZZ $key : $arr_tmp_tanggal_by[$key] >> $arr_tmp_new_tanggal_by[$key]";
     $arr_tmp_tanggal_by[$key] = $arr_tmp_new_tanggal_by[$key];
+  } else {
+    // echo "\nZZZ key: $key | INSERTING NEW value: $value";
+    $arr_tmp_tanggal_by[$key] = $value;
   }
 }
+
 
 ksort($arr_tmp_tanggal_by);
 $new_str_tanggal_by = '';
@@ -101,7 +123,10 @@ arr_hasil='$new_str_hasil',
 arr_tanggal_by='$new_str_tanggal_by'
  
 WHERE id_pasien=$id_pasien";
-// die($s);
+// echo '<pre>';
+// var_dump($s);
+// echo '</pre>';
+// exit;
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
 

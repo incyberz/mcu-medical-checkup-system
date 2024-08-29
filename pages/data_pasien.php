@@ -79,7 +79,17 @@ b.nama as jenis_pasien,
 ( 
   SELECT perusahaan FROM tb_order p 
   WHERE p.order_no=a.order_no 
-  ) perusahaan
+  ) perusahaan,
+( 
+  SELECT nama FROM tb_perusahaan p
+  JOIN tb_harga_perusahaan q ON p.id=q.id_perusahaan
+  WHERE q.id=a.id_harga_perusahaan  
+  ) perusahaan_ci, -- Corporate Individu
+( 
+  SELECT nama FROM tb_perusahaan p
+  JOIN tb_order q ON p.id=q.id_perusahaan
+  WHERE q.order_no=a.order_no  
+  ) perusahaan_bc -- By Corporate
 
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
@@ -118,6 +128,8 @@ if (mysqli_num_rows($q)) {
         || $key == 'status_bayar_corporate_mandiri'
         || $key == 'tanggal_bayar_corporate_mandiri'
         || $key == 'perusahaan'
+        || $key == 'perusahaan_ci'
+        || $key == 'perusahaan_bc'
         || $key == 'whatsapp'
         || $key == 'username'
       ) continue;
@@ -234,10 +246,10 @@ if (mysqli_num_rows($q)) {
             $value = $arr_paket_corporate[$d4['id_paket']];
             $value = "<div class='f14 '>$value</div>";
             $value = "<a href='?manage_paket_custom&id_pasien=$id_pasien' >$value</a>";
-            $value = "$value<div class='f12 abu miring'><a href='?manage_harga_perusahaan&id_harga_perusahaan=$d[id_harga_perusahaan]'>$d[perusahaan]</a></div>";
+            $value = "$value<div class='f12 abu miring'><a href='?manage_harga_perusahaan&id_harga_perusahaan=$d[id_harga_perusahaan]'>$d[perusahaan_ci]</a></div>";
           } else {
             // biarkan
-            $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[perusahaan]</a></div>";
+            $value = "$value<div class='f12 abu miring'><a href='?manage_order&order_no=$d[order_no]'>$d[perusahaan_bc]</a></div>";
           }
         } else {
           if (!$value and !$d['id_paket_custom']) {

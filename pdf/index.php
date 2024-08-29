@@ -43,7 +43,7 @@ if ($get_id_pasien) {
   $nama_file = "hasil-mcu$get_id_pasien-$nama.pdf";
   $sql_tanggal_periksa = '1';
 } elseif ($get_id_perusahaan) {
-  if ($get_id_perusahaan == 1 || $get_id_perusahaan == 28) { // yasunli or PT GI
+  if ($get_id_perusahaan == 1 || $get_id_perusahaan == 28 || $get_id_perusahaan == 29) { // yasunli or PT GI or LJK
     $s = "SELECT a.id as id_pasien,
     c.nama as nama_perusahaan 
     FROM tb_pasien a 
@@ -207,6 +207,9 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     $nama_pasien = $pasien['nama'];
     $arr_hasil = explode('||', $pasien['arr_hasil']);
     $arr_tanggal_by = explode('||', $pasien['arr_tanggal_by']);
+    $tmp = explode(', Jawa Barat,', $pasien['alamat']);
+    $alamat_trim = $tmp[0];
+
 
     foreach ($arr_hasil as $pair) {
       $pair = trim($pair);
