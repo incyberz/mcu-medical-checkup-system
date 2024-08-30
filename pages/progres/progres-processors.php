@@ -1,4 +1,7 @@
 <?php
+# ============================================================
+# DELETE ACTION
+# ============================================================
 if (isset($_POST['btn_delete_modul'])) {
   $s = "DELETE FROM tb_progres_modul WHERE id=$_POST[btn_delete_modul]";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -14,6 +17,8 @@ if (isset($_POST['btn_delete_task'])) {
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   jsurl();
 }
+
+
 
 # ============================================================
 # TAKE TASK
@@ -34,22 +39,36 @@ if (isset($_POST['btn_drop_task'])) {
 }
 
 
+
+# ============================================================
+# ADD TASK
+# ============================================================
 if (isset($_POST['btn_add_task'])) {
   $post_task = $_POST['task'] ?? die(erid('task'));
   $post_keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
   $post_id_fitur = $_POST['id_fitur'] ?? die(erid('id_fitur'));
+  $assign_by = $_POST['assign_by'] ?? die(erid('assign_by'));
+  $status = $_POST['status'] ?? die(erid('status'));
+
+  $assign_by = $assign_by ? $assign_by : 'NULL';
 
   if ($post_id_fitur) {
     $s = "INSERT INTO tb_progres_task (
       id_fitur,
       task,
       request_by,
-      keterangan
+      keterangan,
+      date_created,
+      assign_by,
+      status
     ) VALUES (
       $post_id_fitur,
       '$post_task',
       $id_user,
-      '$post_keterangan'
+      '$post_keterangan',
+      '$post_today',
+      $assign_by,
+      $status
     )";
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     jsurl();
@@ -58,34 +77,42 @@ if (isset($_POST['btn_add_task'])) {
   }
 }
 
-if (isset($_POST['btn_add_fitur'])) {
-  $nama_fitur = $_POST['new_fitur'] ?? die(erid('new_fitur'));
-  $nama_fitur = strtoupper($nama_fitur);
-  $s = "INSERT INTO tb_progres_modul (modul, request_by) VALUES ('$nama_fitur',$id_user)";
+# ============================================================
+# ADD MODUL
+# ============================================================
+if (isset($_POST['btn_add_modul'])) {
+  $nama_modul = $_POST['new_modul'] ?? die(erid('new_modul'));
+  $nama_modul = strtoupper($nama_modul);
+  $s = "INSERT INTO tb_progres_modul (modul, request_by) VALUES ('$nama_modul',$id_user)";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   jsurl();
 }
+
 if (isset($_POST['btn_add_fitur']) || isset($_POST['btn_add_fitur_daily'])) {
-  $id_modul =  $_POST['id_modul'] ?? $_POST['btn_add_fitur']; // from daily-form or from btn-val
-  if (!$id_modul) die(erid('id_modul'));
-  $nama_fitur = $_POST['new_fitur'] ?? die(erid('new_fitur'));
-  $keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
-  $href = $_POST['href'] ?? null;
-  $href = $href ? "'$href'" : 'NULL';
+  die('processor aborted.');
+  // $id_modul =  $_POST['id_modul'] ?? $_POST['btn_add_fitur']; // from daily-form or from btn-val
+  // if (!$id_modul) die(erid('id_modul'));
+  // $nama_fitur = $_POST['new_fitur'] ?? die(erid('new_fitur'));
+  // $keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
+  // $href = $_POST['href'] ?? null;
+  // $href = $href ? "'$href'" : 'NULL';
 
-  $nama_fitur = strtoupper($nama_fitur);
+  // $nama_fitur = strtoupper($nama_fitur);
 
-  $s = "INSERT INTO tb_progres_fitur 
-  (id_modul,nama,request_by,keterangan,href) VALUES 
-  ($id_modul,'$nama_fitur',$id_user,'$keterangan',$href)";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  jsurl();
+  // $s = "INSERT INTO tb_progres_fitur 
+  // (id_modul,nama,request_by,keterangan,href) VALUES 
+  // ($id_modul,'$nama_fitur',$id_user,'$keterangan',$href)";
+  // $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  // jsurl();
 }
 
 
-if (isset($_POST['btn_update_fitur'])) {
-  $id = $_POST['btn_update_fitur'];
-  unset($_POST['btn_update_fitur']);
+# ============================================================
+# UPDATE MODUL
+# ============================================================
+if (isset($_POST['btn_update_modul'])) {
+  $id = $_POST['btn_update_modul'];
+  unset($_POST['btn_update_modul']);
 
   $pairs = '__';
   foreach ($_POST as $key => $value) {
@@ -100,22 +127,21 @@ if (isset($_POST['btn_update_fitur'])) {
   jsurl();
 }
 
-if (isset($_POST['btn_set_status_progres_sub'])) {
-  // echo div_alert('danger','Maaf, saat ini hanya DEVELOPER yang bisa mengubah status development.');
-  $arr = explode('__', $_POST['btn_set_status_progres_sub']);
-  $status = $arr[0];
-  $id_fitur = $arr[1];
 
-  $s = "SELECT id_modul FROM tb_progres_fitur WHERE id=$id_fitur";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  $d = mysqli_fetch_assoc($q);
-  $id_modul = $d['id_modul'];
+# ============================================================
+# SET STATUS TASK 
+# ============================================================
+if (isset($_POST['btn_set_status_task'])) {
+  if (!in_array($username, $dev_usernames)) {
+    echo div_alert('danger', "Hanya Developer yang berhak mengubah status Task.");
+  } else {
+    $arr = explode('__', $_POST['btn_set_status_task']);
+    $status = $arr[0];
+    $id_task = $arr[1];
 
-  $s = "UPDATE tb_progres_fitur SET status=$status,last_update=CURRENT_TIMESTAMP WHERE id=$id_fitur";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  jsurl("?progres&id_modul=$id_modul&mode=$mode");
-}
 
-if (isset($_POST['btn_sedang_dikerjakan'])) {
-  echo div_alert('danger', 'Maaf, hanya DEVELOPER yang bisa mengubah fitur mana yang sedang dikerjakan saat ini.');
+    $s = "UPDATE tb_progres_task SET status=$status,last_update=CURRENT_TIMESTAMP WHERE id=$id_task";
+    $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+    jsurl("?progres&id_modul=$id_modul&mode=$mode");
+  }
 }

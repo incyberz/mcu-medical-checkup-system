@@ -85,14 +85,16 @@ $no = 0;
 $tr = '';
 for ($i = $durasi_hari; $i > 0; $i--) {
   $s = "SELECT a.*,
-  b.keterangan as nama_status,
+  b.arti as arti_status,
   (SELECT nama FROM tb_user WHERE id=a.request_by) requester,
   (SELECT nama FROM tb_user WHERE id=a.assign_by) assigner,
-1
+  1
+
   FROM tb_progres_task a 
   JOIN tb_progres_status b ON a.status=b.status 
-  WHERE a.last_update >= '$kemarin' 
-  AND a.last_update <= '$kemarin 23:59:59' 
+  WHERE a.date_created >= '$kemarin' 
+  AND a.date_created <= '$kemarin 23:59:59' 
+  ORDER BY a.date_created
   ";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $jumlah_task = mysqli_num_rows($q);
@@ -102,17 +104,28 @@ for ($i = $durasi_hari; $i > 0; $i--) {
     # ============================================================
     # FORM ADD TASK PADA ROW PALING ATAS
     # ============================================================
-    $form_add_task = '';
-    if ($i == $durasi_hari) {
-      $form_add_task = $role != 'admin' ? '' :  "
-        <span class=btn_aksi id=form_add_task__toggle>$img_add Task</span>
-        <form method=post class='hideita mt1 wadah gradasi-kuning' id=form_add_task>
-          $select_fitur
-          <input class='form-control mb2' required minlength=3 name=task value='$post_task' placeholder='Task...'>
-          <textarea class='form-control mb2' required minlength=10 name=keterangan placeholder='Keterangan...'>$post_keterangan</textarea>
-          <button class='btn btn-primary btn-sm' name=btn_add_task>Add Task</button>
-        </form>
-      ";
+    if ($as_dev) {
+      $form_add_task = '';
+      if ($i == $durasi_hari) {
+        $form_add_task = $role != 'admin' ? '' :  "
+          <span class=btn_aksi id=form_add_task__toggle>$img_add Task</span>
+          <form method=post class='hideita mt1 wadah gradasi-kuning' id=form_add_task>
+            $select_fitur
+            <div class=row>
+              <div class=col-lg-6>
+                <input class='form-control mb2' required minlength=3 name=task value='$post_task' placeholder='Task...'>
+              </div>
+              <div class=col-lg-6>
+                <input type=date class='form-control mb2' required name=date_created value='$post_today'>
+              </div>
+            </div>
+            <textarea class='form-control mb2' required minlength=10 name=keterangan placeholder='Keterangan...'>$post_keterangan</textarea>
+            <button class='btn btn-primary btn-sm' name=btn_add_task>Add Task</button>
+          </form>
+        ";
+      }
+    } else {
+      $form_add_task = div_alert('info', "Hanya developer yang berhak Add Task");
     }
 
 
@@ -128,31 +141,60 @@ for ($i = $durasi_hari; $i > 0; $i--) {
       while ($d = mysqli_fetch_assoc($q)) {
         $j++;
         $id_task = $d['id'];
+        $status = $d['status'];
+        $is_mine = $d['assign_by'] == $id_user ? 1 : 0;
 
         # ============================================================
         # FORM DELETE TASK
         # ============================================================
-        $form_hapus_task = "<form method=post class='inline m0 p0'><button onclick='return confirm(`Delete Task ini?`)' class='btn-transparan' name=btn_delete_task value=$id_task>$img_delete</button></form>";
+        $form_hapus_task = $status >= 3 ? "<i onclick='alert(`Tidak dapat menghapus atau Dropping Task yang sudah selesai.`)'>$img_delete_disabled</i>" : "<form method=post class='inline m0 p0'><button onclick='return confirm(`Delete Task ini?`)' class='btn-transparan' name=btn_delete_task value=$id_task>$img_delete</button></form>";
 
         if ($d['assign_by']) {
-          # ============================================================
-          # DROP TASK
-          # ============================================================
-          $form_drop_task = "<form method=post class='inline m0 p0'><button onclick='return confirm(`Batalkan Task ini?`)' class='btn-transparan' name=btn_drop_task value=$id_task>$img_drop</button></form>";
+          if ($is_mine) {
+            # ============================================================
+            # DROP TASK
+            # ============================================================
+            $form_drop_task = $status >= 3 ? '' :  "<form method=post class='inline m0 p0'><button onclick='return confirm(`Batalkan Task ini?`)' class='btn-transparan' name=btn_drop_task value=$id_task>$img_drop</button></form>";
+            $assign_by_show =   "(me) $form_drop_task";
+          } else {
+            $assign_by_show = $d['assigner'];
+          }
+
 
           # ============================================================
           # ASSIGN_BY 
           # ============================================================
-          $assign_by_show =  $d['assigner'];
-          if ($d['assign_by'] == $id_user) { // mine task
-            $assign_by_show = "(me) $form_drop_task";
-          }
         } else {
           # ============================================================
           # FORM TAKE TASK
           # ============================================================
           $form_take_task = "<form method=post class='inline m0 p0'><button onclick='return confirm(`Ambil Task ini?`)' class='btn btn-sm btn-warning' name=btn_take_task value=$id_task>$img_take Take</button></form>";
           $assign_by_show = $form_take_task;
+        }
+
+        # ============================================================
+        # STATUS TASK
+        # ============================================================
+        $status_task_show = $d['arti_status'];
+        if ($is_mine) {
+          # ============================================================
+          # FORM SET STATUS TASK
+          # ============================================================
+          $icon = $icon_status[$d['status']];
+          $status_task_show .= "
+            <span class='btn_aksi pointer' id=keterangan_task_$id_task" . "__toggle>$icon</span> 
+            <div class='hideit f10 mt2' id=keterangan_task_$id_task>
+              <form method=post class='mt2 f10'>
+                <div class=mb1>Set status:</div>
+                <button class='btn btn-danger btn_sm w-100 mb1' name=btn_set_status_task value=0__$id_task>[0] $arti_status[0]</button>
+                <button class='btn btn-warning btn_sm w-100 mb1' name=btn_set_status_task value=1__$id_task>[1] $arti_status[1]</button>
+                <button class='btn btn-warning btn_sm w-100 mb1' name=btn_set_status_task value=2__$id_task>[2] $arti_status[2]</button>
+                <button class='btn btn-info btn_sm w-100 mb1' name=btn_set_status_task value=3__$id_task>[3] $arti_status[3]</button>
+                <button class='btn btn-success btn_sm w-100 mb1' name=btn_set_status_task value=4__$id_task>[4] $arti_status[4]</button>
+                <button class='btn btn-success btn_sm w-100 mb1' name=btn_set_status_task value=5__$id_task>[5] $arti_status[5]</button>
+              </form>
+            </div>            
+          ";
         }
 
         $tasks .= "
@@ -166,7 +208,7 @@ for ($i = $durasi_hari; $i > 0; $i--) {
               $assign_by_show
             </td>
             <td >
-              $d[nama_status]
+              $status_task_show
             </td>
           </tr>
         ";

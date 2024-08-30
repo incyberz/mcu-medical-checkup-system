@@ -12,6 +12,7 @@ $status = $_GET['status'] ?? 'all';
 $id_modul = $_GET['id_modul'] ?? null;
 $post_task = $_POST['task'] ?? null;
 $post_keterangan = $_POST['keterangan'] ?? null;
+$post_today = $_POST['date_created'] ?? $today;
 set_title("Progres - $mode mode");
 $nav_mode = '';
 foreach ($arr_mode as $k => $v) {
@@ -25,6 +26,13 @@ foreach ($arr_mode as $k => $v) {
     }
   }
 }
+
+# ============================================================
+# DEV USERNAMES 
+# ============================================================
+$dev_usernames = ['insho'];
+$as_dev = in_array($username, $dev_usernames) ? 1 : 0;
+
 
 # ============================================================
 # TOTAL TASK 
@@ -52,6 +60,18 @@ while ($d = mysqli_fetch_assoc($q)) {
 }
 $arti_status['all'] = 'All';
 $count_status['all'] = $total_task;
+
+
+# ============================================================
+# ICON STATUS
+# ============================================================
+$icon_status = [];
+$icon_status[0] = $img_warning;
+$icon_status[1] = img_icon('review');
+$icon_status[2] = img_icon('revision2');
+$icon_status[3] = $img_check;
+$icon_status[4] = img_icon('release2');
+$icon_status[5] = img_icon('stable');
 
 
 # ============================================================
