@@ -1,9 +1,15 @@
 <?php
-$tanggal_awal = '2024-7-1';
-$bln = $arr_nama_bulan[intval(date('m', strtotime($tanggal_awal))) - 1];
+$s = "SELECT MIN(DATE(date_created)) as tanggal_awal FROM tb_pasien  ";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$d = mysqli_fetch_assoc($q);
+$tanggal_awal = $d['tanggal_awal'];
+$bulan_awal = intval(date('m', strtotime($tanggal_awal)));
+
+$nama_bulan_awal = $arr_nama_bulan[intval(date('m', strtotime($tanggal_awal))) - 1];
+$nama_bulan = $arr_nama_bulan[intval(date('m', strtotime($today))) - 1];
 $tahun = date('Y', strtotime($tanggal_awal));
 $img_filter = img_icon('filter');
-set_h2('Pendaftaran', "Data Pendaftaran Pasien <b class=darkblue>$bln $tahun</b> $img_filter");
+set_h2('Pendaftaran', "Data Pendaftaran Pasien <b class=darkblue>$nama_bulan $tahun</b> $img_filter");
 only(['admin', 'nakes', 'marketing', 'dokter', 'dokter-pj']);
 
 

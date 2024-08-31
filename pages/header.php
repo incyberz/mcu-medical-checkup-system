@@ -100,6 +100,12 @@ if ($username) {
 }
 
 if ($username and ($role == 'admin' || $role == 'marketing')) {
+
+  $menu_insho = '';
+  if ($username == 'insho') {
+    $menu_insho = "<li><a class='nav-link gradasi-merah bold menu_admin' href='?replacer_hasil_mcu'>Replacer Hasil MCU</a></li>";
+  }
+
   $li_admin = "
     <li><a class='nav-link gradasi-hijau bold menu_admin' href='?progres'>Progres</a></li>
     <li class='dropdown '><a class='gradasi-hijau' href='#'><span>Manage</span> <i class='bi bi-chevron-down'></i></a>
@@ -117,7 +123,10 @@ if ($username and ($role == 'admin' || $role == 'marketing')) {
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_order'>Manage Order</a></li>
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_pemeriksaan'>Manage Pemeriksaan</a></li>
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_perusahaan'>Manage Perusahaan</a></li>
+        <li><a class='nav-link gradasi-hijau bold menu_admin' href='?manage_cara_bayar'>Manage Cara Bayar</a></li>
+        <li><a class='nav-link gradasi-hijau bold menu_admin' href='?paket_harga_perusahaan'>Paket Harga Perusahaan</a></li>
         <li><a class='nav-link gradasi-hijau bold menu_admin' href='?import'>Import Data</a></li>
+        $menu_insho
       </ul>
     </li>
   ";

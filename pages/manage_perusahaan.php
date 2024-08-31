@@ -33,17 +33,20 @@ if (isset($_POST['btn_delete_perusahaan'])) {
 # ============================================================
 # MAIN SELECT PERUSAHAAN
 # ============================================================
-$s = "SELECT a.*,
-(SELECT count(1) FROM tb_order WHERE id_perusahaan=a.id) count_order, 
-(SELECT count(1) FROM tb_harga_perusahaan WHERE id_perusahaan=a.id) count_harga_perusahaan, 
+$s = "SELECT 
+a.id,
+a.nama,
+(
+  SELECT p.harga FROM tb_harga_perusahaan p 
+  WHERE p.id_perusahaan=a.id) harga_perusahaan, 
 (
   SELECT count(1) FROM tb_order p 
   JOIN tb_pasien q ON p.order_no=q.order_no 
-  WHERE p.id_perusahaan=a.id) count_pasien_bc, 
+  WHERE p.id_perusahaan=a.id) count_pasien_free, 
 (
   SELECT count(1) FROM tb_harga_perusahaan p 
   JOIN tb_pasien q ON q.id_harga_perusahaan=p.id 
-  WHERE p.id_perusahaan=a.id) count_pasien_ci  
+  WHERE p.id_perusahaan=a.id) count_pasien_berbayar  
 FROM tb_perusahaan a ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
@@ -54,7 +57,9 @@ if (mysqli_num_rows($q)) {
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $id_perusahaan = $d['id'];
-    $count = $d['count_order'] + $d['count_harga_perusahaan'] + $d['count_pasien_bc'] + $d['count_pasien_ci'];
+
+
+    $count_pasien =  $d['count_pasien_free'] + $d['count_pasien_berbayar'];
     $td = '';
     foreach ($d as $key => $value) {
       if (in_array($key, $key_hidden)) continue;
@@ -62,7 +67,7 @@ if (mysqli_num_rows($q)) {
 
       if ($key == 'nama') {
         $kolom = 'Nama Perusahaan';
-        $icon_delete = $count ? "<i onclick='alert(`hapus dahulu sub-trx agar perusahaan ini dapat dihapus.`)'>$img_delete_disabled</i>" : "
+        $icon_delete = $count_pasien ? "<i onclick='alert(`hapus dahulu sub-trx agar perusahaan ini dapat dihapus.`)'>$img_delete_disabled</i>" : "
           <form method=post style='display:inline' class='m0 p0'>
             <button class='transparan' name=btn_delete_perusahaan value=$id_perusahaan onclick='return confirm(`Hapus perusahaan ini?`)'>$img_delete</button>
           </form>
@@ -72,15 +77,15 @@ if (mysqli_num_rows($q)) {
           <a href='?add_perusahaan&aksi=edit&id_perusahaan=$id_perusahaan' onclick='return confirm(`Edit perusahaan ini?`)'>$img_edit</a> 
           $i. $value
         ";
-      } elseif ($key == 'count_pasien_ci') {
-        $kolom = 'Pasien CI<div class="f10 abu">Corporate Individu</div>';
-      } elseif ($key == 'count_pasien_bc') {
-        $kolom = 'Pasien BC<div class="f10 abu">Bayar by Corporate</div>';
+      } elseif ($key == 'harga_perusahaan') {
+        $value = !$value ? '<i class="f12 abu consolas">free</i>' : '<a href=?paket_harga_perusahaan>Rp ' . number_format($value) . '</a>';
+      } elseif ($key == 'count_pasien_free' || $key == 'count_pasien_berbayar') {
+        $value = !$value ? $value : "<a target=_blank onclick='return confirm(`Buka rekap perusahaan?`)' href='?rekap_perusahaan&id_perusahaan=$d[id]&mode=detail'>$value</a>";
       }
       if (substr($key, 0, 6) == 'count_') {
         $value = $value ? $value : '<i class="abu">-</i>';
       }
-      $value = $count ? $value : "<span class='miring abu'>$value</span>";
+      $value = $count_pasien ? $value : "<span class='miring abu'>$value</span>";
       $td .= "<td>$value</td>";
       if ($i == 1) {
         $kolom = $kolom ? $kolom : key2kolom($key);

@@ -43,16 +43,20 @@ if (strtolower($pasien['gender']) == 'l') {
 }
 
 
-
-$poin_tes_warna = $arr_id_detail[11];
-if ($poin_tes_warna < 8) {
-  if ($poin_tes_warna < 3) {
-    $tes_buta_warna = 'Buta warna total';
+if (isset($arr_id_detail[11])) {
+  $poin_tes_warna = $arr_id_detail[11];
+  if ($poin_tes_warna < 8) {
+    if ($poin_tes_warna < 3) {
+      $tes_buta_warna = 'Buta warna total';
+    } else {
+      $tes_buta_warna = 'Buta warna parsial';
+    }
   } else {
-    $tes_buta_warna = 'Buta warna parsial';
+    $tes_buta_warna = 'Tidak buta warna';
   }
 } else {
-  $tes_buta_warna = 'Tidak buta warna';
+  $poin_tes_warna = 0;
+  $tes_buta_warna = '--no data--';
 }
 
 $sistol = $arr_id_detail[7];

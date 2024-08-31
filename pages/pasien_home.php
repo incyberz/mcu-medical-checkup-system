@@ -137,7 +137,25 @@ if ($order_no) {
   JOIN tb_program d ON c.id_program=d.id 
   WHERE a.id='$id_user'";
 } elseif ($id_paket_custom) {
-  die(div_alert('danger', "Belum ada handler untuk pasien custom [id_paket_custom: $id_paket_custom]"));
+  # ============================================================
+  # PASIEN INDIVIDU CORPORATE
+  # ============================================================
+  $s = "SELECT 
+  a.*, 
+  a.id as id_pasien,
+  a.status, -- status pasien
+  (CONCAT(a.nama,' (Anda sendiri)')) pendaftar,
+  a.date_created as tanggal_order,
+  b.id as id_paket,
+  'Paket Custom' as paket,
+  'Program Medical Checkup' as program,
+  '1' as id_program,
+  (SELECT awal_periksa FROM tb_hasil_pemeriksaan WHERE id_pasien=a.id) awal_periksa, 
+  (SELECT nama FROM tb_status_pasien WHERE status=a.status) status_pasien 
+  FROM tb_pasien a 
+  JOIN tb_paket_custom b ON a.id_paket_custom=b.id 
+  WHERE a.id='$id_user'";
+  // die(div_alert('danger', "Belum ada handler untuk pasien custom [id_paket_custom: $id_paket_custom]"));
 } else {
   die(div_alert('danger', "Belum melakukan pembayaran atau belum ada handler untuk Jenis pasien invalid.<hr>Silahkan tanyakan kepada Petugas tentang Status Pembayaran Anda."));
 }

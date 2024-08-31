@@ -5,11 +5,12 @@ if ($mode == 'monitoring_pasien') {
 }
 
 $arr_mode = [
-  'detail' => ['Preview untuk Perusahaan', ''],
-  'approv' => ['Approv MCU Corporate', ''],
+  'detail' => ['Preview Mode', ''],
+  'approv' => ['Approv Mode', ''],
   'monitoring_pasien' => ['Monitoring Pasien', '_blank'],
   'kirim_link' => ['Kirim Link ke HRD', '_blank'],
-  'invoice' => ['Cetak Invoice', ''],
+  'invoice' => ['Invoice', ''],
+  'kwitansi' => ['Kwitansi', ''],
 ];
 
 $nav_mode = '';

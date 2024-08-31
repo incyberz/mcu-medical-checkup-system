@@ -104,16 +104,50 @@ for ($i = $durasi_hari; $i > 0; $i--) {
     # ============================================================
     # FORM ADD TASK PADA ROW PALING ATAS
     # ============================================================
-    if ($as_dev) {
-      $form_add_task = '';
-      if ($i == $durasi_hari) {
-        $form_add_task = $role != 'admin' ? '' :  "
+    $form_add_task = '';
+    if ($i == $durasi_hari) {
+      if ($as_dev || $role == 'admin') {
+        # ============================================================
+        # SELECT USERS FOR ADD TASK
+        # ============================================================
+        $opt = '<option value=0>--assign by no one--</option>';
+        $s2 = "SELECT id,username FROM tb_user ORDER BY username";
+        $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+        while ($d2 = mysqli_fetch_assoc($q2)) {
+          $selected = '';
+          if ($as_dev && $d2['id'] == $id_user) {
+            $selected = 'selected';
+            $d2['username'] = '--by myself--';
+          }
+          $opt .= "<option value=$d2[id] $selected>$d2[username]</option>";
+        }
+        $select_assigned_by = "<select name=assign_by class='form-control mb2'>$opt</select>";
+
+        # ============================================================
+        # SELECT STATUS FOR ADD TASK
+        # ============================================================
+        $opt = '';
+        $s2 = "SELECT status,arti FROM tb_progres_status";
+        $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+        while ($d2 = mysqli_fetch_assoc($q2)) {
+          $opt .= "<option value=$d2[status] >Status $d2[status] : $d2[arti]</option>";
+        }
+        $select_status = "<select name=status class='form-control mb2'>$opt</select>";
+
+
+        $form_add_task = "
           <span class=btn_aksi id=form_add_task__toggle>$img_add Task</span>
           <form method=post class='hideita mt1 wadah gradasi-kuning' id=form_add_task>
             $select_fitur
             <div class=row>
               <div class=col-lg-6>
                 <input class='form-control mb2' required minlength=3 name=task value='$post_task' placeholder='Task...'>
+              </div>
+              <div class=col-lg-6>
+                $select_assigned_by
+              </div>
+              <div class=col-lg-6>
+                $select_status
               </div>
               <div class=col-lg-6>
                 <input type=date class='form-control mb2' required name=date_created value='$post_today'>
@@ -123,9 +157,9 @@ for ($i = $durasi_hari; $i > 0; $i--) {
             <button class='btn btn-primary btn-sm' name=btn_add_task>Add Task</button>
           </form>
         ";
+      } else {
+        $form_add_task = div_alert('info', "Hanya developer atau admin yang berhak Add Task");
       }
-    } else {
-      $form_add_task = div_alert('info', "Hanya developer yang berhak Add Task");
     }
 
 
@@ -147,7 +181,7 @@ for ($i = $durasi_hari; $i > 0; $i--) {
         # ============================================================
         # FORM DELETE TASK
         # ============================================================
-        $form_hapus_task = $status >= 3 ? "<i onclick='alert(`Tidak dapat menghapus atau Dropping Task yang sudah selesai.`)'>$img_delete_disabled</i>" : "<form method=post class='inline m0 p0'><button onclick='return confirm(`Delete Task ini?`)' class='btn-transparan' name=btn_delete_task value=$id_task>$img_delete</button></form>";
+        $form_hapus_task = $status >= 3 ? "<span style='display:inline-block; margin: 0 5px' onclick='alert(`Tidak dapat menghapus atau Dropping Task yang sudah selesai.`)'>$img_delete_disabled</span>" : "<form method=post class='inline m0 p0'><button onclick='return confirm(`Delete Task ini?`)' class='btn-transparan' name=btn_delete_task value=$id_task>$img_delete</button></form>";
 
         if ($d['assign_by']) {
           if ($is_mine) {

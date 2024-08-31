@@ -190,7 +190,13 @@ $arr_pemeriksaan_by = [];
 
 
 $s = "SELECT 
-* 
+*,
+(
+  SELECT concat('Kec ',p.nama_kec, ', ', q.nama_kab) 
+  FROM tb_kec p
+  JOIN tb_kab q ON p.id_kab=q.id_kab  
+  WHERE p.id_kec=a.id_kec ) alamat_trim
+
 FROM tb_pasien a 
 JOIN tb_hasil_pemeriksaan b ON b.id_pasien=a.id 
 WHERE $where_id_pasien 
@@ -207,8 +213,12 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     $nama_pasien = $pasien['nama'];
     $arr_hasil = explode('||', $pasien['arr_hasil']);
     $arr_tanggal_by = explode('||', $pasien['arr_tanggal_by']);
-    $tmp = explode(', Jawa Barat,', $pasien['alamat']);
-    $alamat_trim = $tmp[0];
+
+    # ============================================================
+    # ALAMAT TRIM
+    # ============================================================
+    $alamat_trim = $pasien['alamat_trim'] ? ucwords(strtolower($pasien['alamat_trim'])) : '-';
+
 
 
     foreach ($arr_hasil as $pair) {

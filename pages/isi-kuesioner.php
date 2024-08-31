@@ -140,6 +140,8 @@ if (!$start) {
       $i++;
       $kode = $d['penyakit'] ?? $d['gejala'];
 
+      $id_program = 1;
+      // $s2 = "SELECT *,id as id_pertanyaan FROM tb_pertanyaan WHERE id_program=$id_program AND (penyakit='$kode' OR gejala='$kode') ";
       $s2 = "SELECT *,id as id_pertanyaan FROM tb_pertanyaan WHERE id_program=$id_program AND (penyakit='$kode' OR gejala='$kode') ";
       // echo $s2;
       // exit;

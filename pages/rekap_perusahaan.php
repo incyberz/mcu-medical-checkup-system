@@ -322,9 +322,13 @@ if (mysqli_num_rows($qpasien)) {
       include 'rekap_perusahaan-mode_approv.php';
     } else { // end if mode approv
 
-      $buta_show = 'tidak buta warna';
-      if ($arr_id_detail[11] < 7) $buta_show = "<span class=red>parsial</span>";
-      if ($arr_id_detail[11] < 4) $buta_show = "<span class=red>buta warna</span>";
+      if (isset($arr_id_detail[11])) {
+        $buta_show = 'tidak buta warna';
+        if ($arr_id_detail[11] < 7) $buta_show = "<span class=red>parsial</span>";
+        if ($arr_id_detail[11] < 4) $buta_show = "<span class=red>buta warna</span>";
+      } else {
+        $buta_show = '<i>--no data--</i>';
+      }
 
       $status_gizi = '';
       foreach ($batas_imt as $batas => $v) {
@@ -420,9 +424,10 @@ $tanggal_periksa_header = $tanggal_periksa_header ?? hari_tanggal($awal_periksa,
 $landscape = 'landscape';
 if ($mode == 'detail') {
   $h3 = "REKAPITULASI HASIL MCU $NAMA_PERUSAHAAN";
-} elseif ($mode == 'invoice') {
+} elseif ($mode == 'invoice' || $mode == 'kwitansi') {
   $landscape = 'portrait';
-  $h3 = "<span class='f30' style='font-weight: normal; color:blue; letter-spacing: 5px'>INVOICE</span>";
+  $MODE = strtoupper($mode);
+  $h3 = "<span class='f30' style='font-weight: normal; color:blue; letter-spacing: 5px'>$MODE</span>";
   $tanggal_periksa_header = '';
 } elseif ($mode == 'approv') {
   $h3 = "<div class='f18 biru'>APPROV KESIMPULAN $NAMA_PERUSAHAAN</div>";
@@ -478,7 +483,7 @@ if ($mode == 'detail') {
 
 $tag_form = '';
 $end_form = '';
-$btn_print = "<button class='btn btn-primary' onclick=window.print()>Print</button>";
+$btn_print = "<button class='btn btn-primary' onclick=window.print() id=btn_print>Print</button>";
 $btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF Semua Pasien</a>";
 $btn_submit  = '';
 $sub_h = "<div class='tengah m2 abu f14'>Preview Rekap per Perusahaan</div>";
@@ -541,6 +546,8 @@ if ($mode == 'detail' || $mode == 'approv') {
   # END KONTEN INTI : FORM APPROV OR PREVIEW CORPORATE
   # ============================================================
 
+} elseif ($mode == 'kwitansi') {
+  include 'rekap_perusahaan-kwitansi.php';
 } elseif ($mode == 'invoice') {
   include 'rekap_perusahaan-invoice.php';
 } else {

@@ -14,6 +14,7 @@ if ($perusahaan['cara_bayar'] == 'bc' || $perusahaan['cara_bayar'] == 'bi') { //
 
   $tr = '';
   $total_bayar = 0;
+  $total_pasien = 0;
   $i = 0;
   foreach ($arr_tanggal_periksa as $tanggal_periksa) {
     $i++;
@@ -25,6 +26,7 @@ if ($perusahaan['cara_bayar'] == 'bc' || $perusahaan['cara_bayar'] == 'bi') { //
 
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
     $jumlah_pasien = mysqli_num_rows($q);
+    $total_pasien += $jumlah_pasien;
 
     $tgl = hari_tanggal($tanggal_periksa, 1, 0, 0);
 
@@ -51,46 +53,53 @@ if ($perusahaan['cara_bayar'] == 'bc' || $perusahaan['cara_bayar'] == 'bi') { //
   }
 
 
-  $hari = hari_tanggal($today, 1, 0, 0);
-  $total_bayar_show = number_format($total_bayar);
+  if ($mode == 'invoice') {
 
-  $fs = 'f14';
+    $hari = hari_tanggal($today, 1, 0, 0);
+    $total_bayar_show = number_format($total_bayar);
 
-  echo "
-    <div class='kiri border-top pt2 border-bottom pb2 $fs'>
-      <div class=kanan>Bekasi, $hari</div>
-      <div>Kepada Yth. <b>PIMPINAN $NAMA_PERUSAHAAN</b></div>
-      <div class=mb4>di Tempat</div>
-      <div class=mb2>Berikut adalah Invoice Medical Checkup dengan rincian:</div>
-      <table class='table th_toska th_kiri td_trans'>
-        <thead>
-          <th>No</th>
-          <th>Tanggal</th>
-          <th>Uraian</th>
-          <th>Biaya</th>
-          <th>Jumlah Pasien</th>
-          <th class=kanan>Jumlah Rp</th>
-        </thead>
-        $tr
-        <tr style='background: #dff' class='bold'>
-          <td colspan=5 class=kanan>
-            TOTAL BAYAR
-          </td>
-          <td class=kanan>$total_bayar_show</td>
-        </tr>
-      </table>
-    </div>
-    <div style='margin-left: 12cm'>
-      <div class='mt2 mb1 $fs'>Admin Mutiara Medical Center</div>
-  ";
+    $fs = 'f14';
 
-  include 'include/enkrip14.php';
-  $z = enkrip14($id_perusahaan);
+    echo "
+      <div class='kiri border-top pt2 border-bottom pb2 $fs'>
+        <div class=kanan>Bekasi, $hari</div>
+        <div>Kepada Yth. <b>PIMPINAN $NAMA_PERUSAHAAN</b></div>
+        <div class=mb4>di Tempat</div>
+        <div class=mb2>Berikut adalah Invoice Medical Checkup dengan rincian:</div>
+        <table class='table th_toska th_kiri td_trans'>
+          <thead>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Uraian</th>
+            <th>Biaya</th>
+            <th>Jumlah Pasien</th>
+            <th class=kanan>Jumlah Rp</th>
+          </thead>
+          $tr
+          <tr style='background: #dff' class='bold'>
+            <td colspan=5 class=kanan>
+              TOTAL BAYAR
+            </td>
+            <td class=kanan>$total_bayar_show</td>
+          </tr>
+        </table>
+      </div>
 
-  require_once 'include/qrcode.php';
-  $qr = QRCode::getMinimumQRCode("https://mmc-clinic.com/qr?$z", QR_ERROR_CORRECT_LEVEL_L);
-  $qr->printHTML('3px');
-  echo '</div>'; // end margin left xxx cm
+      <div class='mt2 f14'>Pembayaran pada Rek. <b>BSI No. 7265 0379 89</b> atas nama PT. Mutiara Medical Center  </div>
+      <div class='mt1 f14'>NPWP : 50.826.351.4-435.000</div>
+
+      <div style='margin-left: 12cm'>
+        <div class='mt2 mb1 $fs'>Admin Mutiara Medical Center</div>
+    ";
+
+    include 'include/enkrip14.php';
+    $z = enkrip14($id_perusahaan);
+
+    require_once 'include/qrcode.php';
+    $qr = QRCode::getMinimumQRCode("https://mmc-clinic.com/qr?$z", QR_ERROR_CORRECT_LEVEL_L);
+    $qr->printHTML('3px');
+    echo '</div>'; // end margin left xxx cm
+  }
 } else {
   echo div_alert('danger', "BELUM ADA HANDLER INVOICE UNTUK CARA_BAYAR [$perusahaan[cara_bayar] ]");
 }

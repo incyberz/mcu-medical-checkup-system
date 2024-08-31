@@ -70,38 +70,53 @@ foreach ($arr_input as $key => $v) {
 
     // $step_range = round($step_range);
 
+
     $blok_sub_input = "
       <div class='flexy flex-between' >
         <div class='f10 abu miring'>id: $id_detail</div>
         <div>
+          <span class='btn_aksi' id='blok_set_no_data$id_detail" . "__toggle'>$img_delete</span>
+
           <a href='?manage_pemeriksaan_detail&id_detail=$id_detail' target=_blank onclick='return confirm(`Edit Pertanyaan ini?`)'>
             <img src='assets/img/icon/edit5.png' height=20px>
           </a>
+
+          <div class='wadah gradasi-kuning mt2 hideit' id=blok_set_no_data$id_detail>
+            <div class='mb1'>$v[label]</div>
+            <span class='btn btn-warning btn_set_no_data' id=btn_set_no_data__$id_detail>Set No Data</span>
+            <span class='btn btn-secondary btn_cancel' id=btn_cancel__$id_detail>Cancel</span>
+          </div>
         </div>
       </div>
 
-      <div class='flexy flex-center'>
-        <div class='f14 darkblue miring pt1'>$v[label]</div>
-        <div>
-          <input 
-            id='$key' 
-            name='$key' 
-            value='$value' 
-            step='$step' 
-            placeholder='$placeholder' 
-            type='number' 
-            $required
-            class='form-control mb2 $class' 
-            min='$min' 
-            max='$max' 
-            style='max-width:100px'
-          >          
-        </div>
-        <div class='f14 abu miring pt1'>$satuan</div>
+      <div class=hideit id=blok_input_no_data$id_detail>
+        $v[label] : <i class='consolas abu'>-- Set to No Data --</i>  
+        <span class='pointer darkblue btn_cancel_no_data' id=btn_cancel_no_data__$id_detail>[ Cancel No Data ]</span>
       </div>
-      <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range' step='$step_range'>
-      <div class='flexy flex-between f12 consolas abu'>
-        $div_range
+      <div id=blok_input$id_detail>
+        <div class='flexy flex-center'>
+          <div class='f14 darkblue miring pt1'>$v[label]</div>
+          <div>
+            <input 
+              id='$key' 
+              name='$key' 
+              value='$value' 
+              step='$step' 
+              placeholder='$placeholder' 
+              type='number' 
+              $required
+              class='form-control mb2 $class' 
+              min='$min' 
+              max='$max' 
+              style='max-width:100px'
+            >          
+          </div>
+          <div class='f14 abu miring pt1'>$satuan</div>
+        </div>
+        <input type='range' class='form-range range' min='$min_range' max='$max_range' id='range__$key' value='$val_range' step='$step_range'>
+        <div class='flexy flex-between f12 consolas abu'>
+          $div_range
+        </div>
       </div>
     ";
   } elseif ($v['blok'] == 'radio_toolbar' || $v['blok'] == 'radio-toolbar') {
@@ -141,3 +156,41 @@ foreach ($arr_input as $key => $v) {
     ";
   }
 }
+
+
+?>
+<script>
+  $(function() {
+    $('.btn_cancel').click(function() {
+      let tid = $(this).prop('id');
+      let rid = tid.split('__');
+      let aksi = rid[0];
+      let id = rid[1];
+      $('#blok_set_no_data' + id).slideUp();
+    });
+    $('.btn_set_no_data').click(function() {
+      let tid = $(this).prop('id');
+      let rid = tid.split('__');
+      let aksi = rid[0];
+      let id = rid[1];
+      console.log(id);
+
+      $('#blok_input' + id).slideUp();
+      $('#blok_input_no_data' + id).slideDown();
+      $('#blok_set_no_data' + id).slideUp();
+      $('#' + id).prop('required', false);
+      $('#' + id).val('');
+    });
+    $('.btn_cancel_no_data').click(function() {
+      let tid = $(this).prop('id');
+      let rid = tid.split('__');
+      let aksi = rid[0];
+      let id = rid[1];
+      console.log(id);
+
+      $('#blok_input' + id).slideDown();
+      $('#blok_input_no_data' + id).slideUp();
+      $('#' + id).prop('required', true);
+    });
+  })
+</script>

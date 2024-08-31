@@ -63,7 +63,14 @@ if (isset($_POST['btn_delete_perusahaan'])) {
 # MAIN SELECT PERUSAHAAN
 # ============================================================
 if ($id_perusahaan) {
-  $s = "SELECT * FROM tb_perusahaan WHERE id='$id_perusahaan'";
+  $s = "SELECT 
+  a.*,
+  b.arti as arti_cara_bayar, 
+  b.keterangan as keterangan_cara_bayar
+
+  FROM tb_perusahaan a 
+  JOIN tb_cara_bayar b ON a.cara_bayar=b.cara_bayar 
+  WHERE a.id='$id_perusahaan'";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   if (mysqli_num_rows($q)) {
     $perusahaan = mysqli_fetch_assoc($q);
@@ -74,6 +81,9 @@ if ($id_perusahaan) {
   $perusahaan = [];
 }
 
+# ============================================================
+# DESCRIBING KOLOM
+# ============================================================
 $s = "SELECT * FROM tb_perusahaan LIMIT 1";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
@@ -89,9 +99,9 @@ if (mysqli_num_rows($q)) {
         || $key == 'date_created'
         || $key == 'image'
         || $key == 'jumlah_peserta'
-        || $key == 'cara_bayar'
         || $key == 'nomor'
         || $key == 'whatsapp'
+        || $key == 'cara_bayar'
         || $key == 'jabatan_kontak'
         || $key == 'gender_kontak'
       ) continue;
@@ -135,24 +145,44 @@ if (mysqli_num_rows($q)) {
   # ============================================================
   $tr_mode_bayar = '';
   if ($aksi == 'add') {
+    # ============================================================
+    # GET CARA BAYAR 
+    # ============================================================
+    $s2 = "SELECT * FROM tb_cara_bayar WHERE status=1";
+    $q2 = mysqli_query($cn, $s2) or die(mysqli_error($cn));
+    $radio_bayar = '';
+    while ($d2 = mysqli_fetch_assoc($q2)) {
+      $radio_bayar .= "
+        <div>
+          <label>
+            <input required type=radio name=cara_bayar value='$d2[cara_bayar]'> $d2[arti] ($d2[keterangan])
+          </label>
+        </div>
+      ";
+    }
+
+    $perhatian = div_alert('warning mt2', "Perhatian! Cara Pembayaran wajib ditentukan diawal dan tidak boleh diubah.<hr>Untuk cara bayar baru dapat ditambahkan setiap tahun per Corporate setelah tanda tangan MoU");
+
     $tr_mode_bayar = "
-          <tr>
-            <td>Cara Bayar</td>
-            <td>
-              <div>
-                <label>
-                  <input required type=radio name=cara_bayar value='bc'> By Corporate (ditanggung perusahaan)
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input required type=radio name=cara_bayar value='ci'> Corporate Individu (bayar perorangan)
-                </label>
-              </div>
-            </td>
-          </tr>
-        
-        ";
+      <tr>
+        <td>Cara Bayar</td>
+        <td>
+          $radio_bayar
+          $perhatian
+        </td>
+      </tr>
+    ";
+  } elseif ($aksi == 'edit') {
+    $perhatian = div_alert('warning mt2', "Cara Bayar sudah fixed.<hr>Untuk cara bayar baru dapat ditambahkan setiap tahun per Corporate setelah tanda tangan MoU");
+    $tr_mode_bayar = "
+      <tr>
+        <td>Cara Bayar</td>
+        <td>
+          [$perusahaan[cara_bayar]] $perusahaan[arti_cara_bayar] ($perusahaan[keterangan_cara_bayar])
+          $perhatian
+        </td>
+      </tr>
+    ";
   }
   $tr .= $tr_mode_bayar;
 }

@@ -5,6 +5,7 @@ $s = "SELECT a.*,b.nama as jenis_pasien FROM tb_pasien a JOIN tb_jenis_pasien b 
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data Pasien tidak ditemukan.'));
 $pasien = mysqli_fetch_assoc($q);
+$jenis_pasien = $pasien['jenis_pasien'];
 
 // validasi data pasien
 $id_paket_custom = $pasien['id_paket_custom'];
@@ -14,12 +15,10 @@ $harga_perusahaan = [];
 
 if ($order_no) {
   $err = '';
-  $jenis_pasien = $pasien['jenis_pasien'];
 } else {
   $err = 'Tidak ada nomor order';
   if ($id_paket_custom) {
     $err = '';
-    $jenis_pasien = $pasien['jenis_pasien'];
   } else {
     $err = 'Belum membuat Paket Custom';
     $jenis_pasien = 'Corporate Individu';
@@ -52,10 +51,10 @@ $judul = $JENIS == 'COR' ? $judul : 'Paket Individu';
 $link_back = "<a href='?pendaftaran'>$img_prev</a>";
 $perusahaan_show = !$harga_perusahaan ? '' : "<div class='darkblue f20'>Karyawan $harga_perusahaan[nama_perusahaan]</div>";
 set_h2("Manage $judul", "
-$judul untuk $gender_icon <b class=darkblue>$pasien[nama]</b> 
-pasien <b class=darkblue>$jenis_pasien</b>
-$perusahaan_show
-<div class=mt2>$link_back</div>
+  $judul untuk $gender_icon <b class=darkblue>$pasien[nama]</b> 
+  pasien <b class=darkblue>$jenis_pasien</b>
+  $perusahaan_show
+  <div class=mt2>$link_back</div>
 ");
 
 
@@ -89,8 +88,16 @@ if ($JENIS == 'COR') {
       jsurl();
     }
 
+    $tmp = explode('?', $_SERVER['REQUEST_URI']);
+    $from = urlencode($tmp[1]);
 
-    echo '<div class="biru tebal mb2">Silahkan Pilih Paket Corporate:</div>';
+
+    echo "
+    <div class='flexy flex-between'>
+      <div class='biru tebal mb2'>Silahkan Pilih Paket Corporate:</div>
+      <div><a href='?add_harga_paket&from=$from'>$img_add Add Harga Paket</a></div>
+    </div>
+    ";
 
     $s = "SELECT * FROM tb_paket 
     WHERE id_program=1 -- corporate only
@@ -447,10 +454,11 @@ if (mysqli_num_rows($q)) {
               <div class=kanan><button class='btn btn-danger btn-sm' name=btn_bayar value='-1' onclick='return confirm(`Yakin UNDO Pembayaran?`)'>Undo Pembayaran</button></div>
             ";
           } else {
-            $form_action = 'kwitansi.php';
-            $form_target = '_blank';
             $form_undo = "<div><span class='btn btn-danger btn-sm' onclick='alert(`Hanya Role Admin yang dapat UNDO Pembayaran.\n\nSilahkan relogin jika Anda Admin.`)'>Undo Pembayaran</span></div>";
           }
+
+          $form_action = 'kwitansi.php';
+          $form_target = '_blank';
           $form_komponen = "
           <div class='flexy flex-between'>
             <div><button class='btn btn-primary' name=btn_cetak_kwitansi>CETAK KWITANSI</button></div>
