@@ -261,6 +261,35 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
     # ============================================================
+    # DATA PERUSAHAAN 
+    # ============================================================
+    $order_no = $pasien['order_no'];
+    $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
+    if ($order_no) {
+      $s = "SELECT a.id_perusahaan , b.* 
+      FROM tb_order a 
+      JOIN tb_perusahaan b ON a.id_perusahaan=b.id 
+      WHERE a.order_no='$order_no'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+      $perusahaan = mysqli_fetch_assoc($q);
+      $id_perusahaan = $perusahaan['id_perusahaan'];
+    } elseif ($id_harga_perusahaan) {
+      $s = "SELECT a.id_perusahaan, b.*  
+      FROM tb_harga_perusahaan a
+      JOIN tb_perusahaan b ON a.id_perusahaan=b.id 
+      WHERE a.id='$id_harga_perusahaan'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
+      $perusahaan = mysqli_fetch_assoc($q);
+      $id_perusahaan = $perusahaan['id_perusahaan'];
+    } else {
+      $perusahaan = [];
+      $id_perusahaan = null;
+    }
+    $pasien['perusahaan'] = $perusahaan['nama'] ?? '(pribadi)';
+
+    # ============================================================
     # INISIALISASI KESIMPULAN PEMERIKSAAN FISIK
     # ============================================================
     $pasien['kesimpulan_pemeriksaan_fisik'] = [];
@@ -348,27 +377,6 @@ if (mysqli_num_rows($q_pasien_pdf)) {
 
 
 
-
-    # ============================================================
-    # DATA PERUSAHAAN 
-    # ============================================================
-    $order_no = $pasien['order_no'];
-    $id_harga_perusahaan = $pasien['id_harga_perusahaan'];
-    if ($order_no) {
-      $s = "SELECT id_perusahaan FROM tb_order WHERE order_no='$order_no'";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
-      $d = mysqli_fetch_assoc($q);
-      $id_perusahaan = $d['id_perusahaan'];
-    } elseif ($id_harga_perusahaan) {
-      $s = "SELECT id_perusahaan FROM tb_harga_perusahaan WHERE id='$id_harga_perusahaan'";
-      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-      if (!mysqli_num_rows($q)) die(div_alert('danger', 'Data perusahaan tidak ditemukan'));
-      $d = mysqli_fetch_assoc($q);
-      $id_perusahaan = $d['id_perusahaan'];
-    } else {
-      $id_perusahaan = null;
-    }
 
 
 

@@ -2,18 +2,13 @@
 $img_take = img_icon('take');
 $img_drop = img_icon('drop');
 
-
-
-
-
-
-
-
-
-
 # ============================================================
-# ZZZ 
+# FILTER SQL STATUS  
 # ============================================================
+$sql_status = 1;
+if ($status !== 'all') {
+  $sql_status = "a.status = $status";
+}
 
 
 
@@ -24,18 +19,6 @@ $img_drop = img_icon('drop');
 
 
 
-
-
-# ============================================================
-# SELECT MODUL
-# ============================================================
-// $opt = '';
-// $s = "SELECT * FROM tb_progres_modul ORDER BY nomor,date_created ";
-// $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-// while ($d = mysqli_fetch_assoc($q)) {
-//   $opt .= "<option value='$d[id]'>$d[modul]</option>";
-// }
-// $select_modul = "<select name=id_modul class='form-control form-control-sm mb2'>$opt</select>";
 
 # ============================================================
 # SELECT FITUR
@@ -69,8 +52,6 @@ $d = mysqli_fetch_assoc($q);
 $awal_rev = $d['awal_rev'];
 $akhir_rev = $d['akhir_rev'];
 
-
-
 $d = intval(date('d'));
 $m = intval(date('m'));
 $y = date('Y');
@@ -84,16 +65,25 @@ $kemarin = $today;
 $no = 0;
 $tr = '';
 for ($i = $durasi_hari; $i > 0; $i--) {
+  if ($get_tanggal and $kemarin != $get_tanggal) {
+    $kemarin = date('Y-m-d', strtotime("-1 day", strtotime($kemarin)));
+    continue;
+  }
   $s = "SELECT a.*,
   b.arti as arti_status,
+  c.fitur,
+  d.modul,
   (SELECT nama FROM tb_user WHERE id=a.request_by) requester,
   (SELECT nama FROM tb_user WHERE id=a.assign_by) assigner,
   1
 
   FROM tb_progres_task a 
   JOIN tb_progres_status b ON a.status=b.status 
+  JOIN tb_progres_fitur c ON a.id_fitur=c.id 
+  JOIN tb_progres_modul d ON c.id_modul=d.id 
   WHERE a.date_created >= '$kemarin' 
   AND a.date_created <= '$kemarin 23:59:59' 
+  AND $sql_status
   ORDER BY a.date_created
   ";
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -136,8 +126,8 @@ for ($i = $durasi_hari; $i > 0; $i--) {
 
 
         $form_add_task = "
-          <span class=btn_aksi id=form_add_task__toggle>$img_add Task</span>
-          <form method=post class='hideita mt1 wadah gradasi-kuning' id=form_add_task>
+          <div class=mb2><span class=btn_aksi id=form_add_task__toggle>$img_add Add Task</span></div>
+          <form method=post class='hideit wadah gradasi-kuning' id=form_add_task>
             $select_fitur
             <div class=row>
               <div class=col-lg-6>
@@ -209,7 +199,7 @@ for ($i = $durasi_hari; $i > 0; $i--) {
         # ============================================================
         # STATUS TASK
         # ============================================================
-        $status_task_show = $d['arti_status'];
+        $status_task_show = "<span style='color: $color_status[$status]'>$d[arti_status]</span>";
         if ($is_mine) {
           # ============================================================
           # FORM SET STATUS TASK
@@ -231,12 +221,15 @@ for ($i = $durasi_hari; $i > 0; $i--) {
           ";
         }
 
+        $color_class = $status < 3 ? 'darkred' : '';
+        $color_class = $status > 3 ? 'green' : $color_class;
+
         $tasks .= "
           <tr>
             <td>$j</td>
             <td>
-              $form_hapus_task $d[task]
-              <div class='f12 abu'></div>
+              $form_hapus_task <span class='$color_class'>$d[task]</span>
+              <div class='f10  abu' style='margin-left:35px'>$d[modul] > $d[fitur]</div>
             </td>
             <td>
               $assign_by_show
@@ -262,10 +255,13 @@ for ($i = $durasi_hari; $i > 0; $i--) {
       ";
     }
 
+    $kemarin_show = hari_tanggal($kemarin, 0, 0, 0);
+    $hari = $nama_hari[date('w', strtotime($kemarin))];
+
     $tr .= "
       <tr>
         <td>$no</td>
-        <td>$kemarin</td>
+        <td>$hari<br><a href='?progres$get_params&tanggal=$kemarin'>$kemarin_show</td>
         <td>
           $tb_tasks
           $form_add_task

@@ -134,7 +134,7 @@ if ($status_pasien === '') {
   FROM tb_pasien a 
   JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
   WHERE (a.status = $status_pasien $or_status_null)
-  ORDER BY tanggal_periksa,a.order_no,a.id_harga_perusahaan,  a.nama 
+  ORDER BY tanggal_periksa DESC,a.order_no,a.id_harga_perusahaan,  a.nama 
   ";
 
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
@@ -201,9 +201,12 @@ if ($status_pasien === '') {
       } elseif ($jenis == 'idv') {
         if ($d['approv_labs']) {
           $link_verif = "IDV - Lab Approved";
+        } elseif ($d['approv_date']) {
+          $link_verif = "IDV - MCU Approved";
         } else {
-          $link_verif = strtoupper($jenis) . ' UNVERIFIED';
+          $link_verif = strtoupper($jenis) . " <span class=red>UNVERIFIED</span>";
         }
+        $link_verif .= " <span onclick='alert(`Lakukan Print to PDF lalu kirim ke WA Pasien secara manual.\n\n- klik Nama Pasien ($d[nama_pasien])\n- lihat pada Tampil Pasien paling bawah\n- klik Hasil Lab\n- klik Print\n- pilih printer: Print as PDF \n\nHal ini dikarenakan request pemeriksaan dari pasien individu sangatlah bervariatif sehingga belum ada fitur baku untuk Download PDF semisal pasien corporate.`)'>$img_wa</span>";
       }
 
 

@@ -89,21 +89,24 @@ if (isset($_POST['btn_add_modul'])) {
 }
 
 if (isset($_POST['btn_add_fitur']) || isset($_POST['btn_add_fitur_daily'])) {
-  die('processor aborted.');
-  // $id_modul =  $_POST['id_modul'] ?? $_POST['btn_add_fitur']; // from daily-form or from btn-val
-  // if (!$id_modul) die(erid('id_modul'));
-  // $nama_fitur = $_POST['new_fitur'] ?? die(erid('new_fitur'));
-  // $keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
-  // $href = $_POST['href'] ?? null;
-  // $href = $href ? "'$href'" : 'NULL';
+  echo '<pre>';
+  var_dump($_POST);
+  echo '</pre>';
+  $id_modul =  $_POST['id_modul'] ?? $_POST['btn_add_fitur']; // from daily-form or from btn-val
+  if (!$id_modul) die(erid('id_modul'));
+  $fitur = $_POST['new_fitur'] ?? die(erid('new_fitur'));
+  $keterangan = $_POST['keterangan'] ?? die(erid('keterangan'));
+  $href = $_POST['href'] ?? null;
+  $href = $href ? "'$href'" : 'NULL';
 
-  // $nama_fitur = strtoupper($nama_fitur);
+  $fitur = strtoupper($fitur);
+  $keterangan = $keterangan ? "'$keterangan'" : 'NULL';
 
-  // $s = "INSERT INTO tb_progres_fitur 
-  // (id_modul,nama,request_by,keterangan,href) VALUES 
-  // ($id_modul,'$nama_fitur',$id_user,'$keterangan',$href)";
-  // $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  // jsurl();
+  $s = "INSERT INTO tb_progres_fitur 
+  (id_modul,fitur,request_by,keterangan,href) VALUES 
+  ($id_modul,'$fitur',$id_user,$keterangan,$href)";
+  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+  jsurl();
 }
 
 
@@ -142,6 +145,6 @@ if (isset($_POST['btn_set_status_task'])) {
 
     $s = "UPDATE tb_progres_task SET status=$status,last_update=CURRENT_TIMESTAMP WHERE id=$id_task";
     $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-    jsurl("?progres&id_modul=$id_modul&mode=$mode");
+    jsurl();
   }
 }

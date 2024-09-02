@@ -11,7 +11,7 @@ FROM tb_progres_modul a ORDER BY a.nomor";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $nav = "<a class='btn btn-sm btn-info f12' href='?progres&mode=$mode' >All Modul</a> ";
 $i = 0;
-$no_next_fitur = mysqli_num_rows($q) + 1;
+$no_next_modul = mysqli_num_rows($q) + 1;
 while ($d = mysqli_fetch_assoc($q)) {
   $i++;
   $btn = $d['id'] == $get_id_fitur ? "<span class='btn btn-sm btn-primary' style='display:inline-block;margin:0 10px 0 5px'>$i</span>" : "<a class='btn btn-sm btn-info f10 miring' href='?progres&id_modul=$d[id]&no=$i&mode=$mode' >$i</a> ";
@@ -116,12 +116,12 @@ while ($d = mysqli_fetch_assoc($q)) {
     <tr>
       <td class='abu miring consolas f12 sub_number'>*$i.$j</td>
       <td colspan=100%>
-        <span class='consolas green f12 bold btn_aksi pointer' id=form_fitur$id_modul" . "__toggle>+ Add Subfitur</span>
+        <span class='consolas green f12 bold btn_aksi pointer' id=form_fitur$id_modul" . "__toggle>+ Add Fitur</span>
         <form method=post id=form_fitur$id_modul class='hideit mt1'>
           <table width=100%>
             <tr>
               <td>
-                <input class='form-control form-control-sm' name=new_fitur required minlength=5 maxlength=30 placeholder='Subfitur Baru...'/>
+                <input class='form-control form-control-sm' name=new_fitur required minlength=5 maxlength=30 placeholder='Fitur Baru...'/>
               </td>
               <td>
                 <button class='btn btn-success btn-sm ml1' name=btn_add_fitur value=$id_modul>Add</button>
@@ -129,7 +129,7 @@ while ($d = mysqli_fetch_assoc($q)) {
             </tr>
             <tr>
               <td>
-                <textarea class='form-control form-control-sm' name=keterangan required minlength=20 maxlength=1000 placeholder='Keterangan...'></textarea>
+                <textarea class='form-control form-control-sm' name=keterangan minlength=20 maxlength=1000 placeholder='Keterangan...'></textarea>
               </td>
             </tr>
             <tr>
@@ -153,9 +153,9 @@ while ($d = mysqli_fetch_assoc($q)) {
     </table>
   ";
 
-  $form_delete_fitur = $role != 'admin' ? '' :  "
+  $form_delete_modul = $role != 'admin' ? '' :  "
     <form method=post class='mt1'>
-      <button onclick='return confirm(`Delete fitur ini?`)' class='btn btn-danger btn-sm' name=btn_delete_fitur value=$id_modul >Delete</button>
+      <button onclick='return confirm(`Delete modul ini?`)' class='btn btn-danger btn-sm' name=btn_delete_modul value=$id_modul >Delete Modul</button>
     </form>
   ";
 
@@ -169,14 +169,14 @@ while ($d = mysqli_fetch_assoc($q)) {
       <td>$i</td>
       <td>
         $d[modul] <span class=btn_aksi id=$id_toggle>$img_detail</span>
-        <form method=post class='hideit wadah gradasi-kuning mt2' id=fitur$id_modul>
-          <div class='f10 abu consolas mb2'>FORM EDIT FITUR</div>
+        <form method=post class='hideit wadah gradasi-kuning mt2' id=modul$id_modul>
+          <div class='f10 abu consolas mb2'>FORM EDIT MODUL</div>
           <table>
             $tr_form
-            <tr><td>&nbsp;</td><td colspan=100%><button class='btn btn-info btn-sm' name=btn_update_fitur value=$id_modul>Update</button></td></tr>
+            <tr><td>&nbsp;</td><td colspan=100%><button class='btn btn-info btn-sm' name=btn_update_modul value=$id_modul>Update</button></td></tr>
           </table>
         </form>
-        $form_delete_fitur 
+        $form_delete_modul 
       </td>
       <td>
         $tb_sub
@@ -186,19 +186,19 @@ while ($d = mysqli_fetch_assoc($q)) {
 }
 
 # ======================================================
-# TR ADD FITUR
+# TR ADD MODUL
 # ======================================================
 $tr_add = "
   <tr>
-    <td class='abu f12 miring tengah'>*$no_next_fitur</td>
+    <td class='abu f12 miring tengah'>*$no_next_modul</td>
     <td colspan=100%>
       <form method=post>
         <div class=flexy>
           <div>
-            <input class='form-control' name=new_fitur required minlength=5 maxlength=30/>
+            <input class='form-control upper' name=new_modul required minlength=5 maxlength=30/>
           </div>
           <div>
-            <button class='btn btn-success' name=btn_add_fitur>Add Fitur</button>
+            <button class='btn btn-success' name=btn_add_modul>Add Modul</button>
           </div>
         </div>
       </form>

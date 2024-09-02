@@ -4,12 +4,30 @@ $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $d = mysqli_fetch_assoc($q);
 $tanggal_awal = $d['tanggal_awal'];
 $bulan_awal = intval(date('m', strtotime($tanggal_awal)));
-
 $nama_bulan_awal = $arr_nama_bulan[intval(date('m', strtotime($tanggal_awal))) - 1];
-$nama_bulan = $arr_nama_bulan[intval(date('m', strtotime($today))) - 1];
-$tahun = date('Y', strtotime($tanggal_awal));
+$tahun_awal = date('Y', strtotime($tanggal_awal));
+
+$bulan_skg = intval(date('m', strtotime($today)));
+$get_bulan = $_GET['bulan'] ?? $bulan_skg;
+$get_tahun = $_GET['tahun'] ?? $tahun;
+$nama_bulan = $arr_nama_bulan[$bulan_skg - 1];
+$nama_bulan_filtered = $arr_nama_bulan[$get_bulan - 1];
 $img_filter = img_icon('filter');
-set_h2('Pendaftaran', "Data Pendaftaran Pasien <b class=darkblue>$nama_bulan $tahun</b> $img_filter");
+set_h2('Pendaftaran', "
+  Data Pendaftaran Pasien <b class=darkblue>$nama_bulan_filtered $get_tahun</b> 
+  <span class=btn_aksi id=form_filter__toggle>$img_filter</span>
+
+  <form method=post id=form_filter class='wadah gradasi-kuning mt4 hideit'>
+    <div class='wadah tengah f14'>
+      2024
+      <div class='flexy flex-center mt2'>
+        <div><a class='btn btn-sm btn-info' href='?pendaftaran&bulan=7&tahun=2024'>Jul</a></div>
+        <div><a class='btn btn-sm btn-info' href='?pendaftaran&bulan=8&tahun=2024'>Ags</a></div>
+        <div><a class='btn btn-sm btn-info' href='?pendaftaran&bulan=9&tahun=2024'>Sep</a></div>
+      </div>
+    </div>
+  </form>
+");
 only(['admin', 'nakes', 'marketing', 'dokter', 'dokter-pj']);
 
 

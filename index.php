@@ -20,6 +20,7 @@ $tanggal_show = date('d-F-Y');
 $tgl_show = date('d-M-y');
 $edit_section = '';
 $thn = date('y');
+$tahun = date('Y');
 
 $id_klinik = 1; //klinik MMC
 $lokasi_pages = 'pages';
@@ -41,7 +42,7 @@ $lokasi_xls = 'assets/xls';
 // $whatsapp_klinik_show = '0859-7509-6020';
 
 // set auto login
-if (1) {
+if (0) {
   $_SESSION['mmc_username'] = 'ahmadnk';
   $_SESSION['mmc_role'] = 'dokter';
   $_SESSION['mmc_username'] = 'meyda';

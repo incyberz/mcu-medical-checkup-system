@@ -93,9 +93,11 @@ b.nama as jenis_pasien,
 
 FROM tb_pasien a 
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
-WHERE a.date_created > '$tanggal_awal' 
+WHERE YEAR(a.date_created) = $get_tahun 
+AND MONTH(a.date_created) = $get_bulan 
 ORDER BY a.status, a.nama, date_created DESC
 ";
+
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $tr = '';
 if (mysqli_num_rows($q)) {
@@ -358,4 +360,4 @@ $data_pasien = $tr ? "
     <thead>$th</thead>
     $tr
   </table>
-" : div_alert('danger', "Data pasien tidak ditemukan.");
+" : div_alert('danger', "Belum ada pasien pada bulan <b class=darkblue>$nama_bulan $tahun</b>.");

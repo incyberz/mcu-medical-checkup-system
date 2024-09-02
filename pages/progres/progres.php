@@ -1,5 +1,7 @@
 <?php
 $judul = "Progress dan Request Fitur";
+$nama_hari = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
 include 'progres-styles.php';
 $arr_mode = [
   'daily' => 'Project Daily Task',
@@ -7,12 +9,25 @@ $arr_mode = [
   'sort' => 'Sort Penomoran Modul',
   'progres' => 'Task Progres Percentage',
 ];
+
+# ============================================================
+# GET PARAMS | POST HANDLER
+# ============================================================
 $mode = $_GET['mode'] ?? 'daily';
 $status = $_GET['status'] ?? 'all';
 $id_modul = $_GET['id_modul'] ?? null;
+$tanggal = $_GET['tanggal'] ?? '';
+$get_tanggal = $tanggal;
 $post_task = $_POST['task'] ?? null;
 $post_keterangan = $_POST['keterangan'] ?? null;
 $post_today = $_POST['date_created'] ?? $today;
+$get_params = '';
+foreach ($_GET as $key => $value) {
+  if ($value !== '') {
+    $get_params .= "&$key=$value";
+  }
+}
+
 set_title("Progres - $mode mode");
 $nav_mode = '';
 foreach ($arr_mode as $k => $v) {
@@ -47,9 +62,17 @@ $total_task = mysqli_num_rows($q);
 $arti_status = [];
 $count_status = [];
 $percent_task = [];
+
+$sql_tanggal = $get_tanggal ? "(date_created >= '$get_tanggal' AND date_created <= '$get_tanggal 23:59:59')" : 1;
+
 $s = "SELECT a.*,
-  (SELECT count(1) FROM tb_progres_task WHERE status=a.status) count_status 
-  FROM tb_progres_status a";
+  (
+    SELECT count(1) FROM tb_progres_task 
+    WHERE status=a.status
+    AND $sql_tanggal
+    ) count_status 
+  FROM tb_progres_status a 
+  ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 while ($d = mysqli_fetch_assoc($q)) {
   $arti_status[$d['status']] = $d['arti'];
@@ -67,11 +90,23 @@ $count_status['all'] = $total_task;
 # ============================================================
 $icon_status = [];
 $icon_status[0] = $img_warning;
-$icon_status[1] = img_icon('review');
+$icon_status[1] = img_icon('search');
 $icon_status[2] = img_icon('revision2');
 $icon_status[3] = $img_check;
 $icon_status[4] = img_icon('release2');
 $icon_status[5] = img_icon('stable');
+
+
+# ============================================================
+# COLOR STATUS
+# ============================================================
+$color_status = [];
+$color_status[0] = 'red';
+$color_status[1] = 'red';
+$color_status[2] = 'red';
+$color_status[3] = 'blue';
+$color_status[4] = 'green';
+$color_status[5] = 'green';
 
 
 # ============================================================
@@ -96,10 +131,21 @@ if ($mode == 'daily') {
   }
 }
 
+# ============================================================
+# CLEAR FILTER TANGGAL  
+# ============================================================
+$clear_filter_tanggal = '';
+if ($get_tanggal !== '') {
+  $get_tanggal_show = hari_tanggal($get_tanggal, 0, 0, 0);
+  $clear_filter_tanggal = "<a href='?progres&id_modul=$id_modul&mode=$mode&status=$status'>Clear Filter Tanggal [ $get_tanggal_show ]</a>";
+}
+
+
 echo "
 <h2 class='darkblue mb2 f20 tengah'>$judul</h2>
   <div class='f14 tengah mb2'>$nav_mode</div>
   <div class='f12 tengah mb2'>$nav_status</div>
+  <div class=' tengah mb2'>$clear_filter_tanggal</div>
 ";
 
 

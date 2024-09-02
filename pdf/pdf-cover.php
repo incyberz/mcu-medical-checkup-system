@@ -19,7 +19,8 @@ if (!$pasien['gender']) {
   $gender = ucwords($pasien['gender']);
 }
 
-$departemen = $pasien['departemen'] ?? '-';
+$instansi = $pasien['perusahaan'] ?? '-';
+
 $alamat = $pasien['alamat'] ?? '-';
 $nikepeg = $pasien['nikepeg'] ?? '-';
 $tanggal_periksa = hari_tanggal($pasien['awal_periksa'], 1, 0, 0);
@@ -27,7 +28,7 @@ $tanggal_periksa = hari_tanggal($pasien['awal_periksa'], 1, 0, 0);
 $arr = [
   'NO. MCU / NIK' => "MCU-$id_pasien / $nikepeg",
   'NAMA' => "$nama_pasien ($gender)",
-  'DEPARTEMEN' => "$departemen",
+  'INSTANSI' => "$instansi",
   'TTL' => $ttl,
   'TGL PERIKSA' => "$tanggal_periksa",
   'ALAMAT' => "$alamat_trim",
