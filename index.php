@@ -37,10 +37,6 @@ $lokasi_ilustrasi = 'assets/img/ilustrasi';
 $lokasi_excel = 'assets/xls';
 $lokasi_xls = 'assets/xls';
 
-// $whatsapp_klinik = '6285212572979'; // pa ahmad
-// $whatsapp_klinik = '6285975096020'; // MMC
-// $whatsapp_klinik_show = '0859-7509-6020';
-
 // set auto login
 if (0) {
   $_SESSION['mmc_username'] = 'ahmadnk';
@@ -56,9 +52,6 @@ if (0) {
 
 // set logout
 // unset($_SESSION['mmc_username']);
-
-
-// include 'pages/login.php';
 
 
 # ================================================
