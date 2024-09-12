@@ -335,13 +335,7 @@
     background: #cc7719;
   }
 
-  .td_trans td {
-    background: none !important;
-  }
 
-  .th_toska th {
-    background: #cff !important;
-  }
 
   /* .kolom {
     color: #888 !important;
