@@ -138,22 +138,8 @@ $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
 
 
 
-if ($id_perusahaan) {
-  $src = "qr/$id_perusahaan.jpg";
-  if (file_exists($src)) {
-    $pdf->Cell(
-      0,
-      LH,
-      // $pdf->Image("qr/$id_perusahaan", $x, $y, $w, $h, '', 'link'),
-      $pdf->Image($src, null, null, 20, null, '', 'link'),
-      '-',
-      $ln1,
-      'L'
-    );
-  } else {
-    die("File QR tidak ditemukan<hr>src: $src");
-  }
-}
+include 'pdf-qr_show.php';
+
 
 
 // footer after keluhan

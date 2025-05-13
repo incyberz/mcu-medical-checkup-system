@@ -9,6 +9,9 @@ $sudah_bayar = 0;
 if ($custom) {
   $id_pasien = $_GET['id_pasien'] ?? die(div_alert('danger', 'Index [id_pasien] belum terdefinisi.'));
   $href =  "?manage_paket_custom&id_pasien=$id_pasien";
+  # ============================================================
+  # PADA PAKET CUSTOM INDIVIDU
+  # ============================================================
   $s = "SELECT 
   id_pemeriksaan,
   b.status_bayar  
@@ -18,16 +21,33 @@ if ($custom) {
   WHERE c.id=$id_pasien 
   AND a.id_paket_custom=$id_paket
   ";
-  $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
-  while ($d = mysqli_fetch_assoc($q)) {
-    if ($d['status_bayar'] === '0' || $d['status_bayar'] === '1') $sudah_bayar = 1;
-    array_push($arr_id_pemeriksaan, $d['id_pemeriksaan']);
-  }
+} else {
+  # ============================================================
+  # PADA PAKET CORPORATE
+  # ============================================================
+  $s = "SELECT 
+  id_pemeriksaan,
+  '' as status_bayar 
+  FROM tb_paket_detail a 
+  JOIN tb_paket b ON a.id_paket=b.id 
+  WHERE a.id_paket = $id_paket 
+  ";
 }
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$jumlah_pemeriksaan = mysqli_num_rows($q);
+while ($d = mysqli_fetch_assoc($q)) {
+  if ($d['status_bayar'] === '0' || $d['status_bayar'] === '1') $sudah_bayar = 1;
+  array_push($arr_id_pemeriksaan, $d['id_pemeriksaan']);
+}
+
 $link_back = "<div class=mt2><a href='$href'>$img_prev</a></div>";
 $sub_judul = "
-  Assign Pemeriksaan untuk <b class='biru'>$nama_paket</b>
-  <span class='hideit bg-red' id=custom>$custom</span>
+  <div style='position:fixed; bottom:0; left:0; right:0; background: white; border-top: solid 1px #ccc;padding:15px'>
+    Pemeriksaan pada <b class='biru'>$nama_paket</b>
+    <span class='hideit bg-red' id=custom>$custom</span>
+    :: 
+    <span id=jumlah_pemeriksaan class=f30>$jumlah_pemeriksaan</span> Pemeriksaan
+  </div>
   $link_back 
 ";
 set_title($judul);
@@ -121,6 +141,10 @@ if (!mysqli_num_rows($q)) {
 } else {
   $i = 0;
   $tr = '';
+  // echo '<pre>';
+  // print_r($arr_id_pemeriksaan);
+  // echo '<b style=color:red>Developer SEDANG DEBUGING: exit(true)</b></pre>';
+  // exit;
   while ($d = mysqli_fetch_assoc($q)) {
     $i++;
     $id_pemeriksaan = $d['id_pemeriksaan'];
@@ -167,6 +191,10 @@ if (!mysqli_num_rows($q)) {
       let id_pemeriksaan = rid[1];
       let id_paket = $('#id_paket').text();
       let id_user = $('#id_user').text();
+
+      $("#jumlah_pemeriksaan").text(
+        $('input[type="checkbox"]:checked').length
+      );
 
       if (!id_user || !id_paket || !id_pemeriksaan) {
         alert(`Data kurang lengkap.\n\nid_user: ${id_user}\nid_paket: ${id_paket}\nid_pemeriksaan: ${id_pemeriksaan}\n`)

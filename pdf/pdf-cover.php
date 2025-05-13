@@ -6,7 +6,7 @@ $pdf->AddPage(); // header always in new page
 $pdf->SetFont(FF, 'B', 16);
 $pdf->Cell(0, 30, ' ', 0, 1, 'C'); // spacer
 $pdf->Cell(0, 10, 'HASIL MEDICAL CHECKUP', 0, 1, 'C');
-$pdf->Cell(0, 10, 'TAHUN 2024', 0, 1, 'C');
+$pdf->Cell(0, 10, 'TAHUN 2025', 0, 1, 'C');
 
 
 $ttl = '-';

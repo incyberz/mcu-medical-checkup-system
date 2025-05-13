@@ -95,7 +95,7 @@ FROM tb_pasien a
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
 WHERE YEAR(a.date_created) = $get_tahun 
 AND MONTH(a.date_created) = $get_bulan 
-ORDER BY a.status, a.nama, date_created DESC
+ORDER BY date_created DESC, a.status, a.nama
 ";
 
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));

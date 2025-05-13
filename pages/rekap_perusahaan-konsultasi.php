@@ -51,7 +51,9 @@ if (strpos("salt$hasil_lab[RONTGEN]", 'cardiomega') || strpos("salt$hasil_lab[RO
 # ============================================================
 # konsultasi mata
 # ============================================================
-if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
+if (isset($arr_id_detail[14]) and isset($arr_id_detail[142])) {
+  if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
+}
 
 
 if (!$arr_konsultasi) {

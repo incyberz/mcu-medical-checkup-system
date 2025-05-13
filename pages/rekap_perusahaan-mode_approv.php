@@ -67,7 +67,9 @@ $kesimpulan = "
 $gender = strtoupper($pasien['gender']);
 if ($gender == 'L') {
   $is_haid_show = '';
+  $Gender = 'Laki-laki';
 } else {
+  $Gender = 'Perempuan';
   $is_haid_show = $pasien['is_haid'] === null ? 'haidh: no-data' : 'sedang haidh';
   $is_haid_show = "<div class=red>$is_haid_show</div>";
 }
@@ -80,7 +82,7 @@ $hasil_rontgen = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien
 # ============================================================
 # PUBLISITAS
 # ============================================================
-$publish = "<span class='f10 abu miring'>belum bisa publish</span>";
+// $publish = "<span class='f10 abu miring'>belum bisa publish</span>";
 
 
 # ============================================================
@@ -88,20 +90,22 @@ $publish = "<span class='f10 abu miring'>belum bisa publish</span>";
 # ============================================================
 $tr_approv .= "
   <tr>
-    <td>$no_urut</td>
-    <td>MCU-$pasien[id_pasien]</td>
-    <td>$pasien[nama_pasien]</td>
-    <td>$gender$is_haid_show</td>
+    <td>
+      <div>$no_urut</div>
+      <div>MCU-$pasien[id_pasien]</div>
+      <div>$pasien[nama_pasien]</div>
+      <div>$Gender$is_haid_show</div>
+    </td>
+
     <td><span class=hideit>KELUHAN</span>$keluhan</td>
     <td id='kesFis'><span class=hideit>KESIMPULAN FISIK</span>$kesimpulan_fisik</td>
-    $td_kimia_darah
+    $td_tambahan
     <td><span class=hideit>DARAH LENGKAP</span>$hasil_hema</td>
     <td><span class=hideit>URINE</span>$hasil_urine</td>
     <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
     <td class='$gradasi_merah'><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
     <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
     <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        
-    <td><span class=hideit>PUBLISH</span>$publish</td>        
   </tr>
 ";
 

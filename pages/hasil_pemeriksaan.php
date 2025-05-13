@@ -42,6 +42,15 @@ if ($get_jenis == 'mcu') {
   $id_pemeriksaan = $_GET['id_pemeriksaan'] ?? die(erid('[id_pemeriksaan]'));
 }
 
+// fixed get jenis diambil dari DB berdasarkan id pemeriksaan
+$s = "SELECT jenis FROM tb_pemeriksaan WHERE id = $id_pemeriksaan";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+$d = mysqli_fetch_assoc($q);
+$get_jenis = $d['jenis'];
+
+
+
+
 $s = "SELECT * FROM tb_hasil_pemeriksaan WHERE id_pasien=$id_pasien";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 $hasil = mysqli_fetch_assoc($q);
@@ -142,6 +151,7 @@ $arr_sampel_tanggal = [];
 $arr_sampel_by = [];
 include 'pemeriksaan-hasil_at_db.php';
 $dokter_pj = 'dr. Mutiara Putri Camelia';
+echo 'zzz3';
 
 
 
@@ -195,6 +205,7 @@ $arr_id_pemeriksaan_penunjang = [];
 $is_mcu = 0;
 // $s = 'SELECT string (will be replaced)';
 include 'hasil_pemeriksaan-sql_pemeriksaan_detail.php';
+echo 'zzz4';
 
 
 $arr_id_pemeriksaan_mcu = [];
@@ -255,6 +266,7 @@ if ($is_mcu) {
   include 'hasil_pemeriksaan-rontgen.php';
 } else {
   include 'hasil_pemeriksaan-lab.php';
+  echo 'zzz7';
 }
 
 
@@ -310,7 +322,8 @@ if ($hasil_at_db['approv_date'] || $verified_lab) {
 
     $hari = hari_tanggal();
 
-    if ($get_jenis == 'mcu ZZZ Fitur Approv per pasien aborted pada MCU Corporate') {
+    // if ($get_jenis == 'mcu ZZZ Fitur Approv per pasien aborted pada MCU Corporate') {
+    if ($get_jenis == 'mcu') {
       $blok_approve = "
         $radios
         <div class=kiri>

@@ -1,3 +1,8 @@
+<style>
+  .ada_error-1 td {
+    background: yellow !important;
+  }
+</style>
 <?php
 $mode = $_GET['mode'] ?? 'detail';
 $get_tanggal_periksa = $_GET['tanggal_periksa'] ?? '';
@@ -168,7 +173,7 @@ FROM tb_pasien a
 JOIN tb_jenis_pasien b ON a.jenis=b.jenis 
 JOIN $tb_c 
 JOIN tb_hasil_pemeriksaan d ON d.id_pasien=a.id 
-WHERE (a.status = 10) -- SELESAI PEMERIKSAAN  
+WHERE 1 -- (a.status = 10) -- SELESAI PEMERIKSAAN  
 AND c.id_perusahaan=$id_perusahaan 
 AND $sql_tanggal_periksa
 
@@ -190,6 +195,7 @@ if (mysqli_num_rows($qpasien)) {
   while ($pasien = mysqli_fetch_assoc($qpasien)) {
     $i++;
     $no_urut++;
+    $ada_error = 0;
 
     if ($pasien['approv_date']) $jumlah_verif++;
     $jenis = strtolower($pasien['jenis']);
@@ -209,12 +215,24 @@ if (mysqli_num_rows($qpasien)) {
       'RONTGEN' => 9
     ];
 
-    if ($id_perusahaan == 27) {
+    # ============================================================
+    # PENAMBAHAN CUSTOM PEMERIKSAAN LAB UNTUK PERUSAHAAN TERTENTU
+    # ============================================================
+    if ($id_perusahaan == 27) { // SMK TARUNA
       $id_labs = [
         'URINE' => 20,
         'HEMA' => 3,
         'RONTGEN' => 9,
         'KMD' => 2
+      ];
+    } elseif ($id_perusahaan == 41) { // BEN MAKMUR
+      $id_labs = [
+        'URINE' => 20,
+        'HEMA' => 3,
+        'RONTGEN' => 9,
+        'ASAM_URAT' => 43,
+        'GLUKOSA_SEWAKTU' => 46,
+        'CHOLESTEROL_TOTAL' => 35
       ];
     }
 
@@ -271,7 +289,45 @@ if (mysqli_num_rows($qpasien)) {
                   $sub_li .= "<li><span class=column>$d[label]:</span> <span class='consolas red'>$hasil HIGH</span></li>";
                 }
               } else {
-                die(div_alert('danger', "Invalid batasan nilai pada detail pemeriksaan. id_detail: $id_detail"));
+                echo '<pre>';
+                print_r($d);
+                echo '</pre>';
+                echo div_alert('danger', "Invalid batasan nilai pada detail pemeriksaan. id_detail: $id_detail");
+
+                echo "
+                  <form method=post>
+                    <h4>Set Batasan Nilai Normal $d[label] (On Coding ZZZ)</h4>
+                    
+
+                    <div class='row'>
+                      <div class='col-6'>
+                        <div class='card gradasi-kuning'>
+                          <div class='card-body'>
+                            <div class=mb-2>Batasan untuk Laki-laki</div>
+                            <div class='d-flex gap-2'>
+                              <div class=flex-fill>
+                                <input type=number step=0.01 class=form-control name=normal_lo_l>
+                              </div>
+                              <div class=mx-2>
+                                s.d
+                              </div>
+                              <div class=flex-fill>
+                                <input type=number step=0.01 class=form-control name=normal_hi_l>
+                              </div>
+                            </div>
+                            <div class='f14 abu mt-2'>
+                              <label>
+                                <input type=checkbox checked>
+                                Batasan untuk Perempuan adalah sama
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                ";
+                exit;
               }
             }
           }
@@ -281,14 +337,37 @@ if (mysqli_num_rows($qpasien)) {
       $hasil_lab[$key] = $sub_li ? "<ul class='m0 p0 pl2'>$sub_li</ul>" : 'normal';
     }
 
+    # ============================================================
+    # dilarang ada index null (belum diperiksa)
+    # ============================================================
+    if (!isset($arr_id_detail[1])) $arr_id_detail[1] = 0; // tinggi badan
+    if (!isset($arr_id_detail[2])) $arr_id_detail[2] = 0; // berat badan
+    if (!isset($arr_id_detail[6])) $arr_id_detail[6] = 0; // lingkar perut
+    if (!isset($arr_id_detail[7])) $arr_id_detail[7] = 0; // tekanan sistolik
+    if (!isset($arr_id_detail[8])) $arr_id_detail[8] = 0; // diastol
+    if (!isset($arr_id_detail[9])) $arr_id_detail[9] = 0; // pernafasan
+    if (!isset($arr_id_detail[10])) $arr_id_detail[10] = 0; // satur oksigen
+    if (!isset($arr_id_detail[14])) $arr_id_detail[14] = 0; // visus kanan
+    if (!isset($arr_id_detail[140])) $arr_id_detail[140] = 0; // nadi
+    if (!isset($arr_id_detail[142])) $arr_id_detail[142] = 0; // visus kiri
+    if (!isset($arr_id_detail[148])) $arr_id_detail[148] = 0; // suhu
+
+    // $bg_red = 'bg-danger text-white';
+
     $tinggi_badan = $arr_id_detail[2];
     $berat_badan = $arr_id_detail[1];
-    $imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
+    if ($tinggi_badan and $berat_badan) {
+      $imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
+    } else {
+      $imt = "<b class='red'>0</b>";
+      $ada_error = 1;
+    }
 
     $keluhan = $pasien['keluhan'] ?? 'tidak ada';
 
     if ($hasil_at_db['hasil'] === '' || $hasil_at_db['hasil'] === null) {
       $kesimpulan = $belum_ada;
+      $ada_error = 1;
     } else {
       $kesimpulan =  $arr_kesimpulan[$hasil_at_db['hasil']];
       $kesimpulan = $hasil_at_db['hasil'] ? $kesimpulan : "<b class='red'>$kesimpulan</b>";
@@ -303,12 +382,36 @@ if (mysqli_num_rows($qpasien)) {
     include 'rekap_perusahaan-konsultasi.php';
 
 
-    // sementara untuk SMK-TB
-    $td_kimia_darah = '';
+
+    # ============================================================
+    # CUSTOM TD TAMBAHAN UNTUK PERUSAHAAN TERTENTU
+    # ============================================================
+    $td_tambahan = '';
+    $td_tambahan = '';
     if ($id_perusahaan == 27) {
+      // sementara untuk SMK-TB
       $h = strpos(strtolower("salt$hasil_lab[KMD]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[KMD]";
-      $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=KMD&id_pemeriksaan=2'>$h</a>";
-      $td_kimia_darah = "<td><span class=hideit>KIMIA DARAH</span>$h</td>";
+      $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=KMD&id_pemeriksaan=$id_labs[KMD]'>$h</a>";
+      $td_tambahan = "<td><span class=hideit>KIMIA DARAH</span>$h</td>";
+    } elseif ($id_perusahaan == 41) {
+      $h = strpos(strtolower("salt$hasil_lab[ASAM_URAT]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[ASAM_URAT]";
+      $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=ASAM_URAT&id_pemeriksaan=$id_labs[ASAM_URAT]'>$h</a>";
+      $ASAMU = "<div><span class='bold'>ASAM.U</span>: $h</div>";
+
+      $h = strpos(strtolower("salt$hasil_lab[GLUKOSA_SEWAKTU]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[GLUKOSA_SEWAKTU]";
+      $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=GLUKOSA_SEWAKTU&id_pemeriksaan=$id_labs[GLUKOSA_SEWAKTU]'>$h</a>";
+      $GLUKOSA = "<div><span class='bold'>GLUKO</span>: $h</div>";
+
+      $h = strpos(strtolower("salt$hasil_lab[CHOLESTEROL_TOTAL]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[CHOLESTEROL_TOTAL]";
+      $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=CHOLESTEROL_TOTAL&id_pemeriksaan=$id_labs[CHOLESTEROL_TOTAL]'>$h</a>";
+      $CHOLES = "<div><span class='bold'>CHOLES</span>: $h</div>";
+      $td_tambahan .= "
+        <td>
+          $ASAMU
+          $GLUKOSA
+          $CHOLES
+        </td>
+      ";
     }
 
 
@@ -338,32 +441,66 @@ if (mysqli_num_rows($qpasien)) {
 
       $hasil_rontgen = strpos(strtolower("salt$hasil_lab[RONTGEN]"), 'normal') ? 'normal' : "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=RON'><b class=red>$hasil_lab[RONTGEN]</b></a>";
 
+
       # ============================================================
       # FINAL TR PREVIEW UNTUK PERUSAHAAN
       # ============================================================
+      if ($pasien['gender']) {
+        $gender = $pasien['gender'] == 'l' ? 'Laki-laki' : 'Perempuan';
+      } else {
+        $gender = $null;
+        $ada_error = 1;
+      }
+
+      if (strtotime($pasien['tanggal_lahir']) < strtotime('1940-1-1')) {
+        $tanggal_lahir = $null;
+      } else {
+        $tanggal_lahir = date('d-m-Y', strtotime($pasien['tanggal_lahir']));
+      }
+
+      # ============================================================
+      # FINAL TR
+      # ============================================================
       $tr .= " 
-        <tr>
+        <tr class='ada_error-$ada_error'>
           <td>$no_urut</td>
-          <td>MCU-$pasien[id_pasien]</td>
-          <td>$pasien[nama_pasien]</td>
-          <td>$pasien[tanggal_lahir]</td>
+          <td>
+            <div>MCU-$pasien[id_pasien]</div>
+            <div>$pasien[nama_pasien]</div>
+            <div>$gender</div>
+            <div>$tanggal_lahir</div>
+          </td>
+
+
+          <td>
+            <div><span class='lowerZZ bold'>TENSI</span>: $arr_id_detail[7]/$arr_id_detail[8]</div>
+            <div><span class='lowerZZ bold'>NADI</span>: $arr_id_detail[140]</div>
+            <div><span class='lowerZZ bold'>NAFAS</span>: $arr_id_detail[9]</div>
+            <div><span class='lowerZZ bold'>SUHU</span>: $arr_id_detail[148]</div>
+            <div><span class='lowerZZ bold'>S.O</span>: $arr_id_detail[10]</div>
+          </td>
+          <td>
+            <div><span class='lowerZZ bold'>LP</span>: $arr_id_detail[6]</div>
+            <div><span class='lowerZZ bold'>TB</span>: $arr_id_detail[2]</div>
+            <div><span class='lowerZZ bold'>BB</span>: $arr_id_detail[1]</div>
+            <div><span class='lowerZZ bold'>S.GIZI</span>: $status_gizi</div>
+          </td>
+
+
+          <td>
+            <div><span class='lowerZZ bold'>KANAN</span>: $arr_id_detail[14]/20</div>
+            <div><span class='lowerZZ bold'>KIRI</span>: $arr_id_detail[142]/20</div>
+            <div><span class='lowerZZ bold'>BW</span>: $buta_show</div>
+          </td>
+
           <td><span class=hideit>KELUHAN</span>$keluhan</td>
-          <td><span class=hideit>TENSI</span>$arr_id_detail[7]/$arr_id_detail[8]</td>
-          <td><span class=hideit>NADI</span>$arr_id_detail[140]</td>
-          <td><span class=hideit>PERNAFASAN</span>$arr_id_detail[9]</td>
-          <td><span class=hideit>SUHU</span>$arr_id_detail[148]</td>
-          <td><span class=hideit>SATURASI OKSIGEN</span>$arr_id_detail[10]</td>
-          <td><span class=hideit>STATUS GIZI</span>$status_gizi</td>
-          <td><span class=hideit>LINGKAR PERUT</span>$arr_id_detail[6]</td>
-          <td><span class=hideit>TINGGI BADAN</span>$arr_id_detail[2]</td>
-          <td><span class=hideit>BERAT BADAN</span>$arr_id_detail[1]</td>
-          <td><span class=hideit>MATA KANAN</span>$arr_id_detail[14]/20</td>
-          <td><span class=hideit>MATA KIRI</span>$arr_id_detail[142]/20</td>
-          <td><span class=hideit>BUTA WARNA</span>$buta_show</td>
-          $td_kimia_darah
+
           <td><span class=hideit>DARAH LENGKAP</span>$hasil_lab[HEMA]</td>
           <td><span class=hideit>URINE</span>$hasil_lab[URINE]</td>
           <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
+
+          $td_tambahan
+
           <td><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
           <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
           <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        
@@ -376,40 +513,52 @@ if (mysqli_num_rows($qpasien)) {
 
 $arr_head = [ // header preview untuk perusahaan
   'NO',
-  'NO. MCU',
-  'NAMA',
-  'TANGGAL LAHIR',
+  'PASIEN MCU',
+  'PEMFIS-1',
+  'PEMFIS-2',
+  'PEMFIS MATA',
   'KELUHAN',
-  'TENSI',
-  'NADI',
-  'NAFAS',
-  'SUHU',
-  'SAT. O2',
-  'STATUS GIZI',
-  'LINGKAR PERUT',
-  'TINGGI BADAN',
-  'BERAT BADAN',
-  'MATA KANAN',
-  'MATA KIRI',
-  'BUTA WARNA',
 ];
 
-if ($id_perusahaan == 27) {
-  array_push($arr_head, 'KIMIA DARAH');
-}
 array_push($arr_head, 'DARAH LENGKAP');
 array_push($arr_head,   'URINE');
-array_push($arr_head,   'RONTGEN THORAX');
+array_push($arr_head,   'RONTGEN');
+
+# ============================================================
+# HEADER TAMBAHAN
+# ============================================================
+if ($id_perusahaan == 27) { // smk tb
+  array_push($arr_head, 'KIMIA DARAH');
+} elseif ($id_perusahaan == 41) { // ben makmur
+  array_push($arr_head, 'KIMIA DARAH');
+  // array_push($arr_head, 'GLUKOSA_SEWAKTU');
+  // array_push($arr_head, 'CHOLESTEROL_TOTAL');
+}
 
 array_push($arr_head,   'KESIMPULAN');
 array_push($arr_head,   'KONSULTASI');
 array_push($arr_head,   'REKOMENDASI');
 
+# ============================================================
+# HITUNG WIDTH
+# ============================================================
+$width = intval(96 / count($arr_head));
+$width_first = 3;
+$width_last = 100 - $width_first - ($width * count($arr_head));
+
+
 
 
 $th = '';
 foreach ($arr_head as $key => $value) {
-  $th .= "<th>$value</th>";
+  if ($key == 0) {
+    $w = $width_first;
+  } elseif ($key == count($arr_head) - 1) {
+    $w = $width_last;
+  } else {
+    $w = $width;
+  }
+  $th .= "<th style='width:$w%'>$value</th>";
 }
 
 
@@ -434,10 +583,7 @@ if ($mode == 'detail') {
   $tr = $tr_approv;
 
   $arr_head = [
-    'NO',
-    'NO. MCU',
-    'NAMA',
-    'GENDER',
+    'PASIEN MCU',
     'KELUHAN',
     'KESIMPULAN FISIK',
     'DARAH LENGKAP',
@@ -446,26 +592,21 @@ if ($mode == 'detail') {
     'KESIMPULAN',
     'KONSULTASI',
     'REKOMENDASI',
-    'PUBLISH',
   ];
 
   // sementara untuk SMK-TB
-  if ($id_perusahaan == 27) {
+  if ($id_perusahaan == 27 || $id_perusahaan == 41) { // SMK-TB || BEN-MAKMUR
     $arr_head = [
-      'NO',
-      'NO. MCU',
-      'NAMA',
-      'GENDER',
+      'PASIEN MCU',
       'KELUHAN',
       'MCU FISIK',
-      'KIMIA DARAH',
       'DARAH LENGKAP',
       'URINE',
       'RONTGEN',
+      'KIMIA DARAH',
       'KESIMPULAN',
       'KONSULTASI',
       'REKOMENDASI',
-      'PUBLISH',
     ];
   }
 
@@ -502,6 +643,7 @@ if ($mode == 'approv') {
 
 echo "
   $sub_h
+  <div class='text-center mb-3'><span class=f30>$jumlah_rekap</span> rows data</div>
   <div class='flex flex-center'>
     <div class='kertas $landscape bg-white'>
       <div class='tengah mb2'>
@@ -517,11 +659,13 @@ if ($mode == 'detail' || $mode == 'approv') {
   # KONTEN INTI : FORM APPROV OR PREVIEW CORPORATE
   # ============================================================      
   echo "
-        $tag_form
-          <table class='table table-bordered f8'>
-            $th
-            $tr
-          </table>";
+    $tag_form
+    <table class='table table-bordered f8'>
+      $th
+      $tr
+    </table>
+  ";
+
   if ($mode != 'approv') {
     echo "
           <div style='margin-left: 20cm'>

@@ -13,7 +13,7 @@ if (isset($_POST['btn_filter_tanggal'])) {
 # ============================================================
 # PENENTUAN CARA BAYAR PERUSAHAAN : CORMAN | BY-CORP
 # ============================================================
-$arr_tanggal_periksa = [];
+$arr_tanggal_periksa_db = [];
 if ($perusahaan['cara_bayar'] == 'ci' || $perusahaan['cara_bayar'] == 'bi') { // Cor-Idv
   $tb_c = "tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id";
 } else {
@@ -24,29 +24,33 @@ $s = "SELECT date(a.awal_periksa) tanggal_periksa
 FROM tb_hasil_pemeriksaan a 
 JOIN tb_pasien b ON a.id_pasien=b.id 
 JOIN $tb_c 
-WHERE c.id_perusahaan = $id_perusahaan
+WHERE c.id_perusahaan = $id_perusahaan 
+ORDER BY tanggal_periksa 
 ";
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 
 while ($d = mysqli_fetch_assoc($q)) {
   $tanggal_periksa = $d['tanggal_periksa'];
-  if (!in_array($tanggal_periksa, $arr_tanggal_periksa)) array_push($arr_tanggal_periksa, $tanggal_periksa);
+  if (!in_array($tanggal_periksa, $arr_tanggal_periksa_db)) array_push($arr_tanggal_periksa_db, $tanggal_periksa);
 }
 
+$arr_tanggal_periksa = explode(',', $get_tanggal_periksa);
 $nav_tanggal = '';
-if (count($arr_tanggal_periksa) > 1) {
-  foreach ($arr_tanggal_periksa as  $tanggal_periksa) {
+if (count($arr_tanggal_periksa_db) > 1) {
+  foreach ($arr_tanggal_periksa_db as  $tanggal_periksa) {
     $primary = $tanggal_periksa == $get_tanggal_periksa ? 'primary' : 'secondary';
     $TanggalPeriksa = hari_tanggal($tanggal_periksa, 0, 0, 0);
+    $secondary = in_array($tanggal_periksa, $arr_tanggal_periksa) ? 'primary' : 'secondary';
+    $checked = in_array($tanggal_periksa, $arr_tanggal_periksa) ? 'checked' : '';
     $nav_tanggal .= "
       <div class='mr2 hideit'>
         <a class='btn btn-$primary btn-sm' href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggal_periksa'>
           $tanggal_periksa
         </a>
       </div>
-      <div class='mr2 btn btn-secondary f14'>
+      <div class='mr2 btn btn-outline-$secondary f14'>
         <label>
-          <input type=checkbox name=tanggal_periksa[] value='$tanggal_periksa'> $TanggalPeriksa
+          <input type=checkbox name=tanggal_periksa[] value='$tanggal_periksa' $checked> $TanggalPeriksa
         </label>
       </div>
     ";

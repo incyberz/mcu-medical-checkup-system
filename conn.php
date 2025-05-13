@@ -26,7 +26,7 @@ if ($online_version) {
   $db_name = "db_mcu";
   if (1) {
     $dm_db = 1;
-    $db_name = "db_online_mcu";
+    $db_name = "db_online_mcu_10mei";
   }
 }
 

@@ -3,18 +3,32 @@
 # PEMERIKSAAN
 # ============================================================
 $kelainan = [];
-$ARR_JENIS = [
-  2 => 'DK',
-  3 => 'HEM',
-  20 => 'URI',
-  9 => 'RON',
-];
+// $ARR_JENIS = [
+//   2 => 'DK',
+//   3 => 'HEM',
+//   20 => 'URI',
+//   9 => 'RON',
+// ];
+
 $arr_lab = [
   20 => 'URINE',
   2 => 'DK',
   3 => 'HEMA',
   9 => 'RONTGEN'
 ];
+
+
+$ARR_JENIS = [];
+
+$s = "SELECT id,singkatan FROM tb_pemeriksaan";
+$q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+while ($d = mysqli_fetch_assoc($q)) {
+  $ARR_JENIS[$d['id']] = $d['singkatan']; // replace semua id pemeriksaan 
+  $arr_lab[$d['id']] = $arr_lab[$d['id']] ?? $d['singkatan']; // add id yang belum
+}
+
+
+
 $hasil_lab = [];
 
 
@@ -76,7 +90,6 @@ foreach ($arr_id_pemeriksaan_penunjang as $id_pemeriksaan) {
         } elseif ($hasil > $normal_hi) {
           $hl = "<span class='red bold'>HIGH</span>";
         }
-
 
         $sub_li .= $hl ? "<li><span class=column>$d[label]:</span> <a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=$ARR_JENIS[$id_pemeriksaan]&id_pemeriksaan=$id_pemeriksaan'>$hl</a></li>" : '';
       }

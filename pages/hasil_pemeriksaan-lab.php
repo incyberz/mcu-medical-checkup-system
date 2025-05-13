@@ -5,7 +5,7 @@
 // $s = "SELECT a.id as id_pemeriksaan a"
 set_title('Hasil Lab - ' . $nama_pemeriksaan);
 
-$get_jenis = $_GET['jenis'] ?? '';
+// $get_jenis = $_GET['jenis'] ?? '';
 if ($get_jenis) $get_jenis = strtolower($get_jenis);
 
 # ============================================================
@@ -162,8 +162,29 @@ if ($get_jenis == 'wid') { // widal
     </div>    
     ";
   }
+} elseif ($get_jenis == 'glu' || $get_jenis == 'glu') { // ZZZ here for Ben Makmur
+  $blok_detail = "
+    <div 
+      class='f12 left border-bottom pb2' 
+      style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
+    >
+      $detail_header
+      $detail
+    </div>
+  ";
+  if ($get_jenis == 'hem') {
+    $blok_detail .= "
+    <h5 class='kiri f14 mt2 mb2 bold' style='letter-spacing: 2px; color: #4cc'>Hitung Jenis Leukosit</h5>
+    <div 
+      class='f12 left border-bottom pb2' 
+      style='display: grid; grid-template-columns: 25% 10% 8% 17% 25% auto'
+    >
+      $detail2
+    </div>    
+    ";
+  }
 } else {
-  die(div_alert('danger', "get_jenis [$get_jenis] belum terdefinisi."));
+  die(div_alert('danger', "get_jenis [$get_jenis] belum terdefinisi. @hasil_pemeriksaan-lab"));
 }
 
 
