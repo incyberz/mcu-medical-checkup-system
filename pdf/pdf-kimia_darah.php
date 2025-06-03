@@ -17,6 +17,26 @@ $pdf->Cell(0, LHB, 'K I M I A   D A R A H ', '-', 1, 'L');
 
 $pdf->SetFont(FF, '', 8);
 $s = "SELECT * FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=$id_pemeriksaan";
+
+# ============================================================
+# KHUSUS BEN MAKMUR
+# ============================================================
+if ($id_perusahaan == 41) {
+  $s = "SELECT * FROM tb_pemeriksaan_detail 
+  WHERE id_pemeriksaan=43 -- ASAM_URAT
+  OR id_pemeriksaan=46 -- GLUKOSA_SEWAKTU
+  OR id_pemeriksaan=35 -- CHOLESTEROL_TOTAL
+  ";
+}
+
+
+
+
+// echo '<pre>';
+// print_r($id_perusahaan);
+// print_r($s);
+// echo '</pre>';
+// exit;
 $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
 if (!mysqli_num_rows($q)) {
   $pdf->SetTextColor(255, 0, 0);
@@ -24,14 +44,25 @@ if (!mysqli_num_rows($q)) {
 } else {
 
   $koloms = [];
-  // include 'pdf-lab-table_header.php';
+  include 'pdf-lab-table_header.php';
 
   $pdf->SetTextColor(0, 0, 0);
   $pdf->SetFillColor(230, 230, 230);
   $pdf->SetFont(FF, '', FS);
   $i = 0;
+  $j = 0;
   $last_fungsi = '';
   while ($d = mysqli_fetch_assoc($q)) {
+    # ============================================================
+    # SHOW FUNGSI PEMERIKSAAN IF EXISTS
+    # ============================================================
+    if ($d['fungsi_pemeriksaan']) {
+      // $pdf->SetTextColor(0, 0, 255);
+      // $pdf->Cell($d['fungsi_pemeriksaan'], LH, '', '-', $ln, 'L', 0);
+      // $pdf->SetTextColor(0, 0, 0);
+      // sudah di handle
+    }
+
     $i++;
     $fill = $i % 2 == 0 ? 1 : 0;
     $id_detail = $d['id'];
@@ -84,7 +115,7 @@ if (!mysqli_num_rows($q)) {
       $pdf->Cell(0, 4, '  ', '-', 1, 'L'); // spacer
       $pdf->Cell(0, LHB, $d['fungsi_pemeriksaan'], '-', 1, 'L');
 
-      include 'pdf-lab-table_header.php';
+      // include 'pdf-lab-table_header.php';
 
       $pdf->SetFont(FF, '', FS);
       $pdf->SetTextColor(0, 0, 0);
@@ -104,6 +135,7 @@ if (!mysqli_num_rows($q)) {
     # INTI OUTPUT 
     # ============================================================
     foreach ($arr as $k => $v) {
+      $fill = 1;
       $ln = $k == 'NILAI NORMAL' ? $ln1 : $ln0;
       $pdf->Cell($koloms[$k], LH, $v, '-', $ln, 'L', $fill);
     }

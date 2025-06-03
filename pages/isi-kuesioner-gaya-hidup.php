@@ -373,7 +373,7 @@ foreach ($gayas as $key => $gaya) {
 $form_progres = "
   <form method='POST'>
     <input type='hidden' name='kolom' value='$kolom'>
-    <textarea name='jawaban' id=jawaban class='hideita form-control bg-red' rows=4 style='position:fixed;top:0; z-index:999'></textarea>
+    <textarea name='jawaban' id=jawaban class='hideit form-control bg-red' rows=4 style='position:fixed;top:0; z-index:999'></textarea>
 
     <div style='position:fixed; bottom:0; left:0; background: white; padding: 5px 15px 15px 15px; width: 100vw; z-index:999; border-top: solid 1px #ccc'>
       <div class=container>

@@ -61,14 +61,14 @@ a.gender_kontak,
   JOIN tb_pasien q ON p.id_pasien=q.id 
   JOIN tb_harga_perusahaan r ON q.id_harga_perusahaan=r.id 
   WHERE r.id_perusahaan=a.id 
-  AND q.status = 10 -- pasien selesai pemeriksaan 
+  AND 1 -- q.status = 10 -- pasien selesai pemeriksaan 
   ) total_peserta,
 (
   SELECT p.awal_periksa FROM tb_hasil_pemeriksaan p 
   JOIN tb_pasien q ON p.id_pasien=q.id 
   JOIN tb_harga_perusahaan r ON q.id_harga_perusahaan=r.id 
   WHERE r.id_perusahaan=a.id 
-  AND q.status = 10 -- pasien selesai pemeriksaan 
+  AND 1 -- q.status = 10 -- pasien selesai pemeriksaan 
   ORDER BY p.awal_periksa DESC 
   LIMIT 1
   ) last_awal_periksa,

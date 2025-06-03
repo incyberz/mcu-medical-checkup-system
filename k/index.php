@@ -14,6 +14,7 @@
 
   <?php
   include '../include/arr_id_pemeriksaan.php';
+  include '../include/eta.php';
   $post_id_pasien = $_POST['id_pasien'] ?? '';
   $is_valid = 1;
   $day_expire = 7;

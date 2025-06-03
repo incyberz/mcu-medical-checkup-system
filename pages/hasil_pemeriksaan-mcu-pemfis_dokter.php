@@ -13,21 +13,23 @@ while ($d = mysqli_fetch_assoc($q)) {
     $id_detail = $d2['id'];
     $nama_pemeriksaan = trim($d2['label']);
     $koma = $hasil ? '; ' : ' ';
-    $c_hasil = "$koma$nama_pemeriksaan: $arr_id_detail[$id_detail]";
+    $c_hasil = isset($arr_id_detail[$id_detail]) ? "$koma$nama_pemeriksaan: $arr_id_detail[$id_detail]" : "$koma$nama_pemeriksaan: no-data";
 
     $option_default = strtolower($arr_pemeriksaan_detail[$id_detail]['option_default']);
 
     if ($option_default) {
-      if ($option_default == $arr_id_detail[$id_detail]) {
+      $opt = $arr_id_detail[$id_detail] ?? null;
+      if ($option_default == $opt) {
         // $kelainan = '';
       } else {
         $kelainan = $img_check_pink; // "$nama_pemeriksaan: $arr_id_detail[$id_detail]";
 
         // li kesimpulan
+        $tmp_val = $arr_id_detail[$id_detail] ?? 'no-data';
         $li_kesimpulan = "
           <li>
             <span class=column>$d[bagian]:</span>
-            <span class=hasil>$nama_pemeriksaan: $arr_id_detail[$id_detail]</span>
+            <span class=hasil>$nama_pemeriksaan: $tmp_val</span>
           </li>
         ";
 

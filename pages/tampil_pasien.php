@@ -240,7 +240,12 @@ while ($pemeriksaan = mysqli_fetch_assoc($q_pemeriksaan)) {
   if ($tanggal_periksa) {
     $jumlah_pemeriksaan_selesai++;
     $hari = hari_tanggal($tanggal_periksa);
-    $info_pemeriksaan = "by <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>";
+    $info_pemeriksaan = '';
+    if ($id_pemeriksa) {
+      if (isset($arr_user[$id_pemeriksa])) {
+        $info_pemeriksaan = "by <b class=darkblue>$arr_user[$id_pemeriksa]</b> pada  <b class=darkblue>$hari</b>";
+      }
+    }
   }
 
   # ============================================================

@@ -99,10 +99,10 @@ $tr_approv .= "
 
     <td><span class=hideit>KELUHAN</span>$keluhan</td>
     <td id='kesFis'><span class=hideit>KESIMPULAN FISIK</span>$kesimpulan_fisik</td>
-    $td_tambahan
     <td><span class=hideit>DARAH LENGKAP</span>$hasil_hema</td>
     <td><span class=hideit>URINE</span>$hasil_urine</td>
     <td><span class=hideit>RONTGEN</span>$hasil_rontgen</td>
+    $td_tambahan
     <td class='$gradasi_merah'><span class=hideit>KESIMPULAN</span>$kesimpulan</td>
     <td><span class=hideit>KONSULTASI</span>$konsultasi</td>
     <td><span class=hideit>REKOMENDASI</span>$rekomendasi</td>        

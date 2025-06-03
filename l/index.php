@@ -58,7 +58,7 @@
   JOIN tb_pasien b ON a.id_pasien=b.id 
   JOIN tb_harga_perusahaan c ON b.id_harga_perusahaan=c.id
   WHERE c.id_perusahaan=$id_perusahaan 
-  AND b.status = 10 -- selesai pemeriksaan 
+  AND 1 -- b.status = 10 -- selesai pemeriksaan 
   AND $sql_tanggals
   ORDER BY b.nama 
   ";

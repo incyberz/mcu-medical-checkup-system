@@ -1,6 +1,6 @@
 <?php
-$id_pemeriksaan = 9;
-$nama_pemeriksaan = 'RONTGEN THORAX';
+$id_pemeriksaan = 47;
+$nama_pemeriksaan = 'PEMERIKSAAN HBSAG (HEPATITIS)';
 # ===========================================
 # HEADER
 # ===========================================
@@ -15,26 +15,18 @@ $pdf->SetFont(FF, '', FS);
 
 $widths = [15, 5, 170];
 
-$ID_DETAIL_RONTGEN = 134;
-if (isset($arr_id_detail[$ID_DETAIL_RONTGEN])) {
-  $COR_STATUS = 'Jantung Tidak Membesar ( CTR < 50% )';
-  $AORTA_STATUS = 'Normal';
-  $PULMO_STATUS = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin. -- Sinus Kostoferenikus Kanan-Kiri Lancip. Tulang-Tulang Dan Soft Tissue Normal';
-  $PULMO_STATUS = 'Normal'; // ambil cepat
-  $PULMO_STATUS = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin.';
-  $KESAN_STATUS = 'Dalam batas normal';
+$id_detail_pemeriksaan = 135;
+if (isset($arr_id_detail[$id_detail_pemeriksaan])) {
+  $HEPAR_STATUS = 'Anti HBs kuantitatif: Non Reaktif';
+  $KESAN_STATUS = 'Dalam Batas Normal';
 
   # ============================================================
   # HASIL RONTGEN PROCESSOR
   # ============================================================
-  $str_hasil = $arr_id_detail[$ID_DETAIL_RONTGEN];
+  $str_hasil = $arr_id_detail[$id_detail_pemeriksaan];
 
-  $arr_default_rontgen['COR'] = 'Jantung Tidak Membesar ( CTR < 50% )';
-  $arr_default_rontgen['AORTA'] = 'Normal';
-  $arr_default_rontgen['PULMO'] = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin. -- Sinus Kostoferenikus Kanan-Kiri Lancip. Tulang-Tulang Dan Soft Tissue Normal';
-  $arr_default_rontgen['PULMO'] = 'Normal'; // ambil cepat
-  $arr_default_rontgen['PULMO'] = 'Tidak Tampak Infiltrat / Lesi Pada Kedua Paru. Corakan Bronchovasculer Normal. Kedua Hemidiafragma Licin.';
-  $arr_default_rontgen['KESAN'] = 'Dalam batas normal';
+  $arr_default_rontgen['HASIL'] = $HEPAR_STATUS;
+  $arr_default_rontgen['KESAN'] = $KESAN_STATUS;
 
   $str = strtolower(trim($str_hasil));
   if ($str == 'dalam batas normal' || $str == 'normal') {
@@ -47,27 +39,21 @@ if (isset($arr_id_detail[$ID_DETAIL_RONTGEN])) {
 
     $arr = explode(', ', $str_hasil2);
 
-    $abnor['COR'] = '';
-    $abnor['AORTA'] = '';
-    $abnor['PULMO'] = [];
+    $abnor['HASIL'] = '';
     foreach ($arr as $key => $value) {
       $awalan = strtolower(substr($value, 0, 5));
       if ($awalan == 'jantu') {
-        $abnor['COR'] .= $value;
+        $abnor['HASIL'] .= $value;
       } elseif ($awalan == 'aorta') {
-        $abnor['AORTA'] .= $value;
       } elseif ($awalan == 'pulmo') {
         $tmp = explode(' > ', $value);
-        if ($tmp[1]) array_push($abnor['PULMO'], $tmp[1]);
       }
     }
 
 
-    $KESAN_STATUS = $kesan_tambahan ?? 'Terdapat Kelainan Paru';
+    $KESAN_STATUS = $kesan_tambahan ?? 'Terdapat Kelainan Liver';
 
-    $COR_STATUS = $abnor['COR'] ? $abnor['COR'] : $arr_default_rontgen['COR'];
-    $AORTA_STATUS = $abnor['AORTA'] ? $abnor['AORTA'] : $arr_default_rontgen['AORTA'];
-    $PULMO_STATUS = $abnor['PULMO'] ? $abnor['PULMO'] : $arr_default_rontgen['PULMO'];
+    $HEPAR_STATUS = $abnor['HASIL'] ? $abnor['HASIL'] : $arr_default_rontgen['HASIL'];
   }
 
 
@@ -76,16 +62,12 @@ if (isset($arr_id_detail[$ID_DETAIL_RONTGEN])) {
   # CREATE UI PDF
   # ============================================================
   $koloms = [
-    'COR' => $COR_STATUS,
-    'AORTA' => $AORTA_STATUS,
-    'PULMO' => $PULMO_STATUS,
+    'HASIL' => $HEPAR_STATUS,
     'KESAN' => $KESAN_STATUS,
   ];
 } else {
   $koloms = [
-    'COR' => ['COR' => '(no-test)'],
-    'AORTA' => ['AORTA' => '(no-test)'],
-    'PULMO' => ['PULMO' => '(no-test)'],
+    'HASIL' => ['HASIL' => '(no-test)'],
     'KESAN' => ['KESAN' => '(no-test)'],
   ];
 }
@@ -141,7 +123,7 @@ $pdf->Cell(0, 2, ' ', '-', $ln1, 'L'); // spacer
 $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
 $pdf->Cell(0, LH, 'Printed at: Bekasi, ' . hari_tanggal('', 1, 0), '-', $ln1, 'L');
 $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
-$pdf->Cell(0, LH, "Dokter Radiologi: $dokter_radiologi ", '-', $ln1, 'L');
+$pdf->Cell(0, LH, 'Dokter Pemeriksa: dr. Mutiara Putri Camelia ', '-', $ln1, 'L');
 $pdf->Cell(120, LH, ' ', '-', $ln0, 'L');
 
 
@@ -150,8 +132,8 @@ include 'pdf-qr_show.php';
 
 
 
-// footer after keluhan
-$k = 'rontgen';
+// footer 
+$k = 'hepatitis';
 if (in_array($k, $arr_page_at)) {
   // echo "<br>$k ----------------";
   $pdf->SetY(273);

@@ -6,7 +6,7 @@ if (isset($_POST['btn_filter_tanggal'])) {
     $koma = $tanggals ? ',' : '';
     $tanggals .= "$koma$value";
   }
-  if ($tanggals) jsurl("?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggals");
+  if ($tanggals) jsurl("?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggals&mode_kesimpulan=$_POST[mode_kesimpulan]");
 }
 
 
@@ -43,28 +43,42 @@ if (count($arr_tanggal_periksa_db) > 1) {
     $secondary = in_array($tanggal_periksa, $arr_tanggal_periksa) ? 'primary' : 'secondary';
     $checked = in_array($tanggal_periksa, $arr_tanggal_periksa) ? 'checked' : '';
     $nav_tanggal .= "
-      <div class='mr2 hideit'>
+      <div class='hideit'>
         <a class='btn btn-$primary btn-sm' href='?rekap_perusahaan&id_perusahaan=$id_perusahaan&mode=$mode&tanggal_periksa=$tanggal_periksa'>
           $tanggal_periksa
         </a>
       </div>
-      <div class='mr2 btn btn-outline-$secondary f14'>
+      <div class='btn btn-outline-$secondary f14'>
         <label>
           <input type=checkbox name=tanggal_periksa[] value='$tanggal_periksa' $checked> $TanggalPeriksa
         </label>
       </div>
     ";
   }
+
+  $selected = [];
+  $selected[0] = '';
+  $selected[-1] = '';
+  $selected[1] = '';
+  $selected[intval($get_mode_kesimpulan)] = 'selected';
+
   $nav_tanggal .= "
-      <div class='mr2'>
-        <button class='btn btn-success btn-sm' name=btn_filter_tanggal>Filter</button>
-      </div>
-    ";
+    <div class=''>
+      <select class='form-control form-control-sm border-success' name=mode_kesimpulan>
+        <option value='0' $selected[0]>All Data</option>
+        <option value='-1' $selected[-1]>Belum Disimpulkan</option>
+        <option value='1' $selected[1]>Sudah Disimpulkan</option>
+      </select>
+    </div>
+    <div>
+      <button class='btn btn-success btn-sm' name=btn_filter_tanggal>Filter</button>
+    </div>
+  ";
 
   echo  "
     <form method=post class='mb4 tengah'>
       <div class=mb2>Tanggal Pemeriksaan:</div>
-      <div class='flex flex-center'>
+      <div class='flex flex-center gap-2'>
         $nav_tanggal
       </div>
     </form>

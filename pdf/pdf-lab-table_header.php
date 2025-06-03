@@ -1,6 +1,6 @@
 <?php
 $koloms = [
-  'PEMERIKSAAN' => 60,
+  'PEMERIKSAAN' => 60, // width 60%
   'HASIL' => 20,
   'H/L' => 20,
   'SATUAN' => 30,

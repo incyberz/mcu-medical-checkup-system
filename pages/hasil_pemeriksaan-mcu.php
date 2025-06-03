@@ -46,7 +46,7 @@ include 'hasil_pemeriksaan-mcu-kesimpulan.php';
 include 'hasil_pemeriksaan-mcu-kesimpulan_penunjang.php';
 
 include 'include/arr_kesimpulan.php';
-$belum_ada = '<span class="red miring">belum diverifikasi</span>';
+$belum_ada = '<span class="red miring">belum diverifikasi oleh Dokter MCU</span>';
 $hasil_at_db_show = $hasil_at_db['hasil'] ? $arr_kesimpulan[$hasil_at_db['hasil']] : $belum_ada;
 blok_hasil('KESIMPULAN', $hasil_at_db_show);
 
@@ -80,8 +80,15 @@ $arr_konsultasi = [];
 if (strpos("salt$kesimpulan_fisik", 'obese') || strpos("salt$kesimpulan_fisik", 'underweight')) array_push($arr_konsultasi, 'dokter ahli gizi');
 if (strpos("salt$kesimpulan_fisik", 'gigi')) array_push($arr_konsultasi, 'dokter gigi');
 if ($hasil_lab['HEMA'] != 'normal' || $hasil_lab['URINE'] != 'normal') array_push($arr_konsultasi, 'dokter umum');
-if ($hasil_lab['RONTGEN'] != 'normal') array_push($arr_konsultasi, 'dokter paru');
-if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
+
+
+if (isset($hasil_lab['RONTGEN'])) {
+  if ($hasil_lab['RONTGEN'] != 'normal') array_push($arr_konsultasi, 'dokter paru');
+}
+
+if (isset($arr_id_detail[14]) and isset($arr_id_detail[142])) {
+  if ($arr_id_detail[14] > 20 || $arr_id_detail[142] > 20) array_push($arr_konsultasi, 'dokter mata');
+}
 
 
 if (!$arr_konsultasi) {

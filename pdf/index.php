@@ -7,6 +7,7 @@ session_start();
 
 $id_klinik = 1;
 include "../conn.php";
+include '../include/alert.php';
 include '../include/insho_functions.php';
 include '../include/arr_pemeriksaan.php';
 include '../include/arr_pemeriksaan_detail.php';
@@ -385,15 +386,62 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     # ============================================================
     $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
 
-    if ($id_perusahaan == 27) { // SMK-TB
-      $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'kimia_darah', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
+    if ($id_perusahaan == 27 || $id_perusahaan == 41) { // SMK-TB || BEN MAKMUR
+      // $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'kimia_darah', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
+      array_push($arr_page_at, 'kimia_darah');
     }
 
+    # ============================================================
+    # CEK APAKAH PADA PAKET YANG DIAMBIL ADA PEMERIKSAAN LAB
+    # ============================================================
+    if ($id_paket_custom) { // jika pasien individu paket custom
+      $s = "SELECT a.*,b.nama as nama_pemeriksaan FROM tb_paket_custom_detail a 
+      JOIN tb_pemeriksaan b ON a.id_pemeriksaan=b.id
+      WHERE a.id_paket_custom='$id_paket_custom'";
+      $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
+      if (!mysqli_num_rows($q)) {
+        stop("Data paket dengan id_paket_custom: $id_paket_custom tidak ditemukan");
+      } else {
+        while ($d = mysqli_fetch_assoc($q)) {
+          # ============================================================
+          # TAMBAH KIMIA DARAH, EKG, DAN PEMERIKSAAN SPESIAL LAINNYA
+          # ============================================================
+          if ($d['id_pemeriksaan'] == 2) array_push($arr_page_at, 'kimia_darah');
+          if ($d['id_pemeriksaan'] == 5) array_push($arr_page_at, 'ekg');
+          if ($d['id_pemeriksaan'] == 47) array_push($arr_page_at, 'hepatitis');
+        }
+      }
+    }
     $total_page = count($arr_page_at);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // fix keluhan (strip)
     if (strlen($pasien['keluhan']) < 5) $pasien['keluhan'] = null;
-
 
     # ============================================================
     # MAIN LOOPING
@@ -549,34 +597,19 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     } // end foreach main looping
 
 
-
     # ============================================================
-    # KESIMPULAN MCU
+    # INCLUDES SUB PDF
     # ============================================================
     include 'pdf-kesimpulan_mcu.php';
-
-    if ($id_perusahaan == 27) { // SMK-TB
-      # ============================================================
-      # PAGE KIMIA DARA
-      # ============================================================
-      include 'pdf-kimia_darah.php';
-    }
-
-    # ============================================================
-    # PAGE URINE LENGKAP
-    # ============================================================
+    if (in_array('kimia_darah', $arr_page_at)) include 'pdf-kimia_darah.php';
     include 'pdf-urine_lengkap.php';
-
-    # ============================================================
-    # PAGE DARAH LENGKAP
-    # ============================================================
     include 'pdf-darah_lengkap.php';
-
-    # ============================================================
-    # PAGE RONTGEN
-    # ============================================================
+    if (in_array('hepatitis', $arr_page_at)) include 'pdf-hepatitis.php';
     include 'pdf-rontgen.php';
+    if (in_array('ekg', $arr_page_at)) include 'pdf-ekg.php';
   } // end while data pasien
+
+  # ============================================================
 } else {
   die(div_alert('danger', "Data pasien tidak ditemukan"));
 }

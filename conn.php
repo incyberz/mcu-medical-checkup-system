@@ -27,6 +27,7 @@ if ($online_version) {
   if (1) {
     $dm_db = 1;
     $db_name = "db_online_mcu_10mei";
+    $db_name = "db_online_mcu_29_mei";
   }
 }
 
@@ -41,10 +42,6 @@ date_default_timezone_set("Asia/Jakarta");
 function erid($a)
 {
   return "<span style=color:red>Error, index [$a] belum terdefinisi.</span>";
-}
-function kosong($a)
-{
-  return "<span style=color:red>Error, index [$a] tidak boleh kosong.</span>";
 }
 
 function clean_sql($a)

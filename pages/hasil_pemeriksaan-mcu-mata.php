@@ -16,8 +16,12 @@ $arr_hasil_kika = [];
 foreach ($arr as $kika) {
   $li = '';
   foreach ($arr_mata[$kika] as $key => $value) {
-    $hasil = $arr_id_detail[$key];
-    $li .= "<li><span class=column>$value[label]:</span> <span class=hasil>$hasil $value[satuan]</span></li>";
+    $hasil = $arr_id_detail[$key] ?? 0;
+    if ($hasil) {
+      $li .= "<li><span class=column>$value[label]:</span> <span class=hasil>$hasil $value[satuan]</span></li>";
+    } else {
+      $li .= "<li><span class=column>$value[label]:</span> <span class=hasil>no-data</span></li>";
+    }
   }
   $arr_hasil_kika[$kika] = "<ul class='m0'>$li</ul>";
 }

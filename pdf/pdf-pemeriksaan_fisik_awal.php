@@ -16,9 +16,13 @@
 # 6. Pakai Kacamata => 13,
 # ============================================================
 $abnormal = [];
-$berat_badan = $arr_id_detail[1];
-$tinggi_badan = $arr_id_detail[2];
-$imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
+$berat_badan = $arr_id_detail[1] ?? die('Data Berat Badan tidak ditemukan');
+$tinggi_badan = $arr_id_detail[2] ?? die('Data Tinggi Badan tidak ditemukan');
+if ($berat_badan and $tinggi_badan) {
+  $imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
+} else {
+  die("Tidak bisa memproses IMT. Data Tinggi Badan = [$tinggi_badan], Berat Badan = [$berat_badan]");
+}
 
 $batas_imt = [
   18.5 => 'Underweight',
@@ -86,6 +90,8 @@ $abnormal['Lingkar Perut'] = $resiko_lingkar_perut == 'Beresiko' ? 1 : 0;
 $abnormal['Tes Buta Warna'] = $poin_tes_warna < 8 ? 1 : 0;
 $abnormal['Tekanan Darah'] = ($diastol < 60 || $diastol > 89 || $sistol < 100 || $sistol > 148) ? 1 : 0;
 
+$pakai_kacamata = isset($arr_id_detail[13]) ? "$arr_id_detail[13] " . $arr_pemeriksaan_detail[13]['satuan'] : 'no-data';
+
 $pasien['pemeriksaan_fisik_awal'] = [
   'ki' => [
     'Tinggi Badan' => "$arr_id_detail[2] " . $arr_pemeriksaan_detail[2]['satuan'],
@@ -101,7 +107,7 @@ $pasien['pemeriksaan_fisik_awal'] = [
     'Pernafasan' => "$arr_id_detail[9] " . $arr_pemeriksaan_detail[9]['satuan'],
     'Suhu' => "$arr_id_detail[148] " . $arr_pemeriksaan_detail[148]['satuan'],
     'Saturasi Oksigen' => "$arr_id_detail[10] " . $arr_pemeriksaan_detail[10]['satuan'],
-    'Pakai Kacamata' => "$arr_id_detail[13] " . $arr_pemeriksaan_detail[13]['satuan'],
+    'Pakai Kacamata' => $pakai_kacamata,
   ],
 ];
 

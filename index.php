@@ -102,7 +102,7 @@ include 'include/img_icon.php';
 include 'include/date_managements.php';
 include 'include/session_managements.php';
 include 'include/eta.php';
-
+include 'include/alert.php';
 
 # ================================================
 # GET URL PARAMETER

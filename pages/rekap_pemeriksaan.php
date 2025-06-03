@@ -207,8 +207,9 @@ if ($status_pasien === '') {
           // echo '<pre>';
           // var_dump($pasien);
           // echo '</pre>';
-          $link_verif = strtoupper($jenis) . " <a href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'><span class=red>UNVERIFIED $img_next</span></a>";
+          $link_verif = "<span class=red>UNVERIFIED $img_next</span>";
         }
+        $link_verif = strtoupper($jenis) . " <a href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=mcu'>$link_verif</a>";
         $link_verif .= " <span onclick='alert(`Lakukan Print to PDF lalu kirim ke WA Pasien secara manual.\n\n- klik Nama Pasien ($d[nama_pasien])\n- lihat pada Tampil Pasien paling bawah\n- klik Hasil Lab\n- klik Print\n- pilih printer: Print as PDF \n\nHal ini dikarenakan request pemeriksaan dari pasien individu sangatlah bervariatif sehingga belum ada fitur baku untuk Download PDF semisal pasien corporate.`)'>$img_wa</span>";
       }
 

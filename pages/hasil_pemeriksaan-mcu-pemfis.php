@@ -22,9 +22,9 @@ foreach ($arr_id_detail_show as $key => $id_detail) {
   $i++;
   if ($key == 'Tekanan Darah') {
     $satuan = $arr_pemeriksaan_detail[$id_detail[0]]['satuan'];
-    $sistol = $arr_id_detail[$id_detail[0]];
-    $diastol = $arr_id_detail[$id_detail[1]];
-    $hasil =  "$sistol/$diastol $satuan";
+    $sistol = $arr_id_detail[$id_detail[0]] ?? 0;
+    $diastol = $arr_id_detail[$id_detail[1]] ?? 0;
+    $hasil = ($sistol and $diastol) ? "$sistol/$diastol $satuan" : 'no-data';
 
     $arr = [
       'Hipotensi' => ['sistol' => 100, 'distol' => 60],
@@ -46,9 +46,9 @@ foreach ($arr_id_detail_show as $key => $id_detail) {
       $kesimpulan['Tekanan Darah'] = $ket;
     }
   } elseif ($key == 'IMT') {
-    $berat_badan = $arr_id_detail[1];
-    $tinggi_badan = $arr_id_detail[2];
-    $imt = round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2);
+    $berat_badan = $arr_id_detail[1] ?? 0;
+    $tinggi_badan = $arr_id_detail[2] ?? 0;
+    $imt = ($berat_badan and $tinggi_badan) ? round($berat_badan * 10000 / ($tinggi_badan * $tinggi_badan), 2) : 0;
     $hasil = $imt;
   } elseif ($key == 'Status Gizi') {
     $batas_imt = [
@@ -66,29 +66,39 @@ foreach ($arr_id_detail_show as $key => $id_detail) {
     $kesimpulan['Status Gizi'] = $hasil;
     $hasil = '';
   } elseif ($key == 'Status Lingkar Perut') {
-    $lingkar_perut = $arr_id_detail[6];
-    if (strtolower($pasien['gender']) == 'l') {
-      $hasil = $lingkar_perut > 90 ? 'Beresiko' : 'Dalam batas aman';
+    $lingkar_perut = $arr_id_detail[6] ?? 0;
+    if ($lingkar_perut) {
+      if (strtolower($pasien['gender']) == 'l') {
+        $hasil = $lingkar_perut > 90 ? 'Beresiko' : 'Dalam batas aman';
+      } else {
+        $hasil = $lingkar_perut > 80 ? 'Beresiko' : 'Dalam batas aman';
+      }
+      $kesimpulan['Status Lingkar Perut'] = $hasil;
     } else {
-      $hasil = $lingkar_perut > 80 ? 'Beresiko' : 'Dalam batas aman';
+      $hasil = 'no-data';
+      $kesimpulan['Status Lingkar Perut'] = 'no-data';
     }
-    $kesimpulan['Status Lingkar Perut'] = $hasil;
     $hasil = '';
   } elseif ($key == 'Tes Buta Warna') {
-    $poin = $arr_id_detail[$id_detail];
-    if ($poin < 8) {
-      if ($poin < 3) {
-        $hasil = 'Buta warna total';
+    $poin = $arr_id_detail[$id_detail] ?? 0;
+    if ($poin) {
+      if ($poin < 8) {
+        if ($poin < 3) {
+          $hasil = 'Buta warna total';
+        } else {
+          $hasil = 'Buta warna parsial';
+        }
+        $kesimpulan['Tes Buta Warna'] = $hasil;
       } else {
-        $hasil = 'Buta warna parsial';
+        $hasil = 'Tidak buta warna';
       }
-      $kesimpulan['Tes Buta Warna'] = $hasil;
     } else {
-      $hasil = 'Tidak buta warna';
+      $hasil = 'no-data';
+      $kesimpulan['Tes Buta Warna'] = 'no-data';
     }
   } else {
     $satuan = $arr_pemeriksaan_detail[$id_detail]['satuan'];
-    $hasil = "$arr_id_detail[$id_detail] $satuan";
+    $hasil = isset($arr_id_detail[$id_detail]) ? "$arr_id_detail[$id_detail] $satuan" : 'no-data';
   }
   $c_li = !$hasil ? '' : "<li><span class=column>$key:</span> <span class=hasil>$hasil</span></li>";
 

@@ -5,7 +5,9 @@
 </style>
 <?php
 $mode = $_GET['mode'] ?? 'detail';
+$get_csv = $_GET['csv'] ?? null;
 $get_tanggal_periksa = $_GET['tanggal_periksa'] ?? '';
+$get_mode_kesimpulan = $_GET['mode_kesimpulan'] ?? '';
 if ($mode == 'kirim_link') {
   include 'rekap_perusahaan-kirim_link.php';
   exit;
@@ -25,6 +27,13 @@ $batas_imt = [
   40 => 'Obese class 2',
   999 => 'Obese class 3',
 ];
+
+
+
+
+
+
+
 
 
 
@@ -68,6 +77,27 @@ if (!$id_perusahaan) {
   $q = mysqli_query($cn, $s) or die(mysqli_error($cn));
   $perusahaan = mysqli_fetch_assoc($q);
 }
+
+
+
+
+# ============================================================
+# HANDLER FOR CSV
+# ============================================================
+if ($get_csv) {
+  # =======================================================
+  # CSV FILE HANDLER STARTED
+  # =======================================================
+  $NAMA_PERUSAHAAN = $perusahaan['nama'];
+  $date = date('ymd');
+  $src_csv = "csv/data-pasien-" . strtolower(str_replace(' ', '_', $NAMA_PERUSAHAAN)) . "-$date.csv";
+  $file = fopen($src_csv, "w+");
+  fputcsv($file, ['NAMA PERUSAHAAN ' . strtoupper($NAMA_PERUSAHAAN)]);
+  fputcsv($file, ['Tanggal: ' . date('d-M-Y')]);
+  fputcsv($file, ['Jam: ' . date('H:i')]);
+  fputcsv($file, [' ']);
+}
+
 
 # ============================================================
 # MODE CONTROLLER | ROUTING
@@ -118,6 +148,19 @@ if ($perusahaan['cara_bayar'] == 'ci' || $perusahaan['cara_bayar'] == 'bi') { //
 } else {
   $tb_c = "tb_order c ON a.order_no=c.order_no";
 }
+
+$sql_mode_kesimpulan = 1;
+if ($get_mode_kesimpulan == 1) {
+  $sql_mode_kesimpulan = "d.hasil is not null";
+} elseif ($get_mode_kesimpulan == -1) {
+  $sql_mode_kesimpulan = "d.hasil is null";
+}
+
+// echo '<pre>';
+// print_r('zzzzzzzzzzz' . $sql_mode_kesimpulan);
+// echo '</pre>';
+// exit;
+
 
 $sql_tanggal_periksa = 1;
 $tanggal_periksa_header = null;
@@ -176,8 +219,9 @@ JOIN tb_hasil_pemeriksaan d ON d.id_pasien=a.id
 WHERE 1 -- (a.status = 10) -- SELESAI PEMERIKSAAN  
 AND c.id_perusahaan=$id_perusahaan 
 AND $sql_tanggal_periksa
+AND $sql_mode_kesimpulan
 
-ORDER BY a.nama 
+ORDER BY a.urutan, a.nama 
 ";
 
 
@@ -197,11 +241,48 @@ if (mysqli_num_rows($qpasien)) {
     $no_urut++;
     $ada_error = 0;
 
+
+
+    # ============================================================
+    # AUTO FIX URUTAN
+    # ============================================================
+    if (!$pasien['urutan']) {
+      $no_urut_perusahaan = $perusahaan['id'] * 1000 + $no_urut;
+      $s = "UPDATE tb_pasien SET urutan=$no_urut_perusahaan WHERE id=$pasien[id]";
+      mysqli_query($cn, $s) or die(mysqli_error($cn));
+    }
+
+
+
+    # ============================================================
+    # LOOP CSV
+    # ============================================================
+    if ($get_csv) {
+      $dcsv = [];
+      # ============================================================
+      # CSV HEADER HANDLER
+      # ============================================================
+      if ($i == 1) {
+        $rheader_csv = [];
+        foreach ($pasien as $nama_kolom => $array_data) {
+          array_push($rheader_csv, strtoupper(str_replace('_', ' ', $nama_kolom)));
+        }
+        fputcsv($file, $rheader_csv);
+      }
+
+      # ============================================================
+      # CSV KONTEN HANDLER
+      # ============================================================
+      fputcsv($file, $pasien);
+    }
+
     if ($pasien['approv_date']) $jumlah_verif++;
     $jenis = strtolower($pasien['jenis']);
     $status = $pasien['status'];
     $id_pasien = $pasien['id_pasien'];
     $gender = strtolower($pasien['gender']);
+
+    $link_null = "<a href='?pasien_detail&id_pasien=$id_pasien'>$null</a>";
 
     include 'pages/pemeriksaan-hasil_at_db.php';
     $awal_periksa = $hasil_at_db['awal_periksa'];
@@ -447,13 +528,14 @@ if (mysqli_num_rows($qpasien)) {
       # ============================================================
       if ($pasien['gender']) {
         $gender = $pasien['gender'] == 'l' ? 'Laki-laki' : 'Perempuan';
+        $gender = "<a href='?pasien_detail&id_pasien=$id_pasien'>$gender</a>";
       } else {
-        $gender = $null;
+        $gender = $link_null;
         $ada_error = 1;
       }
 
       if (strtotime($pasien['tanggal_lahir']) < strtotime('1940-1-1')) {
-        $tanggal_lahir = $null;
+        $tanggal_lahir = $link_null;
       } else {
         $tanggal_lahir = date('d-m-Y', strtotime($pasien['tanggal_lahir']));
       }
@@ -463,7 +545,7 @@ if (mysqli_num_rows($qpasien)) {
       # ============================================================
       $tr .= " 
         <tr class='ada_error-$ada_error'>
-          <td>$no_urut</td>
+          <td><span class='no-urut hover' id=no-urut--$pasien[id]--$pasien[urutan]--$perusahaan[id]>$no_urut</span></td>
           <td>
             <div>MCU-$pasien[id_pasien]</div>
             <div>$pasien[nama_pasien]</div>
@@ -510,6 +592,32 @@ if (mysqli_num_rows($qpasien)) {
   } // end while
   if (isset($_POST['btn_submit'])) jsurl(); // refresh if POST Processing
 }
+
+
+
+
+
+# ============================================================
+# CLOSING CSV HANDLER
+# ============================================================
+if ($get_csv) {
+  # ============================================================
+  # CSV CLOSING HANDLER
+  # ============================================================
+  fputcsv($file, [
+    'DATA FROM: Mutiara Medical System, PRINTED AT: ' .
+      date('F d, Y, H:i:s')
+  ]);
+  fclose($file);
+  $link_download_export_csv = " 
+    <a href='$src_csv' target=_blank class='btn btn-primary my-3'>Download Excel</a>
+  ";
+} else {
+  $link_download_export_csv = "<a href='?nilai_akhir&csv=1' class='btn btn-success ' onclick='alert(`Export Data?`)'>Export Data</a>";
+}
+
+
+
 
 $arr_head = [ // header preview untuk perusahaan
   'NO',
@@ -610,9 +718,17 @@ if ($mode == 'detail') {
     ];
   }
 
+  # ============================================================
+  # HITUNG WIDTH HEADER MODE APPROV
+  # ============================================================
+  $width = intval(100 / count($arr_head));
+  $width_first = 100 - ($width * (count($arr_head) - 1));
+
+
   $th = '';
   foreach ($arr_head as $key => $value) {
-    $th .= "<th>$value</th>";
+    $w = $key ? $width : $width_first;
+    $th .= "<th style='width:$w%'>$value</th>";
   }
 } else {
   $h3 = 'BELUM ADA DESAIN JUDUL';
@@ -626,6 +742,8 @@ $tag_form = '';
 $end_form = '';
 $btn_print = "<button class='btn btn-primary' onclick=window.print() id=btn_print>Print</button>";
 $btn_pdf = "<a target=_blank href='pdf/?id_perusahaan=$id_perusahaan&tanggal_periksa=$tanggal_periksa' class='btn btn-success' onclick='return confirm(`Download PDF`)'>Download PDF Semua Pasien</a>";
+$btn_excel = "<a target=_blank href='?rekap_perusahaan&id_perusahaan=41&mode=detail&tanggal_periksa=$get_tanggal_periksa&csv=1' class='btn btn-success' onclick='return confirm(`Download CSV`)'>Download Excel</a> $link_download_export_csv";
+$btn_excel  = ''; // aborted
 $btn_submit  = '';
 $sub_h = "<div class='tengah m2 abu f14'>Preview Rekap per Perusahaan</div>";
 if ($mode == 'approv') {
@@ -634,6 +752,7 @@ if ($mode == 'approv') {
   $end_form = '</form>';
   $btn_print = '';
   $btn_pdf = '';
+  $btn_excel = '';
   $btn_submit = "<button class='btn btn-primary w-100' type=submit name=btn_submit>Submit Kesimpulan</button>";
 }
 
@@ -710,6 +829,75 @@ echo "
       <div class=ml4>
         $btn_pdf
       </div>
+      <div class=ml4>
+        $btn_excel
+      </div>
     </div>
   </div>
 ";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+<script>
+  $(function() {
+    $('.no-urut').click(function() {
+      let tid = $(this).prop('id');
+      let rid = tid.split('--');
+      let aksi = rid[0];
+      let id_pasien = rid[1];
+      let no_urut_db = rid[2];
+      let id_perusahaan = rid[3];
+      let no_urut_awal = $(this).text();
+      // console.log(aksi, id_pasien, no_urut_awal);
+      let no_urut_baru = prompt(`No. Urut: ${no_urut_awal} \nMasukkan No. Urut Baru`);
+      if (!no_urut_baru) return;
+      if (no_urut_baru == no_urut_awal) return;
+      let link_ajax = `ajax/ajax_update_no_urut.php?id_pasien=${id_pasien}&no_urut_awal=${no_urut_awal}&no_urut_baru=${no_urut_baru}&id_perusahaan=${id_perusahaan}`;
+      // console.log(tid, id_perusahaan, link_ajax);
+
+      $.ajax({
+        url: link_ajax,
+        success: function(a) {
+          if (a.trim() == 'sukses') {
+            // console.log(a);
+            location.reload();
+          } else {
+            alert(a);
+          }
+        }
+      });
+    })
+  })
+</script>

@@ -171,11 +171,11 @@ if (!mysqli_num_rows($q)) {
           'minrange',
           'maxrange',
 
-          // 'normal_value',
-          // 'normal_lo_l',
-          // 'normal_hi_l',
-          // 'normal_lo_p',
-          // 'normal_hi_p',
+          'normal_value',
+          'normal_lo_l',
+          'normal_hi_l',
+          'normal_lo_p',
+          'normal_hi_p',
           'step',
           'satuan',
 
