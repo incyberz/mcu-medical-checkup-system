@@ -384,7 +384,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     # ============================================================
     # PAGE NUMBER AT
     # ============================================================
-    $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
+    $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan'];
 
     if ($id_perusahaan == 27 || $id_perusahaan == 41) { // SMK-TB || BEN MAKMUR
       // $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'kimia_darah', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
@@ -412,6 +412,11 @@ if (mysqli_num_rows($q_pasien_pdf)) {
         }
       }
     }
+
+    array_push($arr_page_at, 'urine_lengkap');
+    array_push($arr_page_at, 'darah_lengkap');
+    array_push($arr_page_at, 'rontgen');
+
     $total_page = count($arr_page_at);
 
 

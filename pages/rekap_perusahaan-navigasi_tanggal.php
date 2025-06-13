@@ -39,7 +39,7 @@ $nav_tanggal = '';
 if (count($arr_tanggal_periksa_db) > 1) {
   foreach ($arr_tanggal_periksa_db as  $tanggal_periksa) {
     $primary = $tanggal_periksa == $get_tanggal_periksa ? 'primary' : 'secondary';
-    $TanggalPeriksa = hari_tanggal($tanggal_periksa, 0, 0, 0);
+    $TanggalPeriksa = date('d-M', strtotime($tanggal_periksa));
     $secondary = in_array($tanggal_periksa, $arr_tanggal_periksa) ? 'primary' : 'secondary';
     $checked = in_array($tanggal_periksa, $arr_tanggal_periksa) ? 'checked' : '';
     $nav_tanggal .= "
@@ -78,7 +78,7 @@ if (count($arr_tanggal_periksa_db) > 1) {
   echo  "
     <form method=post class='mb4 tengah'>
       <div class=mb2>Tanggal Pemeriksaan:</div>
-      <div class='flex flex-center gap-2'>
+      <div class='flex flex-center gap-2' style='flex-wrap:wrap;'>
         $nav_tanggal
       </div>
     </form>
