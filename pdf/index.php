@@ -386,7 +386,7 @@ if (mysqli_num_rows($q_pasien_pdf)) {
     # ============================================================
     $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan'];
 
-    if ($id_perusahaan == 27 || $id_perusahaan == 41) { // SMK-TB || BEN MAKMUR
+    if ($id_perusahaan == 27 || $id_perusahaan == 41 || $id_perusahaan == 42) { // SMK-TB || BEN MAKMUR
       // $arr_page_at = ['keluhan', 'pemeriksaan_fisik_dokter', 'kesimpulan', 'kimia_darah', 'urine_lengkap', 'darah_lengkap', 'rontgen'];
       array_push($arr_page_at, 'kimia_darah');
     }

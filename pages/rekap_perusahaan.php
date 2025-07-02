@@ -296,6 +296,10 @@ if (mysqli_num_rows($qpasien)) {
       'RONTGEN' => 9
     ];
 
+    echo '<pre>';
+    print_r(zzz);
+    echo '<b style=color:red>Developer SEDANG DEBUGING: exit(true)</b></pre>';
+    exit;
     # ============================================================
     # PENAMBAHAN CUSTOM PEMERIKSAAN LAB UNTUK PERUSAHAAN TERTENTU
     # ============================================================
@@ -306,7 +310,7 @@ if (mysqli_num_rows($qpasien)) {
         'RONTGEN' => 9,
         'KMD' => 2
       ];
-    } elseif ($id_perusahaan == 41) { // BEN MAKMUR
+    } elseif ($id_perusahaan == 41 || $id_perusahaan == 42) { // BEN MAKMUR
       $id_labs = [
         'URINE' => 20,
         'HEMA' => 3,
@@ -474,7 +478,7 @@ if (mysqli_num_rows($qpasien)) {
       $h = strpos(strtolower("salt$hasil_lab[KMD]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[KMD]";
       $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=KMD&id_pemeriksaan=$id_labs[KMD]'>$h</a>";
       $td_tambahan = "<td><span class=hideit>KIMIA DARAH</span>$h</td>";
-    } elseif ($id_perusahaan == 41) {
+    } elseif ($id_perusahaan == 41 || $id_perusahaan == 42) {
       $h = strpos(strtolower("salt$hasil_lab[ASAM_URAT]"), 'normal') ? '<span class=black>normal</span>' : "$hasil_lab[ASAM_URAT]";
       $h = "<a target=_blank href='?hasil_pemeriksaan&id_pasien=$id_pasien&jenis=ASAM_URAT&id_pemeriksaan=$id_labs[ASAM_URAT]'>$h</a>";
       $ASAMU = "<div><span class='bold'>ASAM.U</span>: $h</div>";
@@ -637,7 +641,7 @@ array_push($arr_head,   'RONTGEN');
 # ============================================================
 if ($id_perusahaan == 27) { // smk tb
   array_push($arr_head, 'KIMIA DARAH');
-} elseif ($id_perusahaan == 41) { // ben makmur
+} elseif ($id_perusahaan == 41 || $id_perusahaan == 42) { // ben makmur
   array_push($arr_head, 'KIMIA DARAH');
   // array_push($arr_head, 'GLUKOSA_SEWAKTU');
   // array_push($arr_head, 'CHOLESTEROL_TOTAL');
@@ -703,7 +707,7 @@ if ($mode == 'detail') {
   ];
 
   // sementara untuk SMK-TB
-  if ($id_perusahaan == 27 || $id_perusahaan == 41) { // SMK-TB || BEN-MAKMUR
+  if ($id_perusahaan == 27 || $id_perusahaan == 41 || $id_perusahaan == 42) { // SMK-TB || BEN-MAKMUR
     $arr_head = [
       'PASIEN MCU',
       'KELUHAN',

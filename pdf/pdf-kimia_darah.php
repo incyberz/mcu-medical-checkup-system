@@ -21,7 +21,7 @@ $s = "SELECT * FROM tb_pemeriksaan_detail WHERE id_pemeriksaan=$id_pemeriksaan";
 # ============================================================
 # KHUSUS BEN MAKMUR
 # ============================================================
-if ($id_perusahaan == 41) {
+if ($id_perusahaan == 41 || $id_perusahaan == 42) {
   $s = "SELECT * FROM tb_pemeriksaan_detail 
   WHERE id_pemeriksaan=43 -- ASAM_URAT
   OR id_pemeriksaan=46 -- GLUKOSA_SEWAKTU
